@@ -1,72 +1,126 @@
-NAME	= ms
+NAME					:= minishell
 
-#Commands
-CC		= gcc
-RM		= rm -f
-CFLAGS	= -g#-O3 #-Wall -Wextra -Werror 
+UNAME_S					:= $(shell uname -s)
 
-#Variables
-INCLUDE_DIR = ./includes/
-LIBFT_DIR = ./librairies/libft/
-LIBFT = $(LIBFT_DIR)libft.a
-LIBFT_HEADERS = $(LIBFT_DIR)./
+ifeq ($(UNAME_S),Linux)
+  FSANITIZELEAK			:= -fsanitize=leak
+  FRAMEWORK				:=
+  LINUX_LIBS			:=
+  LINUX_INCLUDES		:= -I/usr/include
+  OS_FLAG				:= -D LINUX
+else
+  FSANITIZELEAK			:=
+  FRAMEWORK				:=
+  LINUX_LIBS			:=
+  LINUX_INCLUDES		:=
+  OS_FLAG				:= -D OSX
+endif
 
-LIBRAIRIES = -lreadline -L. -L$(LIBFT_DIR) -lft
-INCLUDES = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)
+ifndef addressoff
+	FSANADDRESS			:= -fsanitize=address
+else
+	FSANADDRESS			:=
+endif
 
-SOURCES_DIR = ./sources/
-SOURCES_LIST = main replace_envvar helpers
-SOURCES	= $(foreach wrd,$(SOURCES_LIST), $(SOURCES_DIR)$(wrd).c)
+ifndef fsanitizeoff
+	FSANITIZE			:= -fno-omit-frame-pointer -fstack-protector-all $(FSANADDRESS) $(FSANITIZELEAK)
+else
+	FSANITIZE			:=
+endif
 
-OBJECTS_DIR = ./objects/
-OBJECTS	= $(foreach wrd,$(SOURCES_LIST), $(OBJECTS_DIR)$(wrd).o)
+ifdef DEBUG
+	DEVFLAGS			:= -ggdb $(FSANITIZE)
+	OPTFLAG				:= -O0
+else
+	DEVFLAGS			:=
+	OPTFLAG				:= -O3
+endif
 
-#Unit Testing
-TEST_DIR = ./tests/
-SOURCES_TEST = $(subst main,,$(SOURCES_LIST))
-OBJECTS_TEST = $(foreach wrd,$(SOURCES_TEST), $(OBJECTS_DIR)$(wrd).o)
+CC						:= cc
+CFLAGS					:= -Wall -Wextra -Werror -pedantic $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
+RM						:= rm -f
 
-#Coolors
-RESET = \033[0;39m
-GREEN = \033[0;92m
-RED = \033[0;91m
-BLUE = \033[0;94m
-BOLD = \033[0;1m
+LIB_DIRECTORY			:= ./librairies/
 
-#makes
-all:		${NAME}
+LIBFT					:= $(LIBFT_DIRECTORY)libft.a
+LIBFT_DIRECTORY			:= $(LIB_DIRECTORY)libft/
+LIBFT_HEADERS			:= $(LIBFT_DIRECTORY)includes/
 
-$(OBJECTS_DIR):
-	mkdir -p $(OBJECTS_DIR)
+LIBPRINTF				:= $(LIBPRINTF_DIRECTORY)libftprintf.a
+LIBPRINTF_DIRECTORY		:= $(LIB_DIRECTORY)libprintf/
+LIBPRINTF_HEADERS		:= $(LIBPRINTF_DIRECTORY)includes/
 
-$(OBJECTS_DIR)%.o : $(SOURCES_DIR)%.c
+INCLUDE_DIR				:= ./includes/
+
+# lm: default math lib
+LIBRARIES				:= -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINTF_DIRECTORY) $(FRAMEWORK) $(LINUX_LIBS)
+INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES)
+
+SOURCES_DIRECTORY		:= ./sources/
+SOURCES_LIST			:= main.c\
+							helpers.c\
+							replace_envvar.c
+
+HEADER_LIST				:= ms.h
+HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))
+
+OBJECTS_DIRECTORY		:= objects/
+OBJECTS_LIST			:= $(patsubst %.c, %.o, $(SOURCES_LIST))
+OBJECTS					:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
+
+
+.PHONY: all clean fclean re
+
+all: $(NAME)
+
+bonus: all
+
+$(OBJECTS_DIRECTORY):
+	mkdir -p $(OBJECTS_DIRECTORY)
+
+$(OBJECTS_DIRECTORY)%.o : $(SOURCES_DIRECTORY)%.c $(HEADER_FILES)
 	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
 
 $(LIBFT):
 	@echo "$(NAME): Creating $(LIBFT)..."
-	@$(MAKE) -sC $(LIBFT_DIR)
+	@$(MAKE) -sC $(LIBFT_DIRECTORY)
 
-$(NAME): $(LIBFT) $(OBJECTS_DIR) $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LIBRAIRIES) $(INCLUDES) -o $(NAME)
+$(LIBPRINTF):
+	@echo "$(NAME): Creating $(LIBPRINTF)..."
+	@$(MAKE) -sC $(LIBPRINTF_DIRECTORY)
+
+$(NAME): $(LIBFT) $(LIBPRINTF) $(OBJECTS_DIRECTORY) $(OBJECTS) $(HEADER_FILES)
+	$(CC) $(CFLAGS) $(OBJECTS) $(LIBRARIES) $(INCLUDES) -o $(NAME)
+
 
 clean:
-	@$(MAKE) -sC $(LIBFT_DIR) clean
-	@rm -rf $(OBJECTS_DIR)
-	@echo "$(NAME): $(RED)object files were deleted$(RESET)"
+	$(MAKE) -sC $(LIBPRINTF_DIRECTORY) clean
+	$(MAKE) -sC $(LIBFT_DIRECTORY) clean
+	rm -rf $(OBJECTS_DIRECTORY)
+	rm -rf *.dSYM
 
-fclean:		clean
-	@$(MAKE) -sC $(LIBFT_DIR) fclean
-	@$(RM) $(NAME)
-	@echo "$(NAME): $(NAME) was deleted"
+
+clean_pipex:
+	rm -rf $(OBJECTS_DIRECTORY)
+	rm -rf *.dSYM
+
+
+fclean: clean
+	$(MAKE) -sC $(LIBFT_DIRECTORY) fclean
+	$(MAKE) -sC $(LIBPRINTF_DIRECTORY) fclean
+	rm -f $(NAME)
+
 
 re: fclean all
 
-$(OBJECTS_DIR)%.o : $(TEST_DIR)%.c
-	@$(CC) $(CFLAGS) -c $(LIBRAIRIES) $(INCLUDES) $< -o $@
+norm:
+	norminette includes/ sources/ libs/libft/ libs/libprintf/
 
-test: $(LIBFT) $(OBJECTS_DIR) $(OBJECTS_TEST) $(OBJECTS_DIR)unit_envvar.o
-	@$(CC) $(CFLAGS) $(OBJECTS_DIR)unit_envvar.o $(OBJECTS_TEST) $(LIBRAIRIES) $(INCLUDES) -o $(TEST_DIR)temp
-	@./$(TEST_DIR)temp
-	@rm $(TEST_DIR)temp
+funcs: $(NAME)
+	@echo "Functions used in $(NAME):"
+	nm -u $(NAME)
 
-.PHONY:		all clean fclean re bonus test
+francinette_lft:
+	cd libs/libft && cp includes/libft.h .
+	cd libs/libft && ~/francinette/tester.sh
+	cd libs/libft && rm libft.h

@@ -1,1 +1,17 @@
 minishell
+.idea/*
+**/*.o
+**/*.a
+objects
+**/*.dylib
+**/*.swp
+*.dSYM
+*.dSYM/
+*.dSYM/*
+**/artix_pull
+**/artix_push
+**/*.DS_Store
+venv
+venv/
+venv/*
+builds/*

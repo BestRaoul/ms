@@ -3,23 +3,23 @@ NAME					:= minishell
 UNAME_S					:= $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
-  FSANITIZELEAK			:= -fsanitize=leak
-  FRAMEWORK				:=
-  LINUX_LIBS			:=
   LINUX_INCLUDES		:= -I/usr/include
   OS_FLAG				:= -D LINUX
 else
-  FSANITIZELEAK			:=
-  FRAMEWORK				:=
-  LINUX_LIBS			:=
   LINUX_INCLUDES		:=
   OS_FLAG				:= -D OSX
 endif
 
-ifndef addressoff
+ifdef address
 	FSANADDRESS			:= -fsanitize=address
 else
 	FSANADDRESS			:=
+endif
+
+ifdef leak
+	FSANITIZELEAK		:= -fsanitize=leak
+else
+	FSANITIZELEAK		:=
 endif
 
 ifndef fsanitizeoff
@@ -53,7 +53,7 @@ LIBPRINTF_HEADERS		:= $(LIBPRINTF_DIRECTORY)includes/
 INCLUDE_DIR				:= ./includes/
 
 # lm: default math lib
-LIBRARIES				:= -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINTF_DIRECTORY) $(FRAMEWORK) $(LINUX_LIBS)
+LIBRARIES				:= -lreadline -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINTF_DIRECTORY) $(FRAMEWORK) $(LINUX_LIBS)
 INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES)
 
 SOURCES_DIRECTORY		:= ./sources/
@@ -68,6 +68,10 @@ OBJECTS_DIRECTORY		:= objects/
 OBJECTS_LIST			:= $(patsubst %.c, %.o, $(SOURCES_LIST))
 OBJECTS					:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
+#Unit Testing
+TEST_DIR = ./tests/
+SOURCES_TEST = $(subst main,,$(SOURCES_LIST))
+OBJECTS_TEST = $(foreach wrd,$(SOURCES_TEST), $(OBJECTS_DIR)$(wrd).o)
 
 .PHONY: all clean fclean re
 

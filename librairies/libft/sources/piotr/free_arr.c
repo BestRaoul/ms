@@ -1,20 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vector3.c                                          :+:      :+:    :+:   */
+/*   free_arr.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
+/*   By: pkondrac <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/20 11:12:16 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/20 11:12:18 by jwikiera         ###   ########.fr       */
+/*   Created: 2022/10/26 09:20:59 by pkondrac          #+#    #+#             */
+/*   Updated: 2022/10/28 15:14:27 by pkondrac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-t_vec3d	*cross(t_vec3d *v1, t_vec3d *v2)
+void	*free_arr(void **arr)
 {
-	return (new_vect3d(v1->y * v2->z - v1->z * v2->y,
-			v1->x * v2->z - v1->z * v2->x,
-			v1->x * v2->y - v1->y * v2->x));
+	int	i;
+
+	if (arr != NULL)
+	{
+		i = 0;
+		while (arr[i] != NULL)
+			free(arr[i++]);
+		free(arr);
+	}
+	return (NULL);
 }

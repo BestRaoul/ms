@@ -1,5 +1,7 @@
 #include "ms.h"
 
+/* (cat file1 | grep '\"lol\"') && (cat file2 | grep bruh) */
+
 int	main(void)
 {
 	static char	question[100] = "";

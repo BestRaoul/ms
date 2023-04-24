@@ -47,7 +47,7 @@ LIBFT_DIRECTORY			:= $(LIB_DIRECTORY)libft/
 LIBFT_HEADERS			:= $(LIBFT_DIRECTORY)includes/
 
 LIBPRINTF				:= $(LIBPRINTF_DIRECTORY)libftprintf.a
-LIBPRINTF_DIRECTORY		:= $(LIB_DIRECTORY)libprintf/
+LIBPRINTF_DIRECTORY		:= $(LIB_DIRECTORY)ft_printf/
 LIBPRINTF_HEADERS		:= $(LIBPRINTF_DIRECTORY)includes/
 
 INCLUDE_DIR				:= ./includes/
@@ -59,7 +59,8 @@ INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINU
 SOURCES_DIRECTORY		:= ./sources/
 SOURCES_LIST			:= main.c\
 							helpers.c\
-							replace_envvar.c
+							replace_envvar.c\
+							lexer_helper.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

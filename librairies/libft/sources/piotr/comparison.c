@@ -1,25 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*  vec2d.c                                             :+:      :+:    :+:   */
+/*   comarision.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
+/*   By: pkondrac <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/20 11:12:16 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/20 11:12:18 by jwikiera         ###   ########.fr       */
+/*   Created: 2022/10/26 09:20:59 by pkondrac          #+#    #+#             */
+/*   Updated: 2022/10/28 15:14:27 by pkondrac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-t_vec2d	*new_vect2d(double x, double y)
+int	eq(int x, int y)
 {
-	t_vec2d	*res;
+	return (x == y);
+}
 
-	res = malloc(sizeof(*res));
-	if (!res)
-		return (NULL);
-	res->x = x;
-	res->y = y;
-	return (res);
+int	less(int x, int y)
+{
+	return (x < y);
+}
+
+int	less_eq(int x, int y)
+{
+	return (x <= y);
+}
+
+int	more(int x, int y)
+{
+	return (x > y);
+}
+
+int	more_eq(int x, int y)
+{
+	return (x >= y);
 }

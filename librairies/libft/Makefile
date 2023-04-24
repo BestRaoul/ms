@@ -148,9 +148,22 @@ SRCS_OWN_LIST		:= ft_str_starts_ends_with.c\
 						ft_pwd_is_ex.c\
 						ft_strjoin2.c\
 						ft_strequal.c
-
 OBJS_OWN_LIST		:= $(patsubst %.c, %.o, $(SRCS_OWN_LIST))
 OBJS_OWN			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_OWN_LIST))
+
+DICT_DIR			:= $(SOURCES_DIRECTORY)dict/
+SRCS_DICT_LIST		:= dict.c
+OBJS_DICT_LIST		:= $(patsubst %.c, %.o, $(SRCS_DICT_LIST))
+OBJS_DICT			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_DICT_LIST))
+
+PIOTR_DIR			:= $(SOURCES_DIRECTORY)piotr/
+SRCS_PIOTR_LIST		:= comparison.c\
+						free_arr.c\
+						frees.c\
+						ft_atod.c\
+						ft_intr.c\
+						ft_size.c
+OBJS_PIOTR_LIST		:= $(patsubst %.c, %.o, $(SRCS_PIOTR_LIST))
 
 INCLUDE_DIR			:= ./includes/
 
@@ -158,7 +171,7 @@ HEADER_LIST			:= get_next_line.h\
 						libft.h
 HEADER_FILES		:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))
 
-ALL_SRCS_LIST		:= $(SRCS_BONUS_LIST) $(SRCS_GNL_LIST) $(SRCS_MANDATORY_LIST) $(SRCS_MATH_LIST) $(SRCS_OWN_LIST) $(SRCS_VEC_LIST)
+ALL_SRCS_LIST		:= $(SRCS_BONUS_LIST) $(SRCS_GNL_LIST) $(SRCS_MANDATORY_LIST) $(SRCS_MATH_LIST) $(SRCS_OWN_LIST) $(SRCS_VEC_LIST) $(SRCS_DICT_LIST)  $(SRCS_PIOTR_LIST)
 OBJECTS_LIST		:= $(patsubst %.c, %.o, $(ALL_SRCS_LIST))
 OBJECTS				:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
@@ -197,6 +210,12 @@ $(OBJECTS_DIRECTORY)%.o : $(OWN_DIR)%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
 
 $(OBJECTS_DIRECTORY)%.o : $(VEC_DIR)%.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
+
+$(OBJECTS_DIRECTORY)%.o : $(DICT_DIR)%.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
+
+$(OBJECTS_DIRECTORY)%.o : $(PIOTR_DIR)%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
 
 $(NAME): $(OBJECTS_DIRECTORY) $(OBJECTS) $(HEADER_FILES)

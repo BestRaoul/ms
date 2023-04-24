@@ -44,4 +44,17 @@ char	*join(char **strr, char *joint);
 int	in(char c, char *str);
 int	is_azAZ09_(char c);
 void	replace_env_variables(char *input, char **input_ptr);
+
+enum TokenTypes {
+	LPAREN = 0,
+	RPAREN = 1,
+	PIPE = 2,
+	REDIRLEFT = 3,
+	REDIRRIGHT = 4,
+	HEREDOC = 5,
+	AND = 6,
+	OR = 7,
+	COMMAND = 8,
+	ARG = 9
+};
 #endif

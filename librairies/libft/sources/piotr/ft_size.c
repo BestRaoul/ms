@@ -1,20 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   matrix2.c                                          :+:      :+:    :+:   */
+/*   ft_size.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
+/*   By: pkondrac <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/20 11:12:16 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/20 11:12:18 by jwikiera         ###   ########.fr       */
+/*   Created: 2022/10/26 09:20:59 by pkondrac          #+#    #+#             */
+/*   Updated: 2022/10/28 15:14:27 by pkondrac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*free_matrix3d(t_matrix3d *m)
+int	ft_size(char **arr)
 {
-	free_vectors(m->v1, m->v2, m->v3, 0);
-	free(m);
-	return (NULL);
+	int	i;
+
+	i = 0;
+	while (arr[i] != NULL)
+		i++;
+	return (i);
 }

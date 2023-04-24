@@ -419,4 +419,41 @@ t_vec3d		*project_perspective(t_vec3d *point, t_plane3d *plane,
 t_vec3d		*project_orthogonal(t_vec3d *point, t_plane3d *plane,
 				t_screen_info *screen_info);
 
+/* dict */
+typedef struct s_dict_int_str
+{
+	t_list	*lst;
+}	t_dict_int_str;
+
+typedef struct s_dict_int_str_member
+{
+	int		key;
+	char	*value;
+}	t_dict_int_str_member;
+
+//int	dict_int_str_insert(t_dict_int_str *dict, int key, char *value);
+
+/* creates a t_dict_int_str_member. passed char is copied */
+t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value);
+void					t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member);
+
+/* piotr */
+int		ft_printf(const char *format, ...);
+char	*ft_allocprintf(const char *format, ...);
+char	*ft_yoloprintf(char *str, const char *format, ...);
+double	ft_atod(const char *str);
+int		find_intr(int x, int *r, int size);
+int		get_intr(int (*compare)(int, int), int *r, int size);
+int		count_intr(int (*f)(int), int *r, int size);
+int		countx_intr(int x, int (*compare)(int, int), int *r, int size);
+void	*free_arr(void **arr);
+void	*frees(int count, ...);
+void	*frees2(int count, ...);
+int		ft_size(char **arr);
+int		eq(int x, int y);
+int		less(int x, int y);
+int		less_eq(int x, int y);
+int		more(int x, int y);
+int		more_eq(int x, int y);
+
 #endif

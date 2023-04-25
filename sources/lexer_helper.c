@@ -36,7 +36,8 @@ t_list	*scan_tokens(char *s)
 	int		i;
 	int		start;
 
-	start = 0;
+	(void) start;
+	//start = 0;
 	i = 0;
 	while (s[i])
 	{

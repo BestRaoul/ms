@@ -289,6 +289,9 @@ char		*ft_strjoin2(const char *word, ...);
 /* performs two strncmps with both string lengths */
 int			ft_strequal(const char *s1, const char *s2);
 
+/* ft_strlen but returns int */
+int			ft_strlen_int(const char *s);
+
 /* math */
 int			ft_min_int(int a, int b);
 int			ft_max_int(int a, int b);
@@ -306,118 +309,6 @@ double		cos_approx(double angle);
 double		sin_approx(double angle);
 double		tan_approx(double angle);
 double		deg_to_rad(double angle);
-
-/* minilibx color */
-int			argb_to_int(int a, int r, int g, int b);
-int			get_a(int argb);
-int			get_r(int argb);
-int			get_g(int argb);
-int			get_b(int argb);
-
-/* vector */
-typedef struct s_vec2d
-{
-	int	x;
-	int	y;
-}	t_vec2d;
-
-typedef struct s_vec3d
-{
-	double	x;
-	double	y;
-	double	z;
-}	t_vec3d;
-
-typedef struct s_matrix3d
-{
-	t_vec3d	*v1;
-	t_vec3d	*v2;
-	t_vec3d	*v3;
-}	t_matrix3d;
-
-typedef struct s_line3d
-{
-	t_vec3d	*p1;
-	t_vec3d	*p2;
-	t_vec3d	*v1;
-}	t_line3d;
-
-typedef struct s_plane3d
-{
-	t_vec3d	*p1;
-	t_vec3d	*p2;
-	t_vec3d	*p3;
-	t_vec3d	*v1;
-	t_vec3d	*v2;
-}	t_plane3d;
-
-enum e_projection {orthogonal = 0, perspective = 1};
-
-typedef struct s_screen_info
-{
-	int					width;
-	int					height;
-	double				eye_z;
-	t_matrix3d			*rotation_matrix;
-	t_vec3d				*rotation_center;
-	int					rotation_speed;
-	int					screen_depth;
-	t_plane3d			*screen_plane;
-	int					background_color;
-	int					pos_x;
-	int					pos_y;
-	int					pos_z;
-	int					mov_speed;
-	int					zoom_speed;
-	enum e_projection	projection;
-}	t_screen_info;
-
-t_vec2d		*new_vect2d(double x, double y);
-
-double		determinant(t_vec3d *v1, t_vec3d *v2, t_vec3d *v3);
-t_vec3d		*solve_general(t_vec3d *v1, t_vec3d *v2, t_vec3d *v3,
-				t_vec3d *v_sol);
-
-enum e_rotation {axis_x = 0, axis_y = 1, axis_z = 2};
-t_matrix3d	*get_rotation_matrix(double angle,
-				enum e_rotation axis, int is_rad);
-void		add_angle_to_rotation_matrix(t_matrix3d *matrix, double angle,
-				enum e_rotation axis, int is_rad);
-
-t_matrix3d	*new_matrix(t_vec3d *v1, t_vec3d *v2, t_vec3d *v3);
-void		*free_matrix3d(t_matrix3d *m);
-int			valid_matrix(t_matrix3d *m);
-t_vec3d		*matrix_mult_vec(t_matrix3d *matrix, t_vec3d *vec);
-t_matrix3d	*matrix_mult(t_matrix3d *m1, t_matrix3d *m2);
-
-t_line3d	*line_from_points(t_vec3d *p1, t_vec3d *p2);
-t_vec3d		*line_plane_intersect3d(t_line3d *line, t_plane3d *plane);
-t_line3d	*line_from_point_and_vec(t_vec3d *p, t_vec3d *d);
-void		free_line3d(t_line3d *line3d);
-
-t_plane3d	*plane_from_points(t_vec3d *p1, t_vec3d *p2, t_vec3d *p3);
-t_plane3d	*plane_from_point_and_vecs(t_vec3d *p, t_vec3d *u, t_vec3d *v);
-void		free_plane3d(t_plane3d *plane3d);
-
-t_vec3d		*new_vect3d(double x, double y, double z);
-void		*free_vectors(t_vec3d *v1, t_vec3d *v2, t_vec3d *v3, t_vec3d *v4);
-t_vec3d		*vec_add(t_vec3d *v1, t_vec3d *v2);
-void		add_vec_inplace(t_vec3d *addee, t_vec3d *added);
-void		sub_vec_inplace(t_vec3d *substractee, t_vec3d *substracted);
-t_vec3d		*vec_sub(t_vec3d *v1, t_vec3d *v2);
-t_vec3d		*vec_scale(t_vec3d *v, double scalar);
-void		scale_vec_inplace(t_vec3d *v, double scalar);
-t_vec3d		*vec_invert(t_vec3d *v);
-void		invert_vec_inplace(t_vec3d *v);
-
-t_vec3d		*cross(t_vec3d *v1, t_vec3d *v2);
-
-t_vec3d		*apply_rotation_matrix_to_point(t_vec3d *point,
-				t_screen_info *screen_info);
-t_vec3d		*project_perspective(t_vec3d *point, t_plane3d *plane,
-				t_screen_info *screen_info);
-t_vec3d		*project_orthogonal(t_vec3d *point, t_plane3d *plane,
-				t_screen_info *screen_info);
 
 /* dict */
 typedef struct s_dict_int_str

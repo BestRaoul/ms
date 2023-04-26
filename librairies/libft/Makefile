@@ -64,8 +64,7 @@ MATH_DIR				:= $(SOURCES_DIRECTORY)math/
 SRCS_MATH_LIST			:= math1.c\
 							math2.c\
 							math3.c\
-							trig.c\
-							equation.c
+							trig.c
 OBJS_MATH_LIST		:= $(patsubst %.c, %.o, $(SRCS_MATH_LIST))
 OBJS_MATH			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_MATH_LIST))
 
@@ -87,7 +86,6 @@ OBJS_VEC			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_VEC_LIST))
 OWN_DIR				:= $(SOURCES_DIRECTORY)own/
 SRCS_OWN_LIST		:= ft_str_starts_ends_with.c\
 						ft_realloc.c\
-						color.c\
 						ft_str_is_int.c\
 						ft_powertrim.c\
 						ft_powertrim_chr.c\

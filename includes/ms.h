@@ -40,21 +40,31 @@ char	*chop(char *str, int end);
 char	*_scan(char *str, int (*f)(char));
 char	*join(char **strr, char *joint);
 
+//wildcards
+char	**wildmatches(char *token, char *cwd);
+
 //replace_envvar.c
 int	in(char c, char *str);
 int	is_azAZ09_(char c);
 void	replace_env_variables(char *input, char **input_ptr);
 
+
+/*
+ * todo: maybe add LITERALWILD to mark a literal that can be wildcarded
+ * because I don't think export accepts wildcards
+ * */
 enum TokenTypes {
 	LPAREN = 0,
 	RPAREN = 1,
 	PIPE = 2,
 	REDIRLEFT = 3,
 	REDIRRIGHT = 4,
-	HEREDOC = 5,
-	AND = 6,
-	OR = 7,
-	COMMAND = 8,
-	ARG = 9
+	EQUAL = 5,
+	HEREDOC = 6,
+	APPEND = 7,
+	AND = 8,
+	OR = 9,
+	LITERAL = 10,
+	//ARG = 10
 };
 #endif

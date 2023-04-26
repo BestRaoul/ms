@@ -1,7 +1,6 @@
-/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   wildcard.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jwikiera <jwikiera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,30 +9,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ms.h"
 
-size_t	ft_strlen(const char *s)
+/* returns NULL-terminated strarray with all possible matches */
+char	**wildmatches(char *token, char *cwd)
 {
-	size_t	i;
-
-	i = 0;
-	while (s[0])
-	{
-		s ++;
-		i ++;
-	}
-	return (i);
-}
-
-int	ft_strlen_int(const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[0])
-	{
-		s ++;
-		i ++;
-	}
-	return (i);
+	(void) token;
+	(void) cwd;
+	return (NULL);
 }

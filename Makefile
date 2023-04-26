@@ -60,7 +60,8 @@ SOURCES_DIRECTORY		:= ./sources/
 SOURCES_LIST			:= main.c\
 							helpers.c\
 							replace_envvar.c\
-							lexer_helper.c
+							lexer_helper.c\
+							wildcard.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

@@ -39,6 +39,10 @@ int		count(char c, char *str);
 char	*chop(char *str, int end);
 char	*_scan(char *str, int (*f)(char));
 char	*join(char **strr, char *joint);
+void	print_lexeme_tlist(t_list *lst);
+
+// lexing
+t_list	*scan_tokens(char *s);
 
 //wildcards
 char	**wildmatches(char *token, char *cwd);
@@ -48,11 +52,13 @@ int	in(char c, char *str);
 int	is_azAZ09_(char c);
 void	replace_env_variables(char *input, char **input_ptr);
 
+/* stub function replacing $vars with their values */
+char	*handle_env(char *s);
 
-/*
- * todo: maybe add LITERALWILD to mark a literal that can be wildcarded
- * because I don't think export accepts wildcards
- * */
+/* stub function returning files matching wildcard */
+char	*handle_wildcard(char *s);
+
+// TODO: mor literal types telling if they can be substituted or not
 enum TokenTypes {
 	LPAREN = 0,
 	RPAREN = 1,

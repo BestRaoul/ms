@@ -13,7 +13,7 @@
 #include "ms.h"
 
 /* returns -1 if a malloc fails, otherwise length of lexeme */
-int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst)
+int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int advance_len)
 {
 	t_dict_int_str_member	*member;
 	t_list					*new;
@@ -32,7 +32,7 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst)
 		return (1);
 	if (type == HEREDOC || type == APPEND || type == AND || type == OR)
 		return (2);
-	return (ft_strlen_int(value));
+	return (advance_len);
 }
 
 /* expansion, but no wildcards */
@@ -46,13 +46,23 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	word = NULL;
 	i = 1;
 	while (s[pos + i] && (s[pos + i] != '"' || !ft_chr_escaped(pos + i, s + pos)))
-		i ++;
-	literal = ft_calloc((i - 1), sizeof(*literal));
+	{
+		if (!ft_lstadd_chr(s[pos + 1], &word))
+		{
+			//todo free word
+			return (-1);
+		}
+		i++;
+	}
+	literal = ft_tlst_to_str(word);
 	if (!literal)
+	{
+		//todo free word
 		return (-1);
-	ft_strlcpy(literal, s + pos + 1, i);
-	insert_res = insert_token_into_lst(LITERAL, literal, lst);
+	}
+	insert_res = insert_token_into_lst(LITERAL, literal, lst, i + 2);
 	free(literal);
+	//todo free word
 	return (insert_res);
 }
 
@@ -70,23 +80,46 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	if (!literal)
 		return (-1);
 	ft_strlcpy(literal, s + pos + 1, i);
-	insert_res = insert_token_into_lst(LITERAL, literal, lst);
+	insert_res = insert_token_into_lst(LITERAL, literal, lst, i + 2);
 	free(literal);
 	return (insert_res);
 }
 
 /* like double quote but stops at non literal chars and handles wildcards
  * important to remember that lol\ lel is one word ('lol lel')
+ * variable substitution happens prior to wildcard matching
  * */
 int	handle_noquote(t_list **lst, char *s, int pos)
 {
-	(void) lst;
-	(void) s;
-	(void) pos;
-	return (0);
+	char	*literal;
+	int		insert_res;
+	int		i;
+	t_list	*word;
+
+	word = NULL;
+	i = 1;
+	while (s[pos + i] && (ft_isspace(s[pos + i]) || !ft_chr_escaped(pos + i, s + pos)))
+	{
+		if (!ft_lstadd_chr(s[pos + 1], &word))
+		{
+			//todo free word
+			return (-1);
+		}
+		i++;
+	}
+	literal = ft_tlst_to_str(word);
+	if (!literal)
+	{
+		//todo free word
+		return (-1);
+	}
+	insert_res = insert_token_into_lst(LITERAL, literal, lst, i);
+	free(literal);
+	//todo free word
+	return (insert_res);
 }
 
-/* returns -1 if a malloc fails, -2 if unknown char, otherwise length of lexeme */
+/* returns -1 if a malloc fails, -2 if unknown char, otherwise length to advance */
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {
 	char	c1;
@@ -95,29 +128,33 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	c1 = s[pos];
 	c2 = s[pos + 1];
 	if (c1 == '(')
-		return (insert_token_into_lst(LPAREN, NULL, lst));
+		return (insert_token_into_lst(LPAREN, NULL, lst, -1));
 	if (c1 == ')')
-		return (insert_token_into_lst(RPAREN, NULL, lst));
+		return (insert_token_into_lst(RPAREN, NULL, lst, -1));
 	if (c1 == '|' && c2 != '|')
-		return (insert_token_into_lst(PIPE, NULL, lst));
+		return (insert_token_into_lst(PIPE, NULL, lst, -1));
 	if (c1 == '<' && c2 != '<')
-		return (insert_token_into_lst(REDIRLEFT, NULL, lst));
+		return (insert_token_into_lst(REDIRLEFT, NULL, lst, -1));
 	if (c1 == '>' && c2 != '>')
-		return (insert_token_into_lst(REDIRRIGHT, NULL, lst));
+		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, -1));
 	if (c1 == '=')
-		return (insert_token_into_lst(EQUAL, NULL, lst));
+		return (insert_token_into_lst(EQUAL, NULL, lst, -1));
 	if (c1 == '&')
-		return (insert_token_into_lst(AND, NULL, lst));
+		return (insert_token_into_lst(AND, NULL, lst, -1));
 	if (c1 == '|')
-		return (insert_token_into_lst(OR, NULL, lst));
+		return (insert_token_into_lst(OR, NULL, lst, -1));
 	if (c1 == '<')
-		return (insert_token_into_lst(HEREDOC, NULL, lst));
+		return (insert_token_into_lst(HEREDOC, NULL, lst, -1));
 	if (c1 == '>')
-		return (insert_token_into_lst(APPEND, NULL, lst));
+		return (insert_token_into_lst(APPEND, NULL, lst, -1));
 	if (ft_isspace(c1))
 		return (1);
 	if (c1 == '\'')
 		return (handle_single_quote(lst, s, pos));
+	if (c1 == '"')
+		return (handle_double_quote(lst, s, pos));
+	if(1) // literals probably cant start with something
+		return (handle_noquote(lst, s, pos));
 	return (-2);
 }
 

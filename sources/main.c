@@ -16,6 +16,8 @@ int	main(void)
 			add_history(input);
 		replace_env_variables(input, &input);
 		printf("%s➜  %s%s\n", BPURPLE, RESET, input);
+		t_list	*lexemes = scan_tokens(input);
+		print_lexeme_tlist(lexemes);
 		if (strcmp(input, "exit") == 0)
 			break ;
 		free(input);

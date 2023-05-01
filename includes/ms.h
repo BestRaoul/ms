@@ -9,6 +9,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
+# include <dirent.h>
 
 # define RESET "\033[0m"
 //COLORS - normal
@@ -70,7 +71,9 @@ enum TokenTypes {
 	APPEND = 7,
 	AND = 8,
 	OR = 9,
-	LITERAL = 10,
+	LITERAL_NQ = 10,
+	LITERAL_SQ = 11,
+	LITERAL_DQ = 12,
 	//ARG = 10
 };
 #endif

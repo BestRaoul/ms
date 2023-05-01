@@ -30,6 +30,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 			free(res);
 			return (NULL);
 		}
+		ft_strlcpy(res->value, value, ft_strlen(value) + 1);
 	}
 	return (res);
 }

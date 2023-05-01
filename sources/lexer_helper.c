@@ -45,9 +45,9 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 
 	word = NULL;
 	i = 1;
-	while (s[pos + i] && (s[pos + i] != '"' || !ft_chr_escaped(pos + i, s + pos)))
+	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos)))
 	{
-		if (!ft_lstadd_chr(s[pos + 1], &word))
+		if (!ft_lstadd_chr(s[pos + i], &word))
 		{
 			//todo free word
 			return (-1);
@@ -60,7 +60,7 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 		//todo free word
 		return (-1);
 	}
-	insert_res = insert_token_into_lst(LITERAL, literal, lst, i + 2);
+	insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, i + 1);
 	free(literal);
 	//todo free word
 	return (insert_res);
@@ -80,9 +80,15 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	if (!literal)
 		return (-1);
 	ft_strlcpy(literal, s + pos + 1, i);
-	insert_res = insert_token_into_lst(LITERAL, literal, lst, i + 2);
+	insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, i + 2);
 	free(literal);
 	return (insert_res);
+}
+
+/* function that tells if a char can be part of an unquoted literal */
+int	valid_noquote_chr(char c)
+{
+	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>' && c != '=' && !ft_isspace(c));
 }
 
 /* like double quote but stops at non literal chars and handles wildcards
@@ -97,10 +103,10 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	t_list	*word;
 
 	word = NULL;
-	i = 1;
-	while (s[pos + i] && (ft_isspace(s[pos + i]) || !ft_chr_escaped(pos + i, s + pos)))
+	i = 0;
+	while (s[pos + i] && (valid_noquote_chr(s[pos + i]) || ft_chr_escaped(pos + i, s + pos)))
 	{
-		if (!ft_lstadd_chr(s[pos + 1], &word))
+		if (!ft_lstadd_chr(s[pos + i], &word))
 		{
 			//todo free word
 			return (-1);
@@ -113,7 +119,7 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 		//todo free word
 		return (-1);
 	}
-	insert_res = insert_token_into_lst(LITERAL, literal, lst, i);
+	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);
 	free(literal);
 	//todo free word
 	return (insert_res);
@@ -178,14 +184,15 @@ t_list	*scan_tokens(char *s)
 
 	(void) start;
 	//start = 0;
+	res = NULL;
 	i = 0;
 	while (s[i])
 	{
 		advance_len = handle_lexeme(&res, s, i);
+		//print_lexeme_tlist(res);
 		if (advance_len == -1)
 			return (tlst_error_exit(&res));
 		i += advance_len;
 	}
-	res = NULL;
 	return (res);
 }

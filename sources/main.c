@@ -7,6 +7,7 @@ int	main(void)
 	static char	question[100] = "";
 	char		*input;
 
+	wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 	sprintf(question, "%s➜  %s", BYELLOW, WHITE);
 	while (1)
 	{

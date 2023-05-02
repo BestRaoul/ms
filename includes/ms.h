@@ -41,6 +41,7 @@ char	*chop(char *str, int end);
 char	*_scan(char *str, int (*f)(char));
 char	*join(char **strr, char *joint);
 void	print_lexeme_tlist(t_list *lst);
+void	print_lexeme_tlist2(t_list *lst);
 
 // lexing
 t_list	*scan_tokens(char *s);
@@ -51,7 +52,7 @@ char	**wildmatches(char *token, char *cwd);
 //replace_envvar.c
 int	in(char c, char *str);
 int	is_azAZ09_(char c);
-void	replace_env_variables(char *input, char **input_ptr);
+void	replace_envvars(t_list *lexemes);
 
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);

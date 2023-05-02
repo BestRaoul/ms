@@ -13,30 +13,30 @@ int	is_azAZ09_(char c)
 		|| in(c, "UVWXYZ0123456789"));
 }
 
-void	replace_env_variables(char *input, char **input2)
+static char	*replace_envvar_str(char *literal)
 {
 	char	**out;
 	int		i;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', input)), sizeof(char*));
+	out = calloc((2 + 2 * count('$', literal)), sizeof(char*));
 	i = 0;
 	j = 0;
-	while (input[i] != '\0')
+	while (literal[i] != '\0')
 	{
-		int x = find('$', &input[i]); //-> $
-		if (x < 0) { x = len(&input[i]); } //-> 0
+		int x = find('$', &literal[i]); //-> $
+		if (x < 0) { x = len(&literal[i]); } //-> 0
 		if (x != 0) {
-			out[j] = chop(&input[i], x - 1);
+			out[j] = chop(&literal[i], x - 1);
 			//--NULLCHECK
 			i += len(out[j++]);
 		}
-		if (strncmp("$$", &input[i], 2) == 0)
+		if (strncmp("$$", &literal[i], 2) == 0)
 		{char pid[64]="";sprintf(pid, "%d", getpid()); out[j++] = strdup(pid);i+=2;}
-		else if (input[i] == '$')
+		else if (literal[i] == '$')
 		{
 			i++; //->PATH or ->0
-			char *envvar = _scan(&input[i], is_azAZ09_);
+			char *envvar = _scan(&literal[i], is_azAZ09_);
 			//--NULLCHECK
 			if (getenv(envvar)) { out[j] = strdup(getenv(envvar)); } //--NULLCHECK
 			else if (len(envvar) != 0) { out[j] = strdup(""); }
@@ -46,5 +46,24 @@ void	replace_env_variables(char *input, char **input2)
 		}
 	}
 	out[j] = NULL;
-	*input2 = join(out, ""); //frees
+	return join(out, ""); //frees
+}
+
+void	replace_envvars(t_list *lexemes)
+{
+	int	prevKey;
+
+	prevKey = -1;
+	while (lexemes != NULL)
+	{
+		int		key = ((t_dict_int_str_member *) lexemes->content)->key;
+		
+		if ((key == 10 || key == 11 || key == 12) && prevKey != HEREDOC)
+		{
+			((t_dict_int_str_member *) lexemes->content)->value = replace_envvar_str(((t_dict_int_str_member *) lexemes->content)->value);
+		}
+
+		prevKey = key;
+		lexemes = lexemes->next;
+	}
 }

@@ -27,7 +27,7 @@ char	*join(char **strr, char *joint)
 }
 
 /* 
- * Returns index of first occurence of char
+ * Returns index of first occurence of char, else -1
  */
 int	find(char c, char *str)
 {
@@ -44,7 +44,27 @@ int	find(char c, char *str)
 }
 
 /* 
- * Returns index of first matching char
+ * Returns index of first occurence of UNSECAPED-char, else -1
+ */
+int	find_noescape(char c, char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == c)
+		{
+			if (i == 0 || str[i - 1] != '\\')
+				return (i);
+		}
+		i++;
+	}
+	return (-1);
+}
+
+/* 
+ * Returns index of first matching char, else -1
  */
 int	findf(int (*match)(char), char *str)
 {
@@ -61,7 +81,7 @@ int	findf(int (*match)(char), char *str)
 }
 
 /* 
- * Returns index of first NON-matching char
+ * Returns index of first NON-matching char, else -1
  */
 int	findf_nt(int (*match)(char c), char *str)
 {
@@ -145,4 +165,21 @@ char	*_scan_nt(char *str, int (*checker)(char c))
 	if (i < 0)
 		i = len(str);
 	return (chop(str, i - 1));
+}
+
+/* 
+ * Returns allocated string of first consecutive matching characters
+ * also moves the pointer along the scan
+ */
+char	*_scan2(char **str_ptr, int (*checker)(char c))
+{
+	char	*res;
+	int		i;
+
+	i = findf_nt(checker, *str_ptr);
+	if (i < 0)
+		i = len(*str_ptr);
+	res = chop(*str_ptr, i - 1);
+	*str_ptr+=i;
+	return (res);
 }

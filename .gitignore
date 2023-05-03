@@ -15,3 +15,5 @@ venv
 venv/
 venv/*
 builds/*
+.idea
+.vscode

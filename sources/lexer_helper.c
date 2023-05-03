@@ -135,31 +135,31 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	c2 = s[pos + 1];
 	if (c1 == '(')
 		return (insert_token_into_lst(LPAREN, NULL, lst, -1));
-	if (c1 == ')')
+	else if (c1 == ')')
 		return (insert_token_into_lst(RPAREN, NULL, lst, -1));
-	if (c1 == '|' && c2 != '|')
+	else if (c1 == '|' && c2 != '|')
 		return (insert_token_into_lst(PIPE, NULL, lst, -1));
-	if (c1 == '<' && c2 != '<')
+	else if (c1 == '<' && c2 != '<')
 		return (insert_token_into_lst(REDIRLEFT, NULL, lst, -1));
-	if (c1 == '>' && c2 != '>')
+	else if (c1 == '>' && c2 != '>')
 		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, -1));
-	if (c1 == '=')
+	else if (c1 == '=')
 		return (insert_token_into_lst(EQUAL, NULL, lst, -1));
-	if (c1 == '&')
+	else if (c1 == '&')
 		return (insert_token_into_lst(AND, NULL, lst, -1));
-	if (c1 == '|')
+	else if (c1 == '|')
 		return (insert_token_into_lst(OR, NULL, lst, -1));
-	if (c1 == '<')
+	else if (c1 == '<')
 		return (insert_token_into_lst(HEREDOC, NULL, lst, -1));
-	if (c1 == '>')
+	else if (c1 == '>')
 		return (insert_token_into_lst(APPEND, NULL, lst, -1));
-	if (ft_isspace(c1))
+	else if (ft_isspace(c1))
 		return (1);
-	if (c1 == '\'')
+	else if (c1 == '\'')
 		return (handle_single_quote(lst, s, pos));
-	if (c1 == '"')
+	else if (c1 == '"')
 		return (handle_double_quote(lst, s, pos));
-	if(1) // literals probably cant start with something
+	else if(1) // literals probably cant start with something
 		return (handle_noquote(lst, s, pos));
 	return (-2);
 }

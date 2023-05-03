@@ -51,16 +51,18 @@ static char	*replace_envvar_str(char *literal)
 
 void	replace_envvars(t_list *lexemes)
 {
+	t_dict_int_str_member *mem;
 	int	prevKey;
 
 	prevKey = -1;
 	while (lexemes != NULL)
 	{
-		int		key = ((t_dict_int_str_member *) lexemes->content)->key;
+		mem = (t_dict_int_str_member *) lexemes->content;
+		int		key = mem->key;
 		
-		if ((key == 10 || key == 11 || key == 12) && prevKey != HEREDOC)
+		if ((key == LITERAL_NQ || key == LITERAL_DQ) && prevKey != HEREDOC)
 		{
-			((t_dict_int_str_member *) lexemes->content)->value = replace_envvar_str(((t_dict_int_str_member *) lexemes->content)->value);
+			mem->value = replace_envvar_str(mem->value);
 		}
 
 		prevKey = key;

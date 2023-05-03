@@ -39,6 +39,7 @@ int		len(char *str);
 int		count(char c, char *str);
 char	*chop(char *str, int end);
 char	*_scan(char *str, int (*f)(char));
+char	*_scan_nt(char *str, int (*f)(char));
 char	*join(char **strr, char *joint);
 void	print_lexeme_tlist(t_list *lst);
 void	print_lexeme_tlist2(t_list *lst);

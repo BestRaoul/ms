@@ -61,7 +61,7 @@ int	findf(int (*match)(char), char *str)
 }
 
 /* 
- * Returns index of first non-matching char
+ * Returns index of first NON-matching char
  */
 int	findf_nt(int (*match)(char c), char *str)
 {
@@ -105,8 +105,8 @@ int	count(char c, char *str)
 
 /* 
  * Returns allocated string (start inclusive, end exclusive)
+ //printf("CHOP %c(%d) -> %c(%d)\n", str[0], 0, str[end], end);
  */
-//printf("CHOP %c(%d) -> %c(%d)\n", str[0], 0, str[end], end);
 char	*chop(char *str, int end)
 {
 	char	temp;
@@ -129,6 +129,19 @@ char	*_scan(char *str, int (*checker)(char c))
 	int	i;
 
 	i = findf_nt(checker, str);
+	if (i < 0)
+		i = len(str);
+	return (chop(str, i - 1));
+}
+
+/* 
+ * Returns allocated string of first consecutive NON-matching characters
+ */
+char	*_scan_nt(char *str, int (*checker)(char c))
+{
+	int	i;
+
+	i = findf(checker, str);
 	if (i < 0)
 		i = len(str);
 	return (chop(str, i - 1));

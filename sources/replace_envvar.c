@@ -13,38 +13,85 @@ int	is_azAZ09_(char c)
 		|| in(c, "UVWXYZ0123456789"));
 }
 
-void	replace_env_variables(char *input, char **input2)
+static char *handle_var(char *envvar)
+{
+	ft_printf("[] = \'%s\' -> ",envvar);
+	if (len(envvar) == 0)
+		return (strdup("$"));
+	else if (getenv(envvar)) 
+		return (strdup(getenv(envvar)));
+	else
+		return (strdup(""));	
+}
+
+static char	*handle_dd()
+{
+	char	pid[64]="";
+
+	ft_yoloprintf(pid, "%d", getpid());
+	return strdup(pid);
+}
+
+char	*handle_env(char *literal)
 {
 	char	**out;
-	int		i;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', input)), sizeof(char*));
-	i = 0;
+	out = calloc((2 + 2 * count('$', literal)), sizeof(char*));
+	printf("%s: %d\n", literal, 2 + 2 * count('$', literal));
 	j = 0;
-	while (input[i] != '\0')
+	while (*literal)
 	{
-		int x = find('$', &input[i]); //-> $
-		if (x < 0) { x = len(&input[i]); } //-> 0
-		if (x != 0) {
-			out[j] = chop(&input[i], x - 1);
-			//--NULLCHECK
-			i += len(out[j++]);
-		}
-		if (strncmp("$$", &input[i], 2) == 0)
-		{char pid[64]="";sprintf(pid, "%d", getpid()); out[j++] = strdup(pid);i+=2;}
-		else if (input[i] == '$')
+		if (strncmp("$$", literal, 2) == 0)
 		{
-			i++; //->PATH or ->0
-			char *envvar = _scan(&input[i], is_azAZ09_);
-			//--NULLCHECK
-			if (getenv(envvar)) { out[j] = strdup(getenv(envvar)); } //--NULLCHECK
-			else if (len(envvar) != 0) { out[j] = strdup(""); }
-			else { out[j] = strdup("$"); }
-			i+= len(envvar);
+			out[j] = handle_dd();
+			printf("[%d] =dd= \'%s\'\n", j, out[j]);
+			//NULLCHECK
+			literal+=2;
 			j++;
+			continue;
 		}
+
+		int x = find_noescape('$', literal);
+		if (x == -1)
+			x = len(literal);
+
+		if (*literal == '$')
+		{
+			literal++;
+			out[j] = handle_var(_scan2(&(literal), is_azAZ09_));
+		}
+		else
+		{
+			ft_printf("[%d] = \'%.*s\' -> ", j, x, literal);
+			out[j] = chop(literal, x - 1);
+			literal+=x;
+		}
+		printf("\'%s\'\n", out[j]);
+		//NULLCHECK out[j]
+		j++;
 	}
 	out[j] = NULL;
-	*input2 = join(out, ""); //frees
+	return join(out, ""); //frees
+}
+
+void	replace_envvars(t_list *lexemes)
+{
+	t_dict_int_str_member *mem;
+	int	prevKey;
+
+	prevKey = -1;
+	while (lexemes != NULL)
+	{
+		mem = (t_dict_int_str_member *) lexemes->content;
+		int		key = mem->key;
+		
+		if ((key == LITERAL_NQ || key == LITERAL_DQ) && prevKey != HEREDOC)
+		{
+			mem->value = handle_env(mem->value);
+		}
+
+		prevKey = key;
+		lexemes = lexemes->next;
+	}
 }

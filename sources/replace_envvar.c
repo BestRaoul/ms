@@ -86,7 +86,7 @@ void	replace_envvars(t_list *lexemes)
 		mem = (t_dict_int_str_member *) lexemes->content;
 		int		key = mem->key;
 		
-		if ((key == LITERAL_NQ || key == LITERAL_DQ) && prevKey != HEREDOC)
+		if ((key == LITERAL_NQ || key == LITERAL_DQ) && prevKey != HEREDOCOP)
 		{
 			mem->value = handle_env(mem->value);
 		}

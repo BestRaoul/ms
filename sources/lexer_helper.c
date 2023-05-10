@@ -30,7 +30,7 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int a
 	ft_lstadd_back(lst, new);
 	if (type == LPAREN || type == RPAREN || type == PIPE || type == REDIRLEFT || type == REDIRRIGHT || type == EQUAL)
 		return (1);
-	if (type == HEREDOC || type == APPEND || type == AND || type == OR)
+	if (type == HEREDOCOP || type == APPEND || type == AND || type == OR)
 		return (2);
 	return (advance_len);
 }
@@ -43,12 +43,13 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	int		i;
 	t_list	*word;
 
+	/* handle empty string case */
+	if (s[0] == '"' && s[1] == '"' && s[2] == '\0')
+		return (2);
 	word = NULL;
 	i = 1;
-	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos)))
-	{
-		if (!ft_lstadd_chr(s[pos + i], &word))
-		{
+	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos))) {
+		if (!ft_lstadd_chr(s[pos + i], &word)) {
 			//todo free word
 			return (-1);
 		}
@@ -73,6 +74,9 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	int		insert_res;
 	int		i;
 
+	/* handle empty string case */
+	if (s[0] == '\'' && s[1] == '\'' && s[2] == '\0')
+		return (2);
 	i = 1;
 	while (s[pos + i] && s[pos + i] != '\'')
 		i ++;
@@ -80,7 +84,7 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	if (!literal)
 		return (-1);
 	ft_strlcpy(literal, s + pos + 1, i);
-	insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, i + 2);
+	insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, i + 1);
 	free(literal);
 	return (insert_res);
 }
@@ -150,7 +154,7 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	else if (c1 == '|')
 		return (insert_token_into_lst(OR, NULL, lst, -1));
 	else if (c1 == '<')
-		return (insert_token_into_lst(HEREDOC, NULL, lst, -1));
+		return (insert_token_into_lst(HEREDOCOP, NULL, lst, -1));
 	else if (c1 == '>')
 		return (insert_token_into_lst(APPEND, NULL, lst, -1));
 	else if (ft_isspace(c1))
@@ -190,7 +194,7 @@ t_list	*scan_tokens(char *s)
 	{
 		advance_len = handle_lexeme(&res, s, i);
 		//print_lexeme_tlist(res);
-		if (advance_len == -1)
+		if (advance_len < 0)
 			return (tlst_error_exit(&res));
 		i += advance_len;
 	}

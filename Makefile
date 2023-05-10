@@ -62,7 +62,8 @@ SOURCES_LIST			:= main.c\
 							replace_envvar.c\
 							lexer_helper.c\
 							wildcard.c\
-							print_lexeme_tlist.c
+							print_lexeme_tlist.c\
+							ast.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

@@ -63,21 +63,91 @@ char	*handle_env(char *s);
 /* stub function returning files matching wildcard */
 char	*handle_wildcard(char *s);
 
-// TODO: mor literal types telling if they can be substituted or not
 enum TokenTypes {
-	LPAREN = 0,
-	RPAREN = 1,
-	PIPE = 2,
-	REDIRLEFT = 3,
-	REDIRRIGHT = 4,
-	EQUAL = 5,
-	HEREDOC = 6,
-	APPEND = 7,
-	AND = 8,
-	OR = 9,
-	LITERAL_NQ = 10,
-	LITERAL_SQ = 11,
-	LITERAL_DQ = 12,
-	//ARG = 10
+	LPAREN,
+	RPAREN,
+	PIPE,
+	REDIRLEFT,
+	REDIRRIGHT,
+	EQUAL,
+	HEREDOCOP,
+	APPEND,
+	AND,
+	OR,
+	LITERAL,
+	LITERAL_NQ,
+	LITERAL_SQ,
+	LITERAL_DQ,
+	//ARG
 };
+
+enum NonTerminals {
+	CMDLINE,
+	GROUPING,
+	PIPELINE,
+	PIPELINE_SUFFIX,
+	CMD,
+	REDIR,
+	REDIROP,
+	HEREDOC,
+};
+
+enum SymbolType {
+	TERMINAL,
+	NONTERMINAL
+};
+
+typedef struct s_symbol
+{
+	enum SymbolType		terminality_type;
+	int					type;
+}	t_symbol;
+
+typedef struct s_rule {
+	int			name;
+	int 		*symbols;
+	int			num_symbols;
+	int			terminality;
+} t_rule;
+
+typedef struct s_grammar {
+	t_rule*	rules;
+	int		num_rules;
+} t_grammar;
+
+typedef struct s_ast_node {
+	int					is_leaf;
+	int					type;
+	char				*content;
+	struct s_ast_node	**branches;
+} t_ast_node;
+
+/* https://www.tutorialspoint.com/compiler_design/compiler_design_syntax_analysis.htm */
+const t_grammar grammar = {
+		(t_rule[]) {
+				{CMDLINE, (int[]){PIPELINE}, 1, NONTERMINAL},
+				{CMDLINE, (int[]){GROUPING}, 1, NONTERMINAL},
+				{CMDLINE, (int[]){CMDLINE, AND, CMDLINE}, 3, NONTERMINAL},
+				{CMDLINE, (int[]){CMDLINE, OR, CMDLINE}, 3, NONTERMINAL},
+				{GROUPING, (int[]){LPAREN, CMDLINE, RPAREN}, 3, NONTERMINAL},
+
+				//{PIPELINE, (int[]){CMD}, 1, NONTERMINAL},
+				//{PIPELINE, (int[]){CMD, PIPE, PIPELINE}, 3, NONTERMINAL},
+				{PIPELINE, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 1, NONTERMINAL},
+				{PIPELINE_SUFFIX, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 3, NONTERMINAL},
+				{PIPELINE_SUFFIX, (int[]){CMD}, 1, NONTERMINAL},
+
+				{CMD, (int[]){LITERAL}, 1, NONTERMINAL},
+				{CMD, (int[]){REDIR}, 1, NONTERMINAL},
+				{CMD, (int[]){CMD, LITERAL}, 2, NONTERMINAL},
+				{CMD, (int[]){CMD, REDIR}, 2, NONTERMINAL},
+				{REDIR, (int[]){REDIROP, LITERAL}, 2, NONTERMINAL},
+				{REDIROP, (int[]){REDIRLEFT}, 1, TERMINAL},
+				{REDIROP, (int[]){REDIRRIGHT}, 1, TERMINAL},
+				{REDIROP, (int[]){APPEND}, 1, TERMINAL},
+				{HEREDOC, (int[]){HEREDOCOP, LITERAL}, 2, TERMINAL},
+		},
+		17
+};
+
 #endif

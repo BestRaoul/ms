@@ -64,7 +64,7 @@ void	print_lexeme_tlist2(t_list *lst)
 		int k = ((t_dict_int_str_member *) ft_lst_get(lst, i)->content)->key;
 		print_type(k);
 		if (k == 10 || k == 11 || k == 12)
-			ft_printf(": %s", ((t_dict_int_str_member *) ft_lst_get(lst, i)->content)->value);
+			ft_printf(": `%s`", ((t_dict_int_str_member *) ft_lst_get(lst, i)->content)->value);
 		ft_printf("]\n");
 		i ++;
 	}

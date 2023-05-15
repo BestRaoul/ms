@@ -78,18 +78,23 @@ enum TokenTypes {
 	LITERAL_NQ,
 	LITERAL_SQ,
 	LITERAL_DQ,
+	FAILED,
+	END
 	//ARG
 };
 
 enum NonTerminals {
 	CMDLINE,
+	CMDLINE_,
 	GROUPING,
 	PIPELINE,
 	PIPELINE_SUFFIX,
 	CMD,
+	CMD_,
 	REDIR,
 	REDIROP,
 	HEREDOC,
+	EPSILON,
 };
 
 enum SymbolType {
@@ -122,17 +127,37 @@ typedef struct s_ast_node {
 	struct s_ast_node	**branches;
 } t_ast_node;
 
+/* parsing funcs */
+int	prs_pipelinelist (int i, t_list *lexemes);
+int	prs_pipeline(int i, t_list *lexemes);
+
+/*
+	Cmdline ::= PipelineList
+	PipelineList ::= Pipeline PipelineList?
+	Pipeline ::= Cmd PipeSuffix? | Redir PipeSuffix? | Heredoc PipeSuffix? | "("Pipeline")" PipeSuffix?
+	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
+	Cmd ::= Lit CmdSuffix?
+	CmdSuffix ::= Lit
+	Redir ::= RedirOp Lit
+	RedirOp ::= ">" | "<" | ">>"
+	Heredoc ::= "<<" Lit
+ * */
+
+
+//CMDLINE -> CMDLINE' AND CMDLINE
+//CMDLINE -> CMDLINE' OR CMDLINE
+//CMDLINE' -> CMDLINE | epsilon
+
 /* https://www.tutorialspoint.com/compiler_design/compiler_design_syntax_analysis.htm */
-const t_grammar grammar = {
+/*const t_grammar grammar = {
 		(t_rule[]) {
 				{CMDLINE, (int[]){PIPELINE}, 1, NONTERMINAL},
 				{CMDLINE, (int[]){GROUPING}, 1, NONTERMINAL},
-				{CMDLINE, (int[]){CMDLINE, AND, CMDLINE}, 3, NONTERMINAL},
-				{CMDLINE, (int[]){CMDLINE, OR, CMDLINE}, 3, NONTERMINAL},
+				{CMDLINE, (int[]){CMDLINE_, AND, CMDLINE}, 3, NONTERMINAL},
+				{CMDLINE, (int[]){CMDLINE_, OR, CMDLINE}, 3, NONTERMINAL},
+				{CMDLINE_, (int[]){CMDLINE, EPSILON}},
 				{GROUPING, (int[]){LPAREN, CMDLINE, RPAREN}, 3, NONTERMINAL},
 
-				//{PIPELINE, (int[]){CMD}, 1, NONTERMINAL},
-				//{PIPELINE, (int[]){CMD, PIPE, PIPELINE}, 3, NONTERMINAL},
 				{PIPELINE, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 1, NONTERMINAL},
 				{PIPELINE_SUFFIX, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 3, NONTERMINAL},
 				{PIPELINE_SUFFIX, (int[]){CMD}, 1, NONTERMINAL},
@@ -147,7 +172,7 @@ const t_grammar grammar = {
 				{REDIROP, (int[]){APPEND}, 1, TERMINAL},
 				{HEREDOC, (int[]){HEREDOCOP, LITERAL}, 2, TERMINAL},
 		},
-		17
-};
+		18
+};*/
 
 #endif

@@ -118,7 +118,7 @@ int	prs_redir(int i, t_list *lexemes)
 	}
 	else
 	{
-		ft_printf("Unexpected token");
+		ft_printf("Command or filename expected! ");
 		return (-1);
 	}
 }
@@ -132,7 +132,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	if (current == PIPE)
 	{
 		ft_printf("(Suffix | ");
-		pipeline_res = prs_pipeline(i, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -141,7 +141,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	else if (current == AND)
 	{
 		ft_printf("(Suffix && ");
-		pipeline_res = prs_pipeline(i, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -150,7 +150,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	else if (current == OR)
 	{
 		ft_printf("(Suffix || ");
-		pipeline_res = prs_pipeline(i, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -210,14 +210,14 @@ int	prs_pipeline(int i, t_list *lexemes)
 	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
-		res ++;
-		prefix_res = prs_pipeline(i + res, lexemes);
-		if (current_type(i + res, lexemes) != RPAREN)
+		prefix_res = prs_pipeline(i + 1, lexemes);
+		//res += prefix_res;
+		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
 			ft_printf("')' expected!");
 			return (-1);
 		}
-		res ++;
+		prefix_res += 2;
 		ft_printf(" ENDLPAREN)");
 	}
 	else
@@ -262,7 +262,7 @@ int	prs_pipelinelist (int i, t_list *lexemes)
 		prs_pipelinelist_res = prs_pipeline(i, lexemes);
 		if (prs_pipelinelist_res == -1)
 		{
-			ft_printf(")\n");
+			ft_printf("\n");
 			return (-1);
 		}
 		i += prs_pipelinelist_res;

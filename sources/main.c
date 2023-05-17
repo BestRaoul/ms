@@ -17,9 +17,9 @@ int	main(void)
 			add_history(input);
 		//printf("%s➜  %s%s\n", BPURPLE, RESET, input);
 		t_list	*lexemes = scan_tokens(input);
-		prs_pipelinelist(0, lexemes);
 		replace_envvars(lexemes);
 		print_lexeme_tlist2(lexemes);
+		prs_pipelinelist(0, lexemes);
 		if (strcmp(input, "exit") == 0)
 			break ;
 		free(input);

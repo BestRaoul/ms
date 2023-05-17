@@ -68,6 +68,20 @@ int	current_type(int i, t_list *lst)
 	return (((t_dict_int_str_member *)current->content)->key);
 }
 
+int	prs_arg(int i, t_list *lexemes)
+{
+	int		current;
+
+	current = current_type(i, lexemes);
+	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
+	{
+		ft_printf("(CmdArg %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
+		return (1);
+	}
+	printf("Error, expected command or command argument");
+	return (-1);
+}
+
 int	prs_heredoc(int i, t_list *lexemes)
 {
 	if (peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ)
@@ -79,28 +93,12 @@ int	prs_heredoc(int i, t_list *lexemes)
 	return (2);
 }
 
-int	prs_cmd(int i, t_list *lexemes)
-{
-	int	res;
-
-	ft_printf("(Cmd `%s` ", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
-	i ++;
-	res = 1;
-	while (current_type(i, lexemes) == LITERAL_NQ || current_type(i, lexemes) == LITERAL_SQ || current_type(i, lexemes) == LITERAL_DQ)
-	{
-		ft_printf("(Lit %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
-		i ++;
-		res ++;
-	}
-	ft_printf(")");
-	return (res);
-}
-
 int	prs_redir(int i, t_list *lexemes)
 {
 	int		peek;
 	int		current;
 	char	*redir_str;
+	int		argres;
 
 	current = current_type(i, lexemes);
 	redir_str = ">>";
@@ -111,14 +109,18 @@ int	prs_redir(int i, t_list *lexemes)
 	peek = peek_type(i, lexemes);
 	if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
 	{
-		ft_printf("(Redir %s `%s`) ", redir_str, ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
-		return (2);
+		ft_printf("(Redir %s ", redir_str);
+		argres = prs_arg(i + 1, lexemes);
+		if (argres == -1)
+			return (-1);
+		ft_printf(")");
+		return (1 + argres);
 	}
 	else
 	{
 		ft_printf("Unexpected token");
+		return (-1);
 	}
-	return (-1);
 }
 
 int	prs_suffix(int i, t_list *lexemes)
@@ -162,6 +164,38 @@ int	prs_suffix(int i, t_list *lexemes)
 	return (1 + pipeline_res);
 }
 
+int	prs_cmdinfix(int i, t_list *lexemes)
+{
+	int	prefix_res;
+	int	current;
+	int	res;
+
+	res = 0;
+	current = current_type(i, lexemes);
+	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP)
+	{
+		ft_printf("(CmdInfix ");
+		if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
+		{
+			prefix_res = prs_arg(i + res, lexemes);
+		}
+		else if (current == REDIRLEFT || current == REDIRRIGHT || current == APPEND)
+		{
+			prefix_res = prs_redir(i + res, lexemes);
+		}
+		else
+		{
+			prefix_res = prs_heredoc(i + res, lexemes);
+		}
+		if (prefix_res == -1)
+			return (-1);
+		ft_printf(")");
+		res += prefix_res;
+		current = current_type(i + res, lexemes);
+	}
+	return (res);
+}
+
 int	prs_pipeline(int i, t_list *lexemes)
 {
 	int	prefix_res;
@@ -172,16 +206,8 @@ int	prs_pipeline(int i, t_list *lexemes)
 	res = 0;
 	ft_printf("(Pipeline ");
 	current = current_type(i, lexemes);
-	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
-	{
-		prefix_res = prs_cmd(i, lexemes);
-	} else if (current == REDIRLEFT || current == REDIRRIGHT || current == APPEND)
-	{
-		prefix_res = prs_redir(i, lexemes);
-	} else if (current == HEREDOCOP)
-	{
-		prefix_res = prs_heredoc(i, lexemes);
-	} else if (current == LPAREN)
+
+	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
 		res ++;
@@ -196,13 +222,13 @@ int	prs_pipeline(int i, t_list *lexemes)
 	}
 	else
 	{
-		ft_printf("ERROR, unexpected token");
-		return (-1);
+		prefix_res = prs_cmdinfix(i, lexemes);
 	}
 	if (prefix_res == -1)
 	{
 		return (-1);
 	}
+
 	res += prefix_res;
 	suffix_res = 1;
 	while (suffix_res != 0)
@@ -234,6 +260,11 @@ int	prs_pipelinelist (int i, t_list *lexemes)
 	{
 		ft_printf("(PipelineList ");
 		prs_pipelinelist_res = prs_pipeline(i, lexemes);
+		if (prs_pipelinelist_res == -1)
+		{
+			ft_printf(")\n");
+			return (-1);
+		}
 		i += prs_pipelinelist_res;
 		ft_printf(")");
 	}

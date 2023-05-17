@@ -143,6 +143,18 @@ int	prs_pipeline(int i, t_list *lexemes);
 	Heredoc ::= "<<" Lit
  * */
 
+/*
+	Cmdline ::= PipelineList
+	PipelineList ::= Pipeline PipelineList?
+	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
+	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
+	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix?
+	Redir ::= RedirOp CmdArg
+ 	RedirOp ::= ">" | "<" | ">>"
+	Heredoc ::= "<<" Lit
+	CmdArg ::= Lit
+ * */
+
 
 //CMDLINE -> CMDLINE' AND CMDLINE
 //CMDLINE -> CMDLINE' OR CMDLINE

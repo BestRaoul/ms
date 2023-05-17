@@ -34,19 +34,20 @@ static void	print_type(int type)
 	if (type < 10) ft_printf("%s", BRED);
 	switch(type)
 	{
-		case 0: ft_printf("("); break;
-		case 1: ft_printf(")"); break;
-		case 2: ft_printf("|"); break;
-		case 3: ft_printf("<"); break;
-		case 4: ft_printf(">"); break;
-		case 5: ft_printf("="); break;
-		case 6: ft_printf("<<"); break;
-		case 7: ft_printf(">>"); break;
-		case 8: ft_printf("&&"); break;
-		case 9: ft_printf("||"); break;
-		case 10: ft_printf("literal"); break;
-		case 11: ft_printf("literal sq"); break;
-		case 12: ft_printf("literal dq"); break;
+		case LPAREN: ft_printf("("); break;
+		case RPAREN: ft_printf(")"); break;
+		case PIPE: ft_printf("|"); break;
+		case REDIRLEFT: ft_printf("<"); break;
+		case REDIRRIGHT: ft_printf(">"); break;
+		case EQUAL: ft_printf("="); break;
+		case HEREDOCOP: ft_printf("<<"); break;
+		case APPEND: ft_printf(">>"); break;
+		case AND: ft_printf("&&"); break;
+		case OR: ft_printf("||"); break;
+		case LITERAL: ft_printf("literal"); break;
+		case LITERAL_NQ: ft_printf("literal nq"); break;
+		case LITERAL_SQ: ft_printf("literal sq"); break;
+		case LITERAL_DQ: ft_printf("literal dq"); break;
 		default: ft_printf("BIG ERROR"); break;
 	}
 	ft_printf("%s", RESET);

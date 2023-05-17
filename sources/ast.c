@@ -75,7 +75,7 @@ int	prs_arg(int i, t_list *lexemes)
 	current = current_type(i, lexemes);
 	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 	{
-		ft_printf("(CmdArg %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
+		ft_printf("(CmdArg `%s`)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
 		return (1);
 	}
 	printf("Error, expected command or command argument");
@@ -214,7 +214,7 @@ int	prs_pipeline(int i, t_list *lexemes)
 		//res += prefix_res;
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
-			ft_printf("')' expected!");
+			ft_printf("Closing parenthesis (')') expected!");
 			return (-1);
 		}
 		prefix_res += 2;
@@ -255,10 +255,10 @@ int	prs_pipelinelist (int i, t_list *lexemes)
 			return (1 + prs_cmd(i, lexemes));
 		return (1);
 	}*/
+	ft_printf("(PipelineList ");
 	prs_pipelinelist_res = 1;
 	while (/*prs_pipelinelist_res != 0*/i < ft_lstsize(lexemes))
 	{
-		ft_printf("(PipelineList ");
 		prs_pipelinelist_res = prs_pipeline(i, lexemes);
 		if (prs_pipelinelist_res == -1)
 		{

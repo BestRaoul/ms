@@ -45,7 +45,15 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 
 	/* handle empty string case */
 	if (s[0] == '"' && s[1] == '"' && s[2] == '\0')
-		return (2);
+		//return (2);
+	{
+		literal = ft_calloc(1, sizeof(*literal));
+		if (!literal)
+			return (-1);
+		insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, 2);
+		free(literal);
+		return (insert_res);
+	}
 	word = NULL;
 	i = 1;
 	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos))) {
@@ -76,7 +84,15 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 
 	/* handle empty string case */
 	if (s[0] == '\'' && s[1] == '\'' && s[2] == '\0')
-		return (2);
+		//return (2);
+	{
+		literal = ft_calloc(1, sizeof(*literal));
+		if (!literal)
+			return (-1);
+		insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, 2);
+		free(literal);
+		return (insert_res);
+	}
 	i = 1;
 	while (s[pos + i] && s[pos + i] != '\'')
 		i ++;

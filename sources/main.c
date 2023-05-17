@@ -7,7 +7,7 @@ int	main(void)
 	static char	question[100] = "";
 	char		*input;
 
-	wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
+	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 	ft_yoloprintf(question, "%s➜  %s", BPURPLE, WHITE);
 	while (1)
 	{

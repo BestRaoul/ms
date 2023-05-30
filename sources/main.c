@@ -6,8 +6,10 @@ int	main(void)
 {
 	static char	question[100] = "";
 	char		*input;
+	t_ast_node	*ast;
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
+	ast = init_ast_node_type(PIPELINELIST);
 	ft_yoloprintf(question, "%s➜  %s", BPURPLE, WHITE);
 	while (1)
 	{
@@ -19,7 +21,7 @@ int	main(void)
 		t_list	*lexemes = scan_tokens(input);
 		replace_envvars(lexemes);
 		print_lexeme_tlist2(lexemes);
-		prs_pipelinelist(0, lexemes);
+		prs_pipelinelist(0, lexemes, ast);
 		if (strcmp(input, "exit") == 0)
 			break ;
 		free(input);

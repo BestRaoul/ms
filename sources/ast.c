@@ -12,36 +12,65 @@
 
 #include "ms.h"
 
+int	is_leaf(t_ast_node *ast_node)
+{
+	if (ast_node == NULL)
+		return (0);
+	return (ft_lstsize(ast_node->children) == 0);
+}
 
+t_ast_node	*init_ast_node(t_dict_int_str_member *lexeme)
+{
+	t_ast_node	*res;
 
-t_ast_node	*init_ast_node(int isleaf, t_dict_int_str_member lexeme, int branchnum)
+	res = malloc(sizeof(*res));
+	if (!res || !lexeme)
+		return (NULL);
+	res->content = malloc(sizeof(*res->content) * (ft_strlen(lexeme->value) + 1));
+	if (!res->content)
+	{
+		free (res);
+		return (NULL);
+	}
+	ft_memcpy(res->content, lexeme->value, ft_strlen(lexeme->value) + 1);
+	res->type = lexeme->key;
+	res->children = NULL;
+	return (res);
+}
+
+t_ast_node	*init_ast_node_type(int type)
 {
 	t_ast_node	*res;
 
 	res = malloc(sizeof(*res));
 	if (!res)
 		return (NULL);
-	res->content = malloc(sizeof(*res->content) * (ft_strlen(lexeme.value) + 1));
-	if (!res->content)
-	{
-		free (res);
-		return (NULL);
-	}
-	ft_memcpy(res->content, lexeme.value, ft_strlen(lexeme.value) + 1);
-	res->is_leaf = isleaf;
-	res->type = lexeme.key;
-	res->branches = malloc(sizeof(*res->branches) * branchnum);
-	if (!res->branches)
-	{
-		free(res);
-		return (NULL);
-	}
+	res->content = NULL;
+	res->type = type;
+	res->children = NULL;
 	return (res);
 }
 
-/*int	get_next_rule() {
+int	add_ast_child(t_ast_node *ast, int type, t_dict_int_str_member *lexeme)
+{
+	t_ast_node	*node;
+	t_list		*lst_elem;
 
-}*/
+	lst_elem = ft_lstnew(NULL);
+	if (!lst_elem)
+		return (0);
+	if (lexeme == NULL)
+		node = init_ast_node(lexeme);
+	else
+		node = init_ast_node_type(type);
+	if (node == NULL) {
+		free(lst_elem);
+		return (0);
+	}
+	lst_elem->content = node;
+	ft_lstadd_back(&(ast->children), lst_elem);
+	return (1);
+}
 
 /* This gets the next i type (should be a terminal or nonterminal enum) */
 int	peek_type(int i, t_list *lst)
@@ -68,10 +97,11 @@ int	current_type(int i, t_list *lst)
 	return (((t_dict_int_str_member *)current->content)->key);
 }
 
-int	prs_arg(int i, t_list *lexemes)
+int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int		current;
 
+	(void) ast;
 	current = current_type(i, lexemes);
 	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 	{
@@ -82,8 +112,9 @@ int	prs_arg(int i, t_list *lexemes)
 	return (-1);
 }
 
-int	prs_heredoc(int i, t_list *lexemes)
+int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 {
+	(void) ast;
 	if (peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ)
 	{
 		ft_printf("Heredoc delimiter expected!");
@@ -93,7 +124,7 @@ int	prs_heredoc(int i, t_list *lexemes)
 	return (2);
 }
 
-int	prs_redir(int i, t_list *lexemes)
+int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int		peek;
 	int		current;
@@ -110,7 +141,7 @@ int	prs_redir(int i, t_list *lexemes)
 	if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
 	{
 		ft_printf("(Redir %s ", redir_str);
-		argres = prs_arg(i + 1, lexemes);
+		argres = prs_arg(i + 1, lexemes, ast);
 		if (argres == -1)
 			return (-1);
 		ft_printf(")");
@@ -123,7 +154,7 @@ int	prs_redir(int i, t_list *lexemes)
 	}
 }
 
-int	prs_suffix(int i, t_list *lexemes)
+int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	current;
 	int	pipeline_res;
@@ -132,7 +163,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	if (current == PIPE)
 	{
 		ft_printf("(Suffix | ");
-		pipeline_res = prs_pipeline(i + 1, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -141,7 +172,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	else if (current == AND)
 	{
 		ft_printf("(Suffix && ");
-		pipeline_res = prs_pipeline(i + 1, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -150,7 +181,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	else if (current == OR)
 	{
 		ft_printf("(Suffix || ");
-		pipeline_res = prs_pipeline(i + 1, lexemes);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -164,7 +195,7 @@ int	prs_suffix(int i, t_list *lexemes)
 	return (1 + pipeline_res);
 }
 
-int	prs_cmdinfix(int i, t_list *lexemes)
+int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prefix_res;
 	int	current;
@@ -177,15 +208,15 @@ int	prs_cmdinfix(int i, t_list *lexemes)
 		ft_printf("(CmdInfix ");
 		if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 		{
-			prefix_res = prs_arg(i + res, lexemes);
+			prefix_res = prs_arg(i + res, lexemes, ast);
 		}
 		else if (current == REDIRLEFT || current == REDIRRIGHT || current == APPEND)
 		{
-			prefix_res = prs_redir(i + res, lexemes);
+			prefix_res = prs_redir(i + res, lexemes, ast);
 		}
 		else
 		{
-			prefix_res = prs_heredoc(i + res, lexemes);
+			prefix_res = prs_heredoc(i + res, lexemes, ast);
 		}
 		if (prefix_res == -1)
 			return (-1);
@@ -196,7 +227,7 @@ int	prs_cmdinfix(int i, t_list *lexemes)
 	return (res);
 }
 
-int	prs_pipeline(int i, t_list *lexemes)
+int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prefix_res;
 	int	suffix_res;
@@ -204,14 +235,18 @@ int	prs_pipeline(int i, t_list *lexemes)
 	int	res;
 
 	res = 0;
+	//TODO: add pipeline child to ast here
+	if (!add_ast_child(ast, PIPELINE, NULL))
+		return (-1);
 	ft_printf("(Pipeline ");
 	current = current_type(i, lexemes);
 
 	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
-		prefix_res = prs_pipeline(i + 1, lexemes);
-		//res += prefix_res;
+		//TODO: everywhere where *ast is passed, it should be passed as some child of the current ast!!!
+		//It's code to be corrected
+		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content);
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
 			ft_printf("Closing parenthesis (')') expected!");
@@ -222,7 +257,7 @@ int	prs_pipeline(int i, t_list *lexemes)
 	}
 	else
 	{
-		prefix_res = prs_cmdinfix(i, lexemes);
+		prefix_res = prs_cmdinfix(i, lexemes, ast);
 	}
 	if (prefix_res == -1)
 	{
@@ -233,7 +268,7 @@ int	prs_pipeline(int i, t_list *lexemes)
 	suffix_res = 1;
 	while (suffix_res != 0)
 	{
-		suffix_res = prs_suffix(i + res, lexemes);
+		suffix_res = prs_suffix(i + res, lexemes, ast);
 		if (suffix_res == -1)
 			return (-1);
 		res += suffix_res;
@@ -242,53 +277,24 @@ int	prs_pipeline(int i, t_list *lexemes)
 	return (res);
 }
 
-int	prs_pipelinelist (int i, t_list *lexemes)
+int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prs_pipelinelist_res;
 
-	/*peek = peek_type(i, lexemes);
-	if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
-	{
-		ft_printf(" LITERAL `%s` ", (t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content);
-		peek = peek_type(i, lexemes);
-		if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
-			return (1 + prs_cmd(i, lexemes));
-		return (1);
-	}*/
 	ft_printf("(PipelineList ");
-	prs_pipelinelist_res = 1;
-	while (/*prs_pipelinelist_res != 0*/i < ft_lstsize(lexemes))
+	prs_pipelinelist_res = prs_pipeline(i, lexemes, ast);
+	if (prs_pipelinelist_res == -1)
 	{
-		prs_pipelinelist_res = prs_pipeline(i, lexemes);
-		if (prs_pipelinelist_res == -1)
-		{
-			ft_printf("\n");
-			return (-1);
-		}
-		i += prs_pipelinelist_res;
-		ft_printf(")");
+		ft_printf("\n");
+		return (-1);
+	}
+	i += prs_pipelinelist_res;
+	if (i < ft_lstsize(lexemes))
+	{
+		ft_printf("Error, trailing tokens\n");
+		return (-1);
 	}
 	ft_printf(")\n");
 	//ft_printf("\n%sError at token %d!%s\n", RED, i, RESET);
 	return (i);
 }
-
-
-/*t_ast_node	*lexemes_to_ast(t_list *lexemes, t_ast_node *res, int lex_pointer, int gram_pointers[2])
-{
-	//t_ast_node	*res;
-
-	if (res == NULL)
-	{
-		res = malloc(sizeof(*res));
-		if (!res)
-			return (NULL);
-		res->is_leaf = 0;
-		res->type = CMDLINE;
-		lex_pointer = 0;
-	}
-	//gram_pointers are the depth and left to right pointers in the grammar struct
-	// this func needs to call itself for every nonterminal in the RHS of the current grammar rule
-	// one question, how to get back if something doesn't match, in the recursion
-	return (res);
-}*/

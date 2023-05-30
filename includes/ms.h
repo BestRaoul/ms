@@ -84,6 +84,7 @@ enum TokenTypes {
 };
 
 enum NonTerminals {
+	PIPELINELIST,
 	CMDLINE,
 	CMDLINE_,
 	GROUPING,
@@ -121,27 +122,17 @@ typedef struct s_grammar {
 } t_grammar;
 
 typedef struct s_ast_node {
-	int					is_leaf;
-	int					type;
-	char				*content;
-	struct s_ast_node	**branches;
+	int		type;
+	char	*content;
+	t_list	*children;
 } t_ast_node;
 
-/* parsing funcs */
-int	prs_pipelinelist (int i, t_list *lexemes);
-int	prs_pipeline(int i, t_list *lexemes);
 
-/*
-	Cmdline ::= PipelineList
-	PipelineList ::= Pipeline PipelineList?
-	Pipeline ::= Cmd PipeSuffix? | Redir PipeSuffix? | Heredoc PipeSuffix? | "("Pipeline")" PipeSuffix?
-	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
-	Cmd ::= Lit CmdSuffix?
-	CmdSuffix ::= Lit
-	Redir ::= RedirOp Lit
-	RedirOp ::= ">" | "<" | ">>"
-	Heredoc ::= "<<" Lit
- * */
+t_ast_node	*init_ast_node_type(int type);
+
+/* parsing funcs */
+int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast);
+int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast);
 
 /*
 	Cmdline ::= PipelineList
@@ -186,5 +177,17 @@ int	prs_pipeline(int i, t_list *lexemes);
 		},
 		18
 };*/
+
+/* OLD
+	Cmdline ::= PipelineList
+	PipelineList ::= Pipeline PipelineList?
+	Pipeline ::= Cmd PipeSuffix? | Redir PipeSuffix? | Heredoc PipeSuffix? | "("Pipeline")" PipeSuffix?
+	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
+	Cmd ::= Lit CmdSuffix?
+	CmdSuffix ::= Lit
+	Redir ::= RedirOp Lit
+	RedirOp ::= ">" | "<" | ">>"
+	Heredoc ::= "<<" Lit
+ * */
 
 #endif

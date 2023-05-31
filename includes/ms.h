@@ -84,6 +84,7 @@ enum TokenTypes {
 };
 
 enum NonTerminals {
+	NONE,
 	PIPELINELIST,
 	CMDLINE,
 	CMDLINE_,
@@ -102,6 +103,12 @@ enum SymbolType {
 	TERMINAL,
 	NONTERMINAL
 };
+
+enum AstType {
+	COMMAND
+};
+
+
 
 typedef struct s_symbol
 {
@@ -132,13 +139,27 @@ t_ast_node	*init_ast_node_type(int type);
 
 /* parsing funcs */
 int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast);
-int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast);
+int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
+
+void print_ast(t_ast_node *ast, int depth);
 
 /*
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?
 	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
 	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
+	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix?
+	Redir ::= RedirOp CmdArg
+ 	RedirOp ::= ">" | "<" | ">>"
+	Heredoc ::= "<<" Lit
+	CmdArg ::= Lit
+ * */
+
+/* last version, might be flawed
+	Cmdline ::= PipelineList
+	PipelineList ::= Pipeline PipelineList?
+	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
+	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline | Redir PipeSuffix
 	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix?
 	Redir ::= RedirOp CmdArg
  	RedirOp ::= ">" | "<" | ">>"

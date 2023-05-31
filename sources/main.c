@@ -22,6 +22,8 @@ int	main(void)
 		replace_envvars(lexemes);
 		print_lexeme_tlist2(lexemes);
 		prs_pipelinelist(0, lexemes, ast);
+		ft_printf("ast:\n");
+		print_ast(ast, 0);
 		if (strcmp(input, "exit") == 0)
 			break ;
 		free(input);

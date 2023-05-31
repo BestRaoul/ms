@@ -19,7 +19,7 @@ int	is_leaf(t_ast_node *ast_node)
 	return (ft_lstsize(ast_node->children) == 0);
 }
 
-t_ast_node	*init_ast_node(t_dict_int_str_member *lexeme)
+t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
 	t_ast_node	*res;
 
@@ -33,7 +33,10 @@ t_ast_node	*init_ast_node(t_dict_int_str_member *lexeme)
 		return (NULL);
 	}
 	ft_memcpy(res->content, lexeme->value, ft_strlen(lexeme->value) + 1);
-	res->type = lexeme->key;
+	if (type == NONE)
+		res->type = lexeme->key;
+	else
+		res->type = type;
 	res->children = NULL;
 	return (res);
 }
@@ -60,9 +63,9 @@ int	add_ast_child(t_ast_node *ast, int type, t_dict_int_str_member *lexeme)
 	if (!lst_elem)
 		return (0);
 	if (lexeme == NULL)
-		node = init_ast_node(lexeme);
-	else
 		node = init_ast_node_type(type);
+	else
+		node = init_ast_node(type, lexeme);
 	if (node == NULL) {
 		free(lst_elem);
 		return (0);
@@ -105,6 +108,8 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 	current = current_type(i, lexemes);
 	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 	{
+		if (!add_ast_child(ast, NONE, ft_lst_get(lexemes, i)->content))
+			return (-1);
 		ft_printf("(CmdArg `%s`)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
 		return (1);
 	}
@@ -120,6 +125,8 @@ int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 		ft_printf("Heredoc delimiter expected!");
 		return (-1);
 	}
+	if (!add_ast_child(ast, NONE, ft_lst_get(lexemes, i)->content))
+		return (-1);
 	ft_printf("(Heredoc %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
 	return (2);
 }
@@ -134,9 +141,22 @@ int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 	current = current_type(i, lexemes);
 	redir_str = ">>";
 	if (current == REDIRLEFT)
+	{
 		redir_str = "<";
-	if (current == REDIRRIGHT)
+		if (!add_ast_child(ast, REDIRLEFT, NULL))
+			return (-1);
+	}
+	else if (current == REDIRRIGHT)
+	{
 		redir_str = ">";
+		if (!add_ast_child(ast, REDIRRIGHT, NULL))
+			return (-1);
+	}
+	else
+	{
+		if (!add_ast_child(ast, APPEND, NULL))
+			return (-1);
+	}
 	peek = peek_type(i, lexemes);
 	if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
 	{
@@ -162,8 +182,10 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	current = current_type(i, lexemes);
 	if (current == PIPE)
 	{
+		if (!add_ast_child(ast, PIPE, NULL))
+			return (-1);
 		ft_printf("(Suffix | ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -171,8 +193,10 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	}
 	else if (current == AND)
 	{
+		if (!add_ast_child(ast, AND, NULL))
+			return (-1);
 		ft_printf("(Suffix && ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -180,8 +204,10 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	}
 	else if (current == OR)
 	{
+		if (!add_ast_child(ast, OR, NULL))
+			return (-1);
 		ft_printf("(Suffix || ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -227,7 +253,7 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 	return (res);
 }
 
-int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast)
+int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 {
 	int	prefix_res;
 	int	suffix_res;
@@ -236,7 +262,8 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast)
 
 	res = 0;
 	//TODO: add pipeline child to ast here
-	if (!add_ast_child(ast, PIPELINE, NULL))
+	// the continued var should make it append to previous pipeline
+	if (!continued && !add_ast_child(ast, PIPELINE, NULL))
 		return (-1);
 	ft_printf("(Pipeline ");
 	current = current_type(i, lexemes);
@@ -244,9 +271,9 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast)
 	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
-		//TODO: everywhere where *ast is passed, it should be passed as some child of the current ast!!!
+		//TODO: everywhere where *ast is passed, it should sometimes be passed as some child of the current ast!!!
 		//It's code to be corrected
-		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content);
+		prefix_res = prs_pipeline(i + 1, lexemes, ast, 0); //here we give the same ast tho, because it's another pipeline
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
 			ft_printf("Closing parenthesis (')') expected!");
@@ -257,7 +284,7 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast)
 	}
 	else
 	{
-		prefix_res = prs_cmdinfix(i, lexemes, ast);
+		prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
 	}
 	if (prefix_res == -1)
 	{
@@ -282,7 +309,7 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast)
 	int	prs_pipelinelist_res;
 
 	ft_printf("(PipelineList ");
-	prs_pipelinelist_res = prs_pipeline(i, lexemes, ast);
+	prs_pipelinelist_res = prs_pipeline(i, lexemes, ast, 0);
 	if (prs_pipelinelist_res == -1)
 	{
 		ft_printf("\n");

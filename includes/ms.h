@@ -79,11 +79,9 @@ enum TokenTypes {
 	LITERAL_SQ,
 	LITERAL_DQ,
 	FAILED,
-	END
+	END,
 	//ARG
-};
 
-enum NonTerminals {
 	NONE,
 	PIPELINELIST,
 	CMDLINE,
@@ -98,6 +96,10 @@ enum NonTerminals {
 	HEREDOC,
 	EPSILON,
 };
+
+/*enum NonTerminals {
+
+};*/
 
 enum SymbolType {
 	TERMINAL,
@@ -141,7 +143,8 @@ t_ast_node	*init_ast_node_type(int type);
 int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast);
 int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
 
-void print_ast(t_ast_node *ast, int depth);
+void	print_ast(t_ast_node *ast, int depth);
+void	print_type(int type);
 
 /*
 	Cmdline ::= PipelineList

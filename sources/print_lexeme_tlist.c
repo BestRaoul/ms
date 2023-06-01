@@ -28,10 +28,10 @@ void	print_lexeme_tlist(t_list *lst)
 }
 
 //--IGNORE NORME
-static void	print_type(int type)
+void	print_type(int type)
 {
 	ft_printf("%s", RED);
-	if (type < 10) ft_printf("%s", BRED);
+	//if (type < 10) ft_printf("%s", BRED);
 	switch(type)
 	{
 		case LPAREN: ft_printf("("); break;
@@ -48,6 +48,8 @@ static void	print_type(int type)
 		case LITERAL_NQ: ft_printf("literal nq"); break;
 		case LITERAL_SQ: ft_printf("literal sq"); break;
 		case LITERAL_DQ: ft_printf("literal dq"); break;
+		case PIPELINE: ft_printf("pipeline"); break;
+		case PIPELINELIST: ft_printf("pipeline_lst"); break;
 		default: ft_printf("BIG ERROR"); break;
 	}
 	ft_printf("%s", RESET);

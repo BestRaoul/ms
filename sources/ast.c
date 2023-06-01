@@ -178,14 +178,16 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	current;
 	int	pipeline_res;
+	int	redir_res;
 
 	current = current_type(i, lexemes);
+	redir_res = 0;
 	if (current == PIPE)
 	{
 		if (!add_ast_child(ast, PIPE, NULL))
 			return (-1);
 		ft_printf("(Suffix | ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -196,7 +198,7 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 		if (!add_ast_child(ast, AND, NULL))
 			return (-1);
 		ft_printf("(Suffix && ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -207,7 +209,18 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 		if (!add_ast_child(ast, OR, NULL))
 			return (-1);
 		ft_printf("(Suffix || ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1);
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
+		if (pipeline_res == -1)
+		{
+			return (-1);
+		}
+	}
+	else if (current == APPEND || current == REDIRRIGHT || current == REDIRLEFT)
+	{
+		redir_res = prs_redir(i, lexemes, ast);
+		if (redir_res == -1)
+			return (-1);
+		pipeline_res = prs_suffix(i + redir_res, lexemes, ast);
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -218,7 +231,7 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 		return (0);
 	}
 	ft_printf(")");
-	return (1 + pipeline_res);
+	return (redir_res + pipeline_res);
 }
 
 int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)

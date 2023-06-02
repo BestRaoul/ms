@@ -12,6 +12,26 @@
 
 #include "ms.h"
 
+/*TODO: ast nodes are not nested properly:
+
+ASTnode: [pipeline_lst]
+    ASTnode: [pipeline]
+    ASTnode: [pipeline]
+        ASTnode: [literal nq]
+          content: `a`
+    ASTnode: [|]
+        ASTnode: [literal nq]
+          content: `b`
+    ASTnode: [&&]
+    ASTnode: [pipeline]
+        ASTnode: [literal nq]
+          content: `c`
+    ASTnode: [|]
+        ASTnode: [literal nq]
+          content: `d`
+here | should be one tab to the right, while its child should not be its child, but of the parent node
+ * */
+
 int	is_leaf(t_ast_node *ast_node)
 {
 	if (ast_node == NULL)
@@ -184,7 +204,7 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	redir_res = 0;
 	if (current == PIPE)
 	{
-		if (!add_ast_child(ast, PIPE, NULL))
+		if (!add_ast_child(ft_lstlast(ast->children)->content, PIPE, NULL))
 			return (-1);
 		ft_printf("(Suffix | ");
 		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;

@@ -218,7 +218,7 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 		if (!add_ast_child(ast, AND, NULL))
 			return (-1);
 		ft_printf("(Suffix && ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 0) + 1;
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -229,7 +229,7 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 		if (!add_ast_child(ast, OR, NULL))
 			return (-1);
 		ft_printf("(Suffix || ");
-		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
+		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 0) + 1;
 		if (pipeline_res == -1)
 		{
 			return (-1);
@@ -296,17 +296,17 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	res = 0;
 	//TODO: add pipeline child to ast here
 	// the continued var should make it append to previous pipeline
-	if (!continued && !add_ast_child(ast, PIPELINE, NULL))
-		return (-1);
+
 	ft_printf("(Pipeline ");
 	current = current_type(i, lexemes);
-
+	if (!continued /*&& current != LPAREN*/ && !add_ast_child(ast, PIPELINE, NULL))
+		return (-1);
 	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
 		//TODO: everywhere where *ast is passed, it should sometimes be passed as some child of the current ast!!!
 		//It's code to be corrected
-		prefix_res = prs_pipeline(i + 1, lexemes, ast, 0); //here we give the same ast tho, because it's another pipeline
+		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content, 0); //here we give last node, but will also need to come back
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
 			ft_printf("Closing parenthesis (')') expected!");

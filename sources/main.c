@@ -9,10 +9,10 @@ int	main(void)
 	t_ast_node	*ast;
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
-	ast = init_ast_node_type(PIPELINELIST);
 	ft_yoloprintf(question, "%s➜  %s", BPURPLE, WHITE);
 	while (1)
 	{
+		ast = init_ast_node_type(PIPELINELIST);
 		input = readline(question);
 		//--NULLCHECK
 		if (input && *input)
@@ -22,8 +22,11 @@ int	main(void)
 		replace_envvars(lexemes);
 		print_lexeme_tlist2(lexemes);
 		prs_pipelinelist(0, lexemes, ast);
+		//TODO free lexemes
+		ft_lstclear(&lexemes, free_lexeme_node);
 		ft_printf("ast:\n");
 		print_ast(ast, 0);
+		free_ast(ast);
 		if (strcmp(input, "exit") == 0)
 			break ;
 		free(input);

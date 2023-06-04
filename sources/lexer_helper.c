@@ -57,8 +57,9 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	word = NULL;
 	i = 1;
 	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos))) {
-		if (!ft_lstadd_chr(s[pos + i], &word)) {
-			//todo free word
+		if (!ft_lstadd_chr(s[pos + i], &word))
+		{
+			ft_lstclear(&word, ft_delnode);
 			return (-1);
 		}
 		i++;
@@ -66,12 +67,12 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	literal = ft_tlst_to_str(word);
 	if (!literal)
 	{
-		//todo free word
+		ft_lstclear(&word, ft_delnode);
 		return (-1);
 	}
 	insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, i + 1);
 	free(literal);
-	//todo free word
+	ft_lstclear(&word, ft_delnode);
 	return (insert_res);
 }
 
@@ -128,7 +129,7 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	{
 		if (!ft_lstadd_chr(s[pos + i], &word))
 		{
-			//todo free word
+			ft_lstclear(&word, ft_delnode);
 			return (-1);
 		}
 		i++;
@@ -136,12 +137,12 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	literal = ft_tlst_to_str(word);
 	if (!literal)
 	{
-		//todo free word
+		ft_lstclear(&word, ft_delnode);
 		return (-1);
 	}
 	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);
 	free(literal);
-	//todo free word
+	ft_lstclear(&word, ft_delnode);
 	return (insert_res);
 }
 

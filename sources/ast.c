@@ -12,33 +12,6 @@
 
 #include "ms.h"
 
-/*TODO: ast nodes are not nested properly:
-
-ASTnode: [pipeline_lst]
-    ASTnode: [pipeline]
-    ASTnode: [pipeline]
-        ASTnode: [literal nq]
-          content: `a`
-    ASTnode: [|]
-        ASTnode: [literal nq]
-          content: `b`
-    ASTnode: [&&]
-    ASTnode: [pipeline]
-        ASTnode: [literal nq]
-          content: `c`
-    ASTnode: [|]
-        ASTnode: [literal nq]
-          content: `d`
-here | should be one tab to the right, while its child should not be its child, but of the parent node
- * */
-
-int	is_leaf(t_ast_node *ast_node)
-{
-	if (ast_node == NULL)
-		return (0);
-	return (ft_lstsize(ast_node->children) == 0);
-}
-
 t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
 	t_ast_node	*res;
@@ -294,9 +267,6 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	int	res;
 
 	res = 0;
-	//TODO: add pipeline child to ast here
-	// the continued var should make it append to previous pipeline
-
 	ft_printf("(Pipeline ");
 	current = current_type(i, lexemes);
 	if (!continued /*&& current != LPAREN*/ && !add_ast_child(ast, PIPELINE, NULL))
@@ -304,9 +274,7 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	if (current == LPAREN)
 	{
 		ft_printf("(LPAREN ");
-		//TODO: everywhere where *ast is passed, it should sometimes be passed as some child of the current ast!!!
-		//It's code to be corrected
-		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content, 0); //here we give last node, but will also need to come back
+		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content, 0);
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
 			ft_printf("Closing parenthesis (')') expected!");
@@ -355,6 +323,25 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast)
 		return (-1);
 	}
 	ft_printf(")\n");
-	//ft_printf("\n%sError at token %d!%s\n", RED, i, RESET);
 	return (i);
+}
+
+void	free_ast(t_ast_node *ast)
+{
+	int	i;
+
+	if (!ast)
+		return ;
+	i = 0;
+	while (i < ft_lstsize(ast->children))
+	{
+		free_ast(ft_lst_get(ast->children, i)->content);
+		i ++;
+	}
+	if (ast->content)
+		free(ast->content);
+	if (ast->children)
+		free(ast->children);
+	free(ast);
+	ast = NULL;
 }

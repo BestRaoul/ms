@@ -45,6 +45,7 @@ char	*_scan2(char **str_ptr, int (*f)(char));
 char	*join(char **strr, char *joint);
 void	print_lexeme_tlist(t_list *lst);
 void	print_lexeme_tlist2(t_list *lst);
+void	free_lexeme_node(void *node);
 
 // lexing
 t_list	*scan_tokens(char *s);
@@ -110,26 +111,6 @@ enum AstType {
 	COMMAND
 };
 
-
-
-typedef struct s_symbol
-{
-	enum SymbolType		terminality_type;
-	int					type;
-}	t_symbol;
-
-typedef struct s_rule {
-	int			name;
-	int 		*symbols;
-	int			num_symbols;
-	int			terminality;
-} t_rule;
-
-typedef struct s_grammar {
-	t_rule*	rules;
-	int		num_rules;
-} t_grammar;
-
 typedef struct s_ast_node {
 	int		type;
 	char	*content;
@@ -145,6 +126,7 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
 
 void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
+void	free_ast(t_ast_node *ast);
 
 /*
 	Cmdline ::= PipelineList

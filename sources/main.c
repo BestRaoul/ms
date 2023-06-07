@@ -19,7 +19,8 @@ int	main(void)
 			add_history(input);
 		//printf("%s➜  %s%s\n", BPURPLE, RESET, input);
 		t_list	*lexemes = scan_tokens(input);
-		replace_envvars(lexemes);
+		//TODO: possible leak
+		//replace_envvars(lexemes);
 		print_lexeme_tlist2(lexemes);
 		prs_pipelinelist(0, lexemes, ast);
 		//TODO free lexemes

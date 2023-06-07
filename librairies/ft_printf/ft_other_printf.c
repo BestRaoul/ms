@@ -50,7 +50,11 @@ static int	expand_format(char **format_ptr, va_list va, char **str, int *i)
 			+ v.data.width * (v.data.specifier == 'c');
 		*str = ft_realloc(*str, *i, *i + v.len + 1);
 		if (*str == NULL)
-			return (free(v.out), -1);
+		{
+			//TODO: return in one line
+			free(v.out);
+			return (-1);
+		}
 		ft_strlcpy(&(*str)[*i], v.out, v.len + 1);
 		free(v.out);
 		*i += v.len;

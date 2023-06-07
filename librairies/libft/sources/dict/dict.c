@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "libft.h"
+//#define malloc malloc(s) printf("%s %s %u %p", __FILE__, __LINE__, )
 
 t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 {
@@ -31,7 +32,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 			return (NULL);
 		}
 		ft_strlcpy(res->value, value, ft_strlen(value) + 1);
-		ft_printf("allocated value (%s)\n", res->value);
+		//ft_printf("allocated value (%s), %p\n", res->value, res->value);
 	}
 	return (res);
 }
@@ -40,7 +41,7 @@ void	t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member)
 {
 	if (dict_int_str_member->value != NULL)
 	{
-		ft_printf("freeing value (%s)\n", dict_int_str_member->value);
+		//ft_printf("freeing value (%s), %p\n", dict_int_str_member->value, dict_int_str_member->value);
 		free(dict_int_str_member->value);
 	}
 	free(dict_int_str_member);

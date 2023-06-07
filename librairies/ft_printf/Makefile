@@ -10,7 +10,15 @@ CC		= gcc
 
 RM		= rm -f
 
-CFLAGS	= -Wall -Wextra -Werror -pedantic -I. -I./includes -I../libft/includes
+ifdef DEBUG
+	DEVFLAGS			:= -ggdb $(FSANITIZE) -Wno-unused-function
+	OPTFLAG				:= -O0
+else
+	DEVFLAGS			:=
+	OPTFLAG				:= -O3
+endif
+
+CFLAGS	= -Wall -Wextra -Werror -pedantic $(DEVFLAGS) $(OPTFLAG) -I. -I./includes -I../libft/includes
 
 .c.o:
 	@${CC} ${CFLAGS} -c $< -o ${<:.c=.o}

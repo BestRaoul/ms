@@ -29,7 +29,7 @@ else
 endif
 
 ifdef DEBUG
-	DEVFLAGS			:= -ggdb $(FSANITIZE)
+	DEVFLAGS			:= -ggdb $(FSANITIZE) -Wno-unused-function
 	OPTFLAG				:= -O0
 else
 	DEVFLAGS			:=
@@ -93,11 +93,11 @@ $(OBJECTS_DIRECTORY)%.o : $(SOURCES_DIRECTORY)%.c $(HEADER_FILES)
 
 $(LIBFT):
 	@echo "$(NAME): Creating $(LIBFT)..."
-	@$(MAKE) -sC $(LIBFT_DIRECTORY)
+	@$(MAKE) -sC $(LIBFT_DIRECTORY) DEBUG=$(DEBUG)
 
 $(LIBPRINTF):
 	@echo "$(NAME): Creating $(LIBPRINTF)..."
-	@$(MAKE) -sC $(LIBPRINTF_DIRECTORY)
+	@$(MAKE) -sC $(LIBPRINTF_DIRECTORY) DEBUG=$(DEBUG)
 
 $(NAME): $(LIBFT) $(LIBPRINTF) $(OBJECTS_DIRECTORY) $(OBJECTS) $(HEADER_FILES)
 	$(CC) $(CFLAGS) $(OBJECTS) $(LIBRARIES) $(INCLUDES) -o $(NAME)

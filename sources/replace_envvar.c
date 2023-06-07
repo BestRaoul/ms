@@ -73,7 +73,7 @@ char	*handle_env(char *literal)
 	out[j] = NULL;
 	char	*result = join(out, "");
 	//nc result
-	frees2(1, 1, out);
+	frees2(2, 1, out, 0, literal);
 	return result; //frees (out)
 }
 
@@ -90,9 +90,7 @@ void	replace_envvars(t_list *lexemes)
 		if ((mem->key == LITERAL_NQ || mem->key == LITERAL_DQ)
 			&& prev_key != HEREDOCOP)
 		{
-			temp = handle_env(mem->value);
-			free(mem->value);
-			mem->value = temp;
+			mem->value = handle_env(mem->value);
 		}
 
 		prev_key = mem->key;

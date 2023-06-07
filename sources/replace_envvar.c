@@ -37,7 +37,7 @@ char	*handle_env(char *literal)
 	char	**out;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', literal)), sizeof(char*));
+	out = calloc((2 + 2 * count('$', literal)), sizeof(char *));
 	printf("%s: %d\n", literal, 2 + 2 * count('$', literal));
 	j = 0;
 	while (*literal)
@@ -46,12 +46,11 @@ char	*handle_env(char *literal)
 		{
 			out[j] = handle_dd();
 			printf("[%d] =dd= \'%s\'\n", j, out[j]);
-			//NULLCHECK
-			literal+=2;
+			//NULLCHECK out[j]
+			literal += 2;
 			j++;
-			continue;
+			continue ;
 		}
-
 		int x = find_noescape('$', literal);
 		if (x == -1)
 			x = len(literal);
@@ -72,26 +71,31 @@ char	*handle_env(char *literal)
 		j++;
 	}
 	out[j] = NULL;
-	return join(out, ""); //frees
+	char	*result = join(out, "");
+	//nc result
+	frees2(1, 1, out);
+	return result; //frees (out)
 }
 
 void	replace_envvars(t_list *lexemes)
 {
-	t_dict_int_str_member *mem;
-	int	prevKey;
+	t_dict_int_str_member	*mem;
+	char					*temp;
+	int						prev_key;
 
-	prevKey = -1;
+	prev_key = -1;
 	while (lexemes != NULL)
 	{
 		mem = (t_dict_int_str_member *) lexemes->content;
-		int		key = mem->key;
-		
-		if ((key == LITERAL_NQ || key == LITERAL_DQ) && prevKey != HEREDOCOP)
+		if ((mem->key == LITERAL_NQ || mem->key == LITERAL_DQ)
+			&& prev_key != HEREDOCOP)
 		{
-			mem->value = handle_env(mem->value);
+			temp = handle_env(mem->value);
+			free(mem->value);
+			mem->value = temp;
 		}
 
-		prevKey = key;
+		prev_key = mem->key;
 		lexemes = lexemes->next;
 	}
 }

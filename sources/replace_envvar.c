@@ -80,7 +80,6 @@ char	*handle_env(char *literal)
 void	replace_envvars(t_list *lexemes)
 {
 	t_dict_int_str_member	*mem;
-	char					*temp;
 	int						prev_key;
 
 	prev_key = -1;

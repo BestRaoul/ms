@@ -21,12 +21,15 @@ int	main(void)
 		t_list	*lexemes = scan_tokens(input);
 		//TODO: possible leak
 		//replace_envvars(lexemes);
-		print_lexeme_tlist2(lexemes);
+		//print_lexeme_tlist2(lexemes);
 		prs_pipelinelist(0, lexemes, ast);
 		//TODO free lexemes
 		ft_lstclear(&lexemes, free_lexeme_node);
 		ft_printf("ast:\n");
 		print_ast(ast, 0);
+		//EXECUTE here
+		t_ast_node *first_child = (t_ast_node *)(ft_lst_get(ast->children, 0)->content);
+		ms_execute(first_child); //0 cause we know first child is pipeline
 		free_ast(ast);
 		if (strcmp(input, "exit") == 0)
 			break ;

@@ -128,6 +128,9 @@ void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
 void	free_ast(t_ast_node *ast);
 
+/* execution */
+void	ms_execute(t_ast_node *pipeline);
+
 /*
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?

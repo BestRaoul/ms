@@ -112,13 +112,15 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 
 int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 {
-	(void) ast;
 	if (peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ)
 	{
 		ft_printf("Heredoc delimiter expected!");
 		return (-1);
 	}
-	if (!add_ast_child(ast, NONE, ft_lst_get(lexemes, i)->content))
+	t_dict_int_str_member *heredocmem = t_dict_int_str_member_init(HEREDOC, ((t_dict_int_str_member *)ft_lst_get(lexemes, i + 1)->content)->value);
+	if (!heredocmem)
+		return (-1);
+	if (!add_ast_child(ast, NONE, heredocmem))
 		return (-1);
 	ft_printf("(Heredoc %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
 	return (2);

@@ -50,6 +50,7 @@ void	print_type(int type)
 		case LITERAL_DQ: ft_printf("literal dq"); break;
 		case PIPELINE: ft_printf("pipeline"); break;
 		case PIPELINELIST: ft_printf("pipeline_lst"); break;
+		case HEREDOC: ft_printf("heredoc"); break;
 		default: ft_printf("BIG ERROR"); break;
 	}
 	ft_printf("%s", RESET);

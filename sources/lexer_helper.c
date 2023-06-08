@@ -44,7 +44,7 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	t_list	*word;
 
 	/* handle empty string case */
-	if (s[0] == '"' && s[1] == '"' && s[2] == '\0')
+	if (s[pos] == '"' && s[pos + 1] == '"')
 		//return (2);
 	{
 		literal = ft_calloc(1, sizeof(*literal));
@@ -84,7 +84,7 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	int		i;
 
 	/* handle empty string case */
-	if (s[0] == '\'' && s[1] == '\'' && s[2] == '\0')
+	if (s[pos] == '\'' && s[pos + 1] == '\'')
 		//return (2);
 	{
 		literal = ft_calloc(1, sizeof(*literal));

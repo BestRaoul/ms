@@ -52,7 +52,9 @@ int	add_ast_child(t_ast_node *ast, int type, t_dict_int_str_member *lexeme)
 	t_ast_node	*node;
 	t_list		*lst_elem;
 
+
 	lst_elem = ft_lstnew(NULL);
+	ft_printf("allocating child %p\n", lst_elem);
 	if (!lst_elem)
 		return (0);
 	if (lexeme == NULL)
@@ -97,7 +99,6 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int		current;
 
-	(void) ast;
 	current = current_type(i, lexemes);
 	if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 	{
@@ -343,7 +344,7 @@ void	free_ast(t_ast_node *ast)
 	if (ast->content)
 		free(ast->content);
 	if (ast->children)
-		free(ast->children);
+		ft_lstclear(&ast->children, ft_delnode);
 	free(ast);
 	ast = NULL;
 }

@@ -114,7 +114,6 @@ void	ms_execute(t_ast_node *pipeline)
 	}
 	print_argvs(argvs, pipe_i);
 	frees2(1, 1, argvs);
-	return ;
 }
 
 //int	execve(path, argv, env);

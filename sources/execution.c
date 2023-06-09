@@ -122,7 +122,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 	print_argv(argv);
 	printf("(%s) [%s%d%s] -- redir ", argv[0], BLUE, getpid(), RESET);
 	print_redir(lst_redir->next);
-	exit(0);
+	exit(0); //->work here
 	
 	/*consume_redirs()
 		//heredoc

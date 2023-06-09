@@ -28,8 +28,7 @@ int	main(void)
 		ft_printf("ast:\n");
 		print_ast(ast, 0);
 		//EXECUTE here
-		t_ast_node *first_child = (t_ast_node *)(ft_lst_get(ast->children, 0)->content);
-		ms_execute(first_child); //0 cause we know first child is pipeline
+		execute_pl(ast);
 		free_ast(ast);
 		if (strcmp(input, "exit") == 0)
 			break ;

@@ -207,7 +207,7 @@ t_list	*scan_tokens(char *s)
 	//start = 0;
 	res = NULL;
 	i = 0;
-	while (s[i])
+	while (s && s[i])
 	{
 		advance_len = handle_lexeme(&res, s, i);
 		//print_lexeme_tlist(res);

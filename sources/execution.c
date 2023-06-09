@@ -275,7 +275,6 @@ void	ms_execute(t_ast_node *pipeline)
 	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], (void (*)(void *))free_ast);
 	frees2(1, 1, argvs);
-	return ;
 }
 
 void	execute_pl(t_ast_node *pl)

@@ -70,7 +70,7 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 //	printf("argv's: %d\n", count_child_pipes(ast) + 1);
 	char ***argvs = calloc(p_count + 1, sizeof(char **)); //nc
 	int literal_c = 0;
-	int	prev_type = LITERAL;
+	int	prev_type = NONE;
 	while (child != NULL)
 	{
 		literal_c += (IS_LITERAL(child->type) && !IS_REDIR(prev_type));
@@ -80,7 +80,7 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 //			printf("(%d)-th argv: %d\n", j, literal_c + 1);
 			argvs[j++] = calloc(literal_c + 1, sizeof(char *)); //nc
 			literal_c = 0;
-			prev_type = LITERAL;
+			prev_type = NONE;
 		}
 		child = get_child(ast, i++);
 	}
@@ -156,12 +156,13 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 			//else
 				//continue; -> save PID next to argv in table
 				//waiting for signal to know if it failed
+	//free_all();
 }
 
 pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
 {
 	pid_t	*pids = calloc(p_count + 1, sizeof(pid_t)); //nc
-	pid_t parent = getpid();
+	pid_t	parent = getpid();
 	int	i = 0;
 
 	while (i < p_count)
@@ -185,17 +186,6 @@ t_list	**init_redirs(int p_count)
 		i++;
 	}
 	return redirs;
-}
-
-#include <signal.h>
-void	start_subshells(pid_t *pids, int p_count)
-{
-	int	i = 0;
-	while (i < p_count)
-	{
-		kill(pids[i], SIGUSR1);
-		i++;
-	}	
 }
 
 void	print_argvs(char ***argvs, int p_count)
@@ -238,7 +228,6 @@ void	ms_execute(t_ast_node *pipeline)
 			//'&&'/'||' found = inside parenthesis
 		*/
 		
-		
 		if (IS_LITERAL(child->type) && !IS_REDIR(prev_type))
 			(argvs[pipe_i])[arg_i++] = ft_strdup(child->content); //nc
 		else if (IS_LITERAL(child->type)) ;
@@ -251,7 +240,7 @@ void	ms_execute(t_ast_node *pipeline)
 			redir->type = child->type;
 			ft_lstadd_back(&redirs[pipe_i], ft_lstnew(redir)); //nc
 		}
-		else if (child->type == HEREDOCOP) ;
+		else if (child->type == HEREDOCOP) ; //not done yet
 		else if (child->type == PIPE)
 		{ pipe_i++; arg_i = 0; prev_type = NONE;}
 		else if (child->type == PIPELINE)
@@ -274,6 +263,7 @@ void	ms_execute(t_ast_node *pipeline)
 	
 	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], (void (*)(void *))free_ast);
+	//free pids
 	frees2(1, 1, argvs);
 }
 

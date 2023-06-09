@@ -130,6 +130,7 @@ void	free_ast(t_ast_node *ast);
 
 /* execution */
 void	ms_execute(t_ast_node *pipeline);
+void	execute_pl(t_ast_node *pl);
 
 /*
 	Cmdline ::= PipelineList

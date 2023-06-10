@@ -32,9 +32,9 @@ int	main(void)
 		print_ast(ast, 0);
 		//EXECUTE here
 		execute_pl(ast);
-		free_ast(ast);
 		if (strcmp(input, "exit") == 0)
 			break ;
+		free_ast(ast);
 		free(input);
 	}
 	free_ast(ast);

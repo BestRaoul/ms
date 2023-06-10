@@ -379,7 +379,7 @@ void	free_ast(t_ast_node *ast)
 	if (ast->content)
 		free(ast->content);
 	if (ast->children)
-		ft_lstclear(&ast->children, ft_delnode);
+		free(ast->children);
 	free(ast);
 	ast = NULL;
 }

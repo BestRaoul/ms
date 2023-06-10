@@ -34,6 +34,14 @@ typedef struct s_redir {
 
 // https://tldp.org/LDP/abs/html/io-redirection.html
 
+void	free_t_redir(void *ptr)
+{
+	if (ptr == NULL) return;
+	if (((t_redir *)ptr)->val != NULL)
+		free(((t_redir *)ptr)->val);
+	free(ptr);
+}
+
 t_ast_node	*get_child(t_ast_node	*node, int i)
 {
 	t_list	*temp = ft_lst_get(node->children, i);
@@ -70,17 +78,14 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 //	printf("argv's: %d\n", count_child_pipes(ast) + 1);
 	char ***argvs = calloc(p_count + 1, sizeof(char **)); //nc
 	int literal_c = 0;
-	int	prev_type = NONE;
 	while (child != NULL)
 	{
-		literal_c += (IS_LITERAL(child->type) && !IS_REDIR(prev_type));
-		prev_type = child->type;
+		literal_c += (IS_LITERAL(child->type));
 		if (child->type == PIPE)
 		{
 //			printf("(%d)-th argv: %d\n", j, literal_c + 1);
 			argvs[j++] = calloc(literal_c + 1, sizeof(char *)); //nc
 			literal_c = 0;
-			prev_type = NONE;
 		}
 		child = get_child(ast, i++);
 	}
@@ -88,6 +93,19 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 	argvs[j++] = calloc(literal_c + 1, sizeof(char *));
 	argvs[j] = NULL;
 	return (argvs);
+}
+
+void	print_argvs(char ***argvs, int p_count)
+{
+	for (int k=0; k<p_count; k++)
+	{
+		printf("argv: [");
+		int l=0;
+		char **_argv = argvs[k];
+		while (_argv[l] != NULL)
+			printf("%s, ", _argv[l++]);
+		printf("\b\b] argc: %d\n", l);
+	}
 }
 
 void	print_argv(char **argv)
@@ -188,19 +206,6 @@ t_list	**init_redirs(int p_count)
 	return redirs;
 }
 
-void	print_argvs(char ***argvs, int p_count)
-{
-	for (int k=0; k<p_count; k++)
-	{
-		printf("argv: [");
-		int l=0;
-		char **_argv = argvs[k];
-		while (_argv[l] != NULL)
-			printf("%s, ", _argv[l++]);
-		printf("\b\b] argc: %d\n", l);
-	}
-}
-
 #include <sys/wait.h>
 void	ms_execute(t_ast_node *pipeline)
 {
@@ -213,7 +218,6 @@ void	ms_execute(t_ast_node *pipeline)
 	char	***argvs = alloc_argvs(pipeline, p_count); //nc
 	t_list	**redirs = init_redirs(p_count); //nc //array of t_list_ptr
 
-	int	prev_type = NONE;
 	while (child != NULL)
 	{
 		/* --plan--
@@ -228,33 +232,28 @@ void	ms_execute(t_ast_node *pipeline)
 			//'&&'/'||' found = inside parenthesis
 		*/
 		
-		if (IS_LITERAL(child->type) && !IS_REDIR(prev_type))
+		if (IS_LITERAL(child->type))// && !IS_REDIR(prev_type))
 			(argvs[pipe_i])[arg_i++] = ft_strdup(child->content); //nc
-		else if (IS_LITERAL(child->type)) ;
 		else if (IS_REDIR(child->type))
 		{
-			t_ast_node *next_child = get_child(pipeline, child_i);
 			t_redir *redir = calloc(1, sizeof(t_redir)); //nc
-			if (next_child != NULL)
-				redir->val = ft_strdup(next_child->content); //nc
+			redir->val = ft_strdup(child->content); //nc
 			redir->type = child->type;
 			ft_lstadd_back(&redirs[pipe_i], ft_lstnew(redir)); //nc
 		}
 		else if (child->type == HEREDOCOP) ; //not done yet
 		else if (child->type == PIPE)
-		{ pipe_i++; arg_i = 0; prev_type = NONE;}
+		{ pipe_i++; arg_i = 0;}
 		else if (child->type == PIPELINE)
 			ms_execute(child); // (if fail =>return -1;)
 		else //&& or ||
 			printf("BIG ERROR");
 		
-		if (child->type != PIPE) prev_type = child->type;
 		child = get_child(pipeline, child_i++); //nc
 	}
 	//all redirs are ready
 	//all argvs are ready
 	//heredoc pipes, NOT-ready yet.
-	print_argvs(argvs, p_count);
 	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
 	(void) pids;
 	//wait_pid_all
@@ -262,9 +261,9 @@ void	ms_execute(t_ast_node *pipeline)
 	//pause();
 	
 	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
-	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], (void (*)(void *))free_ast);
+	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
 	//free pids
-	frees2(1, 1, argvs);
+	frees2(2, 1, argvs, 0, pids);
 }
 
 void	execute_pl(t_ast_node *pl)

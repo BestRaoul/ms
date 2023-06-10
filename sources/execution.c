@@ -13,14 +13,10 @@
 #include "ms.h"
 
 /* TODO
- - pids
-	- start -> sleep -> add pid to pids
- . redirs
-	- add_redir L R HERE APP
-	. consume
  . returns - RETHINK
 	- waitpid for
 	. -1
+ . wrapper for malloc => garbage collector
  . fix env (static for now)
 */
 
@@ -31,6 +27,12 @@ typedef struct s_redir {
 	int		type;
 	char	*val;
 } t_redir;
+
+typedef	struct s_free {
+	char	***argvs;
+	t_list	**redirs;
+	int		p_count;
+} t_free;
 
 void	free_t_redir(void *ptr)
 {
@@ -66,6 +68,32 @@ int	count_child_pipes(t_ast_node *ast)
 		child = get_child(ast, i++);
 	}
 	return (c);
+}
+
+void	close_pipes(t_list *redirs)
+{
+	int	redir_i = 0;
+	t_redir *r = get_redir(redirs, redir_i++);
+	while (r != NULL)
+	{
+		//is_redir not needed to close becaus O_CLOEXEC
+		if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
+			close(ft_atoi(r->val));
+		r = get_redir(redirs, redir_i++);
+	}
+}
+
+void	print_open_fds(int	max, int fd)
+{
+	int	i = 0;
+	dprintf(fd, "[%d] fds: [", getpid());
+	while (i < max)
+	{
+		int is = fcntl(i, F_GETFL);
+		dprintf(fd, "%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
+		i++;
+	}
+	dprintf(fd, "\b\b]\n");
 }
 
 char	***alloc_argvs(t_ast_node *ast, int p_count)
@@ -216,8 +244,23 @@ void	consume_redirs(t_list *redirs)
 	}
 }
 
+void	close_all_pipes(t_list **redirs)
+{
+	int	i = 0;
+	while (redirs[i] != NULL)
+		close_pipes(redirs[i++]->next);
+}
+
+int	arg_count(char **argv)
+{
+	int	i = 0;
+	while (argv[i] != NULL)
+		i++;
+	return i;
+}
+
 extern char **environ;
-void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
+void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free)
 {
 	printf("(%s) [%s%d%s] -- spawned from %s%d%s\n", argv[0], BLUE, getpid(), RESET, GREEN, parent_pid, RESET);
 	printf("(%s) [%s%d%s] -- args ", argv[0], BLUE, getpid(), RESET);
@@ -225,9 +268,23 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 	printf("(%s) [%s%d%s] -- redir ", argv[0], BLUE, getpid(), RESET);
 	print_redirs(lst_redir->next);
 	consume_redirs(lst_redir->next); //-1
-	
-	char *pathname = ft_getpath(argv[0], environ); //nc	
-	execve(pathname, argv, environ);
+	int		argc = arg_count(argv);
+	char	**my_argv = calloc(argc, sizeof(char *));//nc
+	int	i = 0;
+	while (i < argc)
+	{
+		my_argv[i] = ft_strdup(argv[i]);//nc
+		i++;
+	}
+
+	close_all_pipes(to_free.redirs);
+	print_open_fds(10, 1);	
+	for(int x=0; x<to_free.p_count; x++) ft_lstclear(&(to_free.redirs)[x], &free_t_redir);
+	frees2(1, 1, to_free.argvs);
+	//free_all () -> with the help of garbage collector
+
+	char *pathname = ft_getpath(my_argv[0], environ); //nc	
+	execve(pathname, my_argv, environ);
 
 	printf("EXEC ERROR or not found\n");
 	//free_all();
@@ -236,6 +293,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 
 pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
 {
+	t_free	to_free = (t_free){argvs, redirs, p_count};
 	pid_t	*pids = calloc(p_count + 1, sizeof(pid_t)); //nc
 	pid_t	parent = getpid();
 	int	i = 0;
@@ -244,7 +302,7 @@ pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
 	{
 		pids[i] = fork(); //error -1
 		if (pids[i] == 0)
-			execute_command(argvs[i], redirs[i], parent);
+			execute_command(argvs[i], redirs[i], parent, to_free);
 		i++;
 	}
 	return pids;
@@ -277,7 +335,7 @@ t_list	*alloc_redir(int type, char *val)
 int	heredoc_handler(char *delimiter)
 {
 	int	_pipe[2];
-	pipe2(_pipe, __O_CLOEXEC); //-1
+	pipe(_pipe); //-1
 	char	*input;
 
 	input = readline("|> ");
@@ -290,32 +348,6 @@ int	heredoc_handler(char *delimiter)
 	}
 	close(_pipe[1]);
 	return _pipe[0];
-}
-
-void	close_pipes(t_list *redirs)
-{
-	int	redir_i = 0;
-	t_redir *r = get_redir(redirs, redir_i++);
-	while (r != NULL)
-	{
-		//is_redir not needed to close becaus O_CLOEXEC
-		if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
-			close(ft_atoi(r->val));
-		r = get_redir(redirs, redir_i++);
-	}
-}
-
-void	print_open_fds(int	max)
-{
-	int	i = 0;
-	printf("[%d] fds: [", getpid());
-	while (i < max)
-	{
-		int is = fcntl(i, F_GETFL);
-		printf("%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
-		i++;
-	}
-	printf("\b\b]\n");
 }
 
 #include <sys/wait.h>
@@ -358,7 +390,7 @@ void	ms_execute(t_ast_node *pipeline)
 		}
 		else if (child->type == PIPE)
 		{ 
-			pipe2(_pipe, __O_CLOEXEC); //-1
+			pipe(_pipe); //-1
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1]))); //nc
 			pipe_i++; arg_i = 0;
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
@@ -371,7 +403,7 @@ void	ms_execute(t_ast_node *pipeline)
 		child = get_child(pipeline, child_i++); //nc
 	}
 	//all argvs, redirs (left, right, append, heredocs, pipes) are ready
-	print_open_fds(20);
+//	print_open_fds(20, 1);
 	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
 	
 	//return value management
@@ -379,7 +411,7 @@ void	ms_execute(t_ast_node *pipeline)
 	{	
 		waitpid(pids[x], NULL, 0);
 		close_pipes(redirs[x]->next);
-		print_open_fds(20);
+//		print_open_fds(20, 1);
 	}
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
 	frees2(2, 1, argvs, 0, pids);

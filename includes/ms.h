@@ -2,10 +2,6 @@
 #ifndef MS_H
 # define MS_H
 
-#define _GNU_SOURCE             /* See feature_test_macros(7) */
-#include <fcntl.h>              /* Obtain O_* constant definitions */
-#include <unistd.h>
-
 # include "libft.h"
 # include <stdio.h>
 # include <readline/readline.h>

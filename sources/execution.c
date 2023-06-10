@@ -76,7 +76,7 @@ void	close_pipes(t_list *redirs)
 	t_redir *r = get_redir(redirs, redir_i++);
 	while (r != NULL)
 	{
-		//is_redir not needed to close becaus O_CLOEXEC
+		//others not needed to close becaus O_CLOEXEC
 		if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
 			close(ft_atoi(r->val));
 		r = get_redir(redirs, redir_i++);
@@ -182,13 +182,14 @@ void	consume_redirs(t_list *redirs)
 	}
 	printf("[%d] %.0d > %.0d\n", getpid(), in_i != -1 ? in_i : 0, out_i != -1 ? out_i : 0);
 
-	//second pass to just create the files unused
+	//second pass to just create the files unused and close pipes unused
 	redir_i = 0;
 	r = get_redir(redirs, redir_i++);
 	while (r != NULL)
 	{
 		if (redir_i != in_i && redir_i != out_i)
 		{
+			printf("[%d] inside second loop\n", getpid());
 			int temp_fd = -1;
 			if (r->type == REDIRRIGHT || r->type == APPEND)
 				temp_fd = creat(r->val, (unsigned int)00664);
@@ -310,7 +311,7 @@ pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
 
 t_list	**init_redirs(int p_count)
 {
-	t_list **redirs = calloc(p_count, sizeof(t_list *)); //nc
+	t_list **redirs = calloc(p_count + 1, sizeof(t_list *)); //nc
 	int	i = 0;
 
 	while (i < p_count)
@@ -318,6 +319,7 @@ t_list	**init_redirs(int p_count)
 		redirs[i] = ft_lstnew(NULL); //nc
 		i++;
 	}
+	redirs[i] = NULL;
 	return redirs;
 }
 
@@ -406,11 +408,12 @@ void	ms_execute(t_ast_node *pipeline)
 //	print_open_fds(20, 1);
 	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
 	
+	close_all_pipes(redirs);
 	//return value management
 	for(int x=0; x<p_count; x++)
 	{	
 		waitpid(pids[x], NULL, 0);
-		close_pipes(redirs[x]->next);
+//		close_pipes(redirs[x]->next);
 //		print_open_fds(20, 1);
 	}
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);

@@ -8,6 +8,8 @@
         "type_traits": "c",
         "utility": "c",
         "random": "c",
-        "signal.h": "c"
+        "signal.h": "c",
+        "history.h": "c",
+        "fcntl.h": "c"
     }
 }

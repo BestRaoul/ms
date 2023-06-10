@@ -127,6 +127,7 @@ void	print_redir(t_list *redir)
 		if (r->type == REDIRLEFT) printf("<");
 		if (r->type == REDIRRIGHT) printf(">");
 		if (r->type == APPEND) printf(">>");
+		if (r->type == PIPE) printf("|");
 		printf("%s%s%s%s, ", RESET, CYAN, r->val, RESET);
 		r = get_redir(redir, redir_i++);
 	}
@@ -206,6 +207,17 @@ t_list	**init_redirs(int p_count)
 	return redirs;
 }
 
+t_list	*alloc_redir(int type, char *val)
+{
+	if (val == NULL)
+		return NULL;
+	t_redir *redir = malloc(sizeof(t_redir)); //nc
+	redir->type = type;
+	redir->val = val;
+	t_list *_redir = ft_lstnew(redir); //nc =>free
+	return _redir;
+}
+
 #include <sys/wait.h>
 void	ms_execute(t_ast_node *pipeline)
 {
@@ -217,6 +229,7 @@ void	ms_execute(t_ast_node *pipeline)
 	t_ast_node	*child = get_child(pipeline, child_i++); //nc
 	char	***argvs = alloc_argvs(pipeline, p_count); //nc
 	t_list	**redirs = init_redirs(p_count); //nc //array of t_list_ptr
+	int	_pipe[2] = {-1, -1};
 
 	while (child != NULL)
 	{
@@ -225,7 +238,7 @@ void	ms_execute(t_ast_node *pipeline)
 		//REDIR
 			//handle redir -> switch
 		//PIPE
-			//j=0; argvs++; redirect both out and in
+			//j=0; argvs++; add pipes
 		//PIPELINE
 			//-r ms_exec
 		//AND,OR ??
@@ -236,14 +249,17 @@ void	ms_execute(t_ast_node *pipeline)
 			(argvs[pipe_i])[arg_i++] = ft_strdup(child->content); //nc
 		else if (IS_REDIR(child->type))
 		{
-			t_redir *redir = calloc(1, sizeof(t_redir)); //nc
-			redir->val = ft_strdup(child->content); //nc
-			redir->type = child->type;
-			ft_lstadd_back(&redirs[pipe_i], ft_lstnew(redir)); //nc
+			t_list	*redir = alloc_redir(child->type, ft_strdup(child->content)); //nc
+			ft_lstadd_back(&redirs[pipe_i], redir);
 		}
 		else if (child->type == HEREDOCOP) ; //not done yet
 		else if (child->type == PIPE)
-		{ pipe_i++; arg_i = 0;}
+		{ 
+			pipe(_pipe); //-1
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE, ft_itoa(_pipe[1]))); //nc
+			pipe_i++; arg_i = 0;
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE, ft_itoa(_pipe[0]))); //nc
+		}
 		else if (child->type == PIPELINE)
 			ms_execute(child); // (if fail =>return -1;)
 		else //&& or ||
@@ -262,7 +278,6 @@ void	ms_execute(t_ast_node *pipeline)
 	
 	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
-	//free pids
 	frees2(2, 1, argvs, 0, pids);
 }
 

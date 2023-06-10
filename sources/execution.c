@@ -32,8 +32,6 @@ typedef struct s_redir {
 	char	*val;
 } t_redir;
 
-// https://tldp.org/LDP/abs/html/io-redirection.html
-
 void	free_t_redir(void *ptr)
 {
 	if (ptr == NULL) return;
@@ -154,6 +152,7 @@ void	consume_redirs(t_list *redirs)
 			out_i = redir_i;
 		r = get_redir(redirs, redir_i++);
 	}
+	printf("[%d] %.0d > %.0d\n", getpid(), in_i != -1 ? in_i : 0, out_i != -1 ? out_i : 0);
 
 	//second pass to just create the files unused
 	redir_i = 0;
@@ -187,20 +186,22 @@ void	consume_redirs(t_list *redirs)
 			int	to, from;
 			if (r->type == REDIRRIGHT)
 			{
-				to = open(r->val, O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
+				to = open(r->val, __O_CLOEXEC | O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
 				from = STDOUT_FILENO;
 			}
 			if (r->type == APPEND)
 			{
-				to = open(r->val, O_WRONLY | O_CREAT | O_APPEND, (unsigned int)00664);
+				to = open(r->val, __O_CLOEXEC | O_WRONLY | O_CREAT | O_APPEND, (unsigned int)00664);
 				from = STDOUT_FILENO;
 			}
 			if (r->type == REDIRLEFT)
 			{
-				to = open(r->val, O_RDONLY, (unsigned int)00664);
+				to = open(r->val, __O_CLOEXEC | O_RDONLY, (unsigned int)00664);
 				from = STDIN_FILENO;
 			}
-			if (r->type == HEREDOC || r->type == PIPE_IN)
+			if (r->type == HEREDOC)
+			{ to = ft_atoi(r->val); from = STDIN_FILENO;}
+			if (r->type == PIPE_IN)
 			{ to = ft_atoi(r->val); from = STDIN_FILENO;}
 			if (r->type == PIPE_OUT)
 			{ to = ft_atoi(r->val); from = STDOUT_FILENO;}
@@ -225,9 +226,10 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 	print_redirs(lst_redir->next);
 	consume_redirs(lst_redir->next); //-1
 	
-	//getproperpath
-	//execve("", argv, environ);
+	char *pathname = ft_getpath(argv[0], environ); //nc	
+	execve(pathname, argv, environ);
 
+	printf("EXEC ERROR or not found\n");
 	//free_all();
 	exit(0);
 }
@@ -275,17 +277,45 @@ t_list	*alloc_redir(int type, char *val)
 int	heredoc_handler(char *delimiter)
 {
 	int	_pipe[2];
-	pipe(_pipe); //-1
+	pipe2(_pipe, __O_CLOEXEC); //-1
 	char	*input;
 
 	input = readline("|> ");
 	while (strcmp(input, delimiter) != 0)
 	{
 		write(_pipe[1], input, ft_strlen(input));
+		write(_pipe[1], "\n", 1);
+		free(input);
 		input = readline("|> ");
 	}
 	close(_pipe[1]);
 	return _pipe[0];
+}
+
+void	close_pipes(t_list *redirs)
+{
+	int	redir_i = 0;
+	t_redir *r = get_redir(redirs, redir_i++);
+	while (r != NULL)
+	{
+		//is_redir not needed to close becaus O_CLOEXEC
+		if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
+			close(ft_atoi(r->val));
+		r = get_redir(redirs, redir_i++);
+	}
+}
+
+void	print_open_fds(int	max)
+{
+	int	i = 0;
+	printf("[%d] fds: [", getpid());
+	while (i < max)
+	{
+		int is = fcntl(i, F_GETFL);
+		printf("%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
+		i++;
+	}
+	printf("\b\b]\n");
 }
 
 #include <sys/wait.h>
@@ -328,7 +358,7 @@ void	ms_execute(t_ast_node *pipeline)
 		}
 		else if (child->type == PIPE)
 		{ 
-			pipe(_pipe); //-1
+			pipe2(_pipe, __O_CLOEXEC); //-1
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1]))); //nc
 			pipe_i++; arg_i = 0;
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
@@ -340,14 +370,17 @@ void	ms_execute(t_ast_node *pipeline)
 		
 		child = get_child(pipeline, child_i++); //nc
 	}
-	//all redirs are ready
-	//all argvs are ready
-	//all heredoc pipes, ready.
+	//all argvs, redirs (left, right, append, heredocs, pipes) are ready
+	print_open_fds(20);
 	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
-	(void) pids;
 	
 	//return value management
-	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
+	for(int x=0; x<p_count; x++)
+	{	
+		waitpid(pids[x], NULL, 0);
+		close_pipes(redirs[x]->next);
+		print_open_fds(20);
+	}
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
 	frees2(2, 1, argvs, 0, pids);
 }
@@ -372,34 +405,3 @@ void	execute_pl(t_ast_node *pl)
 	printf(succes ? GREEN : RED);
 	*/
 }
-
-//int	execve(path, argv, env);
-/* fork => execve example
-int	launch_sub(char **argv)
-{
-	pid_t	pid;
-
-	pid = fork();
-	if (pid == 0)
-		return execve(argv[0], argv, NULL);
-	else
-		return 0;
-}
-*/
-
-/* all token types you can find in a proper ast execute-ready tree
-PIPE, // new argv
-REDIRLEFT, // redirect
-REDIRRIGHT, //redirect
-HEREDOCOP, //redirect (but weirder, use static string for testing)
-APPEND, >> //redirect but different
-AND, //after of pipeline
-OR, //after pipeline
-LITERAL_NQ, //arg
-LITERAL_SQ, //arg
-LITERAL_DQ, //arg
-PIPELINELIST,
-PIPELINE, //inside
-*/
-
-

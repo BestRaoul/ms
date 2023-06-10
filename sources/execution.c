@@ -128,6 +128,7 @@ void	print_redir(t_list *redir)
 		if (r->type == REDIRRIGHT) printf(">");
 		if (r->type == APPEND) printf(">>");
 		if (r->type == PIPE) printf("|");
+		if (r->type == HEREDOC) printf("<<");
 		printf("%s%s%s%s, ", RESET, CYAN, r->val, RESET);
 		r = get_redir(redir, redir_i++);
 	}
@@ -218,6 +219,22 @@ t_list	*alloc_redir(int type, char *val)
 	return _redir;
 }
 
+int	heredoc_handler(char *delimiter)
+{
+	int	_pipe[2];
+	pipe(_pipe); //-1
+	char	*input;
+
+	input = readline("|> ");
+	while (strcmp(input, delimiter) != 0)
+	{
+		write(_pipe[1], input, ft_strlen(input));
+		input = readline("|> ");
+	}
+	close(_pipe[1]);
+	return _pipe[0];
+}
+
 #include <sys/wait.h>
 void	ms_execute(t_ast_node *pipeline)
 {
@@ -235,12 +252,11 @@ void	ms_execute(t_ast_node *pipeline)
 	{
 		/* --plan--
 		//LITERAL -done
-		//REDIR
-			//handle redir -> switch
-		//PIPE
-			//j=0; argvs++; add pipes
+		//REDIR	  -done
+		//PIPE	  -done
 		//PIPELINE
 			//-r ms_exec
+			//return value management
 		//AND,OR ??
 			//'&&'/'||' found = inside parenthesis
 		*/
@@ -252,7 +268,11 @@ void	ms_execute(t_ast_node *pipeline)
 			t_list	*redir = alloc_redir(child->type, ft_strdup(child->content)); //nc
 			ft_lstadd_back(&redirs[pipe_i], redir);
 		}
-		else if (child->type == HEREDOCOP) ; //not done yet
+		else if (child->type == HEREDOC)
+		{
+			int	fd_pipe_end = heredoc_handler(child->content);
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(HEREDOC, ft_itoa(fd_pipe_end))); //nc
+		}
 		else if (child->type == PIPE)
 		{ 
 			pipe(_pipe); //-1
@@ -269,13 +289,11 @@ void	ms_execute(t_ast_node *pipeline)
 	}
 	//all redirs are ready
 	//all argvs are ready
-	//heredoc pipes, NOT-ready yet.
+	//all heredoc pipes, ready.
 	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
 	(void) pids;
-	//wait_pid_all
-		//int	*returns[]; .. if last return -1 => paint it red!
-	//pause();
 	
+	//return value management
 	for(int x=0; x<p_count; x++) waitpid(pids[x], NULL, 0);
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
 	frees2(2, 1, argvs, 0, pids);

@@ -95,7 +95,7 @@ enum TokenTypes {
 	REDIR,
 	REDIROP,
 	HEREDOC,
-	EPSILON,
+	ASSIGN,
 };
 
 /*enum NonTerminals {
@@ -132,7 +132,7 @@ void	free_ast(t_ast_node *ast);
 void	ms_execute(t_ast_node *pipeline);
 void	execute_pl(t_ast_node *pl);
 
-/*
+/* v1
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?
 	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
@@ -144,12 +144,25 @@ void	execute_pl(t_ast_node *pl);
 	CmdArg ::= Lit
  * */
 
-/* last version, might be flawed
+/* v2
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?
 	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
 	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline | Redir PipeSuffix
 	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix?
+	Redir ::= RedirOp CmdArg
+ 	RedirOp ::= ">" | "<" | ">>"
+	Heredoc ::= "<<" Lit
+	CmdArg ::= Lit
+ * */
+
+/* v3
+	Cmdline ::= PipelineList
+	PipelineList ::= Pipeline PipelineList?
+	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
+	PipeSuffix ::= "|" Pipeline | "&&" Pipeline | "||" Pipeline | Redir PipeSuffix
+	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix? | Assign CmdInfix?
+ 	Assign ::= "=" CmdArg
 	Redir ::= RedirOp CmdArg
  	RedirOp ::= ">" | "<" | ">>"
 	Heredoc ::= "<<" Lit

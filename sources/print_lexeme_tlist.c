@@ -39,7 +39,7 @@ void	print_type(int type)
 		case PIPE: ft_printf("|"); break;
 		case REDIRLEFT: ft_printf("<"); break;
 		case REDIRRIGHT: ft_printf(">"); break;
-		case EQUAL: ft_printf("="); break;
+		case ASSIGN: ft_printf("="); break;
 		case HEREDOCOP: ft_printf("<<"); break;
 		case APPEND: ft_printf(">>"); break;
 		case AND: ft_printf("&&"); break;

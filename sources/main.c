@@ -19,14 +19,14 @@ int	main(void)
 			add_history(input);
 		else
 			break ;
-		//printf("%s➜  %s%s\n", BPURPLE, RESET, input);
+		ft_printf("%s", RESET);
 		t_list	*lexemes = scan_tokens(input);
 		if (!lexemes)
 			break ;
-		//TODO: possible leak
 		//replace_envvars(lexemes);
 		//print_lexeme_tlist2(lexemes);
-		prs_pipelinelist(0, lexemes, ast);
+		if (prs_pipelinelist(0, lexemes, ast) == -1)
+			continue ;
 		ft_lstclear(&lexemes, free_lexeme_node);
 		ft_printf("ast:\n");
 		print_ast(ast, 0);

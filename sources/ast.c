@@ -54,7 +54,7 @@ int	add_ast_child(t_ast_node *ast, int type, t_dict_int_str_member *lexeme)
 
 
 	lst_elem = ft_lstnew(NULL);
-	ft_printf("allocating child %p\n", lst_elem);
+	//ft_printf("allocating child %p\n", lst_elem);
 	if (!lst_elem)
 		return (0);
 	if (lexeme == NULL)
@@ -78,6 +78,21 @@ int	peek_type(int i, t_list *lst)
 	if (i >= ft_lstsize(lst) - 1)
 		return (END);
 	current = ft_lst_get(lst, i + 1);
+	if (!current)
+		return (FAILED);
+	return (((t_dict_int_str_member *)current->content)->key);
+}
+
+/* Like peek but backwards */
+int	back_type(int i, t_list *lst)
+{
+	t_list	*current;
+
+	if (i > ft_lstsize(lst))
+		return (END);
+	if (i == 0)
+		return (FAILED);
+	current = ft_lst_get(lst, i - 1);
 	if (!current)
 		return (FAILED);
 	return (((t_dict_int_str_member *)current->content)->key);
@@ -113,7 +128,9 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 
 int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 {
-	if (peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ || peek_type(i, lexemes) != LITERAL_NQ)
+	if (!ft_lst_get(lexemes, i + 1))
+		return (-1);
+	if (peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ)
 	{
 		ft_printf("Heredoc delimiter expected!");
 		return (-1);
@@ -132,42 +149,36 @@ int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 	int		peek;
 	int		current;
 	char	*redir_str;
-	int		argres;
 
+	if (!ft_lst_get(lexemes, i + 1))
+		return (-1);
+	peek = peek_type(i, lexemes);
+	if (peek != LITERAL_NQ && peek != LITERAL_SQ && peek != LITERAL_DQ)
+	{
+		ft_printf("Filename expected! ");
+		return (-1);
+	}
 	current = current_type(i, lexemes);
 	redir_str = ">>";
 	if (current == REDIRLEFT)
 	{
 		redir_str = "<";
-		if (!add_ast_child(ast, REDIRLEFT, NULL))
+		if (!add_ast_child(ast, REDIRLEFT, ft_lst_get(lexemes, i + 1)->content))
 			return (-1);
 	}
 	else if (current == REDIRRIGHT)
 	{
 		redir_str = ">";
-		if (!add_ast_child(ast, REDIRRIGHT, NULL))
+		if (!add_ast_child(ast, REDIRRIGHT, ft_lst_get(lexemes, i + 1)->content))
 			return (-1);
 	}
 	else
 	{
-		if (!add_ast_child(ast, APPEND, NULL))
+		if (!add_ast_child(ast, APPEND, ft_lst_get(lexemes, i + 1)->content))
 			return (-1);
 	}
-	peek = peek_type(i, lexemes);
-	if (peek == LITERAL_NQ || peek == LITERAL_SQ || peek == LITERAL_DQ)
-	{
-		ft_printf("(Redir %s ", redir_str);
-		argres = prs_arg(i + 1, lexemes, ast);
-		if (argres == -1)
-			return (-1);
-		ft_printf(")");
-		return (1 + argres);
-	}
-	else
-	{
-		ft_printf("Command or filename expected! ");
-		return (-1);
-	}
+	ft_printf("(Redir %s %s)", redir_str, ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
+	return (2);
 }
 
 int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
@@ -230,6 +241,26 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	return (redir_res + pipeline_res);
 }
 
+int	prs_assign(int i, t_list *lexemes, t_ast_node *ast)
+{
+	if (!ft_lst_get(lexemes, i + 1) || !ft_lst_get(lexemes, i - 1))
+		return (-1);
+	if (back_type(i, lexemes) != LITERAL_NQ && back_type(i, lexemes) != LITERAL_DQ && back_type(i, lexemes) != LITERAL_SQ)
+		return (-1);
+	if (peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_DQ && peek_type(i, lexemes) != LITERAL_SQ)
+	{
+		ft_printf("Variable value expected!");
+		return (-1);
+	}
+	t_dict_int_str_member *assignmem = t_dict_int_str_member_init(ASSIGN, ((t_dict_int_str_member *)ft_lst_get(lexemes, i + 1)->content)->value);
+	if (!assignmem)
+		return (-1);
+	if (!add_ast_child(ast, ASSIGN, assignmem))
+		return (-1);
+	ft_printf("(Assignment %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
+	return (2);
+}
+
 int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prefix_res;
@@ -238,7 +269,7 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 
 	res = 0;
 	current = current_type(i, lexemes);
-	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP)
+	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP || current == EQUAL)
 	{
 		ft_printf("(CmdInfix ");
 		if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
@@ -248,6 +279,10 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 		else if (current == REDIRLEFT || current == REDIRRIGHT || current == APPEND)
 		{
 			prefix_res = prs_redir(i + res, lexemes, ast);
+		}
+		else if (current == EQUAL)
+		{
+			prefix_res = prs_assign(i + res, lexemes, ast);
 		}
 		else
 		{

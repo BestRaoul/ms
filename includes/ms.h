@@ -156,19 +156,6 @@ void	execute_pl(t_ast_node *pl);
 	CmdArg ::= Lit
  * */
 
-/* v3
-	Cmdline ::= PipelineList
-	PipelineList ::= Pipeline PipelineList?
-	Pipeline ::= CmdInfix? PipeSuffix? | "("Pipeline")" PipeSuffix?
-	PipeSuffix ::= "|" Pipeline | "&&" Pipeline | "||" Pipeline | Redir PipeSuffix
-	CmdInfix ::= CmdArg CmdInfix? | Redir CmdInfix? | Heredoc CmdInfix? | Assign CmdInfix?
- 	Assign ::= "=" CmdArg
-	Redir ::= RedirOp CmdArg
- 	RedirOp ::= ">" | "<" | ">>"
-	Heredoc ::= "<<" Lit
-	CmdArg ::= Lit
- * */
-
 
 //CMDLINE -> CMDLINE' AND CMDLINE
 //CMDLINE -> CMDLINE' OR CMDLINE

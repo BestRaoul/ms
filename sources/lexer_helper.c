@@ -109,7 +109,7 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 /* function that tells if a char can be part of an unquoted literal */
 int	valid_noquote_chr(char c)
 {
-	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>' && c != '=' && !ft_isspace(c));
+	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>' /*&& c != '='*/ && !ft_isspace(c));
 }
 
 /* like double quote but stops at non literal chars and handles wildcards
@@ -164,8 +164,8 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 		return (insert_token_into_lst(REDIRLEFT, NULL, lst, -1));
 	else if (c1 == '>' && c2 != '>')
 		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, -1));
-	else if (c1 == '=')
-		return (insert_token_into_lst(EQUAL, NULL, lst, -1));
+	//else if (c1 == '=')
+		//return (insert_token_into_lst(EQUAL, NULL, lst, -1));
 	else if (c1 == '&')
 		return (insert_token_into_lst(AND, NULL, lst, -1));
 	else if (c1 == '|')

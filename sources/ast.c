@@ -241,26 +241,6 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	return (redir_res + pipeline_res);
 }
 
-int	prs_assign(int i, t_list *lexemes, t_ast_node *ast)
-{
-	if (!ft_lst_get(lexemes, i + 1) || !ft_lst_get(lexemes, i - 1))
-		return (-1);
-	if (back_type(i, lexemes) != LITERAL_NQ && back_type(i, lexemes) != LITERAL_DQ && back_type(i, lexemes) != LITERAL_SQ)
-		return (-1);
-	if (peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_DQ && peek_type(i, lexemes) != LITERAL_SQ)
-	{
-		ft_printf("Variable value expected!");
-		return (-1);
-	}
-	t_dict_int_str_member *assignmem = t_dict_int_str_member_init(ASSIGN, ((t_dict_int_str_member *)ft_lst_get(lexemes, i + 1)->content)->value);
-	if (!assignmem)
-		return (-1);
-	if (!add_ast_child(ast, ASSIGN, assignmem))
-		return (-1);
-	ft_printf("(Assignment %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
-	return (2);
-}
-
 int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prefix_res;
@@ -269,7 +249,7 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 
 	res = 0;
 	current = current_type(i, lexemes);
-	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP || current == EQUAL)
+	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP )
 	{
 		ft_printf("(CmdInfix ");
 		if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
@@ -279,10 +259,6 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 		else if (current == REDIRLEFT || current == REDIRRIGHT || current == APPEND)
 		{
 			prefix_res = prs_redir(i + res, lexemes, ast);
-		}
-		else if (current == EQUAL)
-		{
-			prefix_res = prs_assign(i + res, lexemes, ast);
 		}
 		else
 		{

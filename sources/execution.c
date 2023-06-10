@@ -16,10 +16,10 @@
  - pids
 	- start -> sleep -> add pid to pids
  . redirs
-	. add_redir L R HERE APP
+	- add_redir L R HERE APP
 	. consume
  . returns - RETHINK
-	. waitpid for
+	- waitpid for
 	. -1
  . fix env (static for now)
 */
@@ -116,67 +116,120 @@ void	print_argv(char **argv)
 	printf("\b\b%s]\n", RESET);
 }
 
-void	print_redir(t_list *redir)
+void	print_redirs(t_list *redirs)
 {
 	int	redir_i = 0;
-	t_redir *r = get_redir(redir, redir_i++);
+	t_redir *r = get_redir(redirs, redir_i++);
 	printf("[%s", r ? "" : "  ");
 	while (r != NULL)
 	{
 		printf("%s", BPURPLE);
-		if (r->type == REDIRLEFT) printf("<");
 		if (r->type == REDIRRIGHT) printf(">");
 		if (r->type == APPEND) printf(">>");
-		if (r->type == PIPE) printf("|");
+		if (r->type == REDIRLEFT) printf("<");
 		if (r->type == HEREDOC) printf("<<");
+		if (r->type == PIPE_IN) printf("<|");
+		if (r->type == PIPE_OUT) printf(">|");
 		printf("%s%s%s%s, ", RESET, CYAN, r->val, RESET);
-		r = get_redir(redir, redir_i++);
+		r = get_redir(redirs, redir_i++);
 	}
 	printf("\b\b%s]\n", RESET);
 }
 
+void	consume_redirs(t_list *redirs)
+{
+	int	redir_i = 0;
+	t_redir *r = get_redir(redirs, redir_i++);
+
+	int	in_i = -1;
+	int	out_i = -1;
+	//first pass to set in_i and out_i, -1 means unset
+	while (r != NULL)
+	{
+		if (r->type == REDIRLEFT || r->type == HEREDOC || r->type == PIPE_IN)
+			in_i = redir_i;
+		else if (r->type == REDIRRIGHT || r->type == APPEND)
+			out_i = redir_i;
+		else if (r->type == PIPE_OUT && out_i == -1)
+			out_i = redir_i;
+		r = get_redir(redirs, redir_i++);
+	}
+
+	//second pass to just create the files unused
+	redir_i = 0;
+	r = get_redir(redirs, redir_i++);
+	while (r != NULL)
+	{
+		if (redir_i != in_i && redir_i != out_i)
+		{
+			int temp_fd = -1;
+			if (r->type == REDIRRIGHT || r->type == APPEND)
+				temp_fd = creat(r->val, (unsigned int)00664);
+			if (r->type == REDIRLEFT)
+				;//check existence -1 => crash NO_SUCH_FILE_OR_DIRECTORY
+			if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
+				temp_fd = ft_atoi(r->val);
+			if (temp_fd != -1)
+				close(temp_fd);
+			//if temp_fd && !REDIRLEFT
+				//return errno
+		}
+		r = get_redir(redirs, redir_i++);
+	}
+
+	//last pass to setup the redirects
+	redir_i = 0;
+	r = get_redir(redirs, redir_i++);
+	while (r != NULL)
+	{
+		if (redir_i == in_i || redir_i == out_i)
+		{
+			int	to, from;
+			if (r->type == REDIRRIGHT)
+			{
+				to = open(r->val, O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
+				from = STDOUT_FILENO;
+			}
+			if (r->type == APPEND)
+			{
+				to = open(r->val, O_WRONLY | O_CREAT | O_APPEND, (unsigned int)00664);
+				from = STDOUT_FILENO;
+			}
+			if (r->type == REDIRLEFT)
+			{
+				to = open(r->val, O_RDONLY, (unsigned int)00664);
+				from = STDIN_FILENO;
+			}
+			if (r->type == HEREDOC || r->type == PIPE_IN)
+			{ to = ft_atoi(r->val); from = STDIN_FILENO;}
+			if (r->type == PIPE_OUT)
+			{ to = ft_atoi(r->val); from = STDOUT_FILENO;}
+			if (to == -1)
+				printf("redir error: %s\n", strerror(errno));
+			//if to = -1;
+			//return -1, errno is already set
+			dup2(to, from); //-1
+			close(to);
+		}
+		r = get_redir(redirs, redir_i++);
+	}
+}
+
+extern char **environ;
 void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid)
 {
 	printf("(%s) [%s%d%s] -- spawned from %s%d%s\n", argv[0], BLUE, getpid(), RESET, GREEN, parent_pid, RESET);
 	printf("(%s) [%s%d%s] -- args ", argv[0], BLUE, getpid(), RESET);
 	print_argv(argv);
 	printf("(%s) [%s%d%s] -- redir ", argv[0], BLUE, getpid(), RESET);
-	print_redir(lst_redir->next);
-	exit(0); //->work here
+	print_redirs(lst_redir->next);
+	consume_redirs(lst_redir->next); //-1
 	
-	/*consume_redirs()
-		//heredoc
-			//pipe(start, end)
-			//dup2(start, stdin);
-			//close(start)
-			//start_interactive readline_sessions + waiting for char
-			//reset(stdin)
-			//dup2(end, STDIN)
-		//consume(file, STD*)
-			//if !file: create()
-			//pid = open(file, r/w, overwrite/append)
-			//dup2(pid, dup(STD*))
-		>'log_file': //dup2(log_file, dup(STDIN))
-		<'in_file': //dup2(in_file, dup(STDOUT))
-	*/
-	//dup2(pipe[-1].end, STDIN)
-	//dup2(pipe[0].start, STDOUT)
-	
-	//launch(argv[_i++]);
-		/*
-		pathname = find_in_getenv(PATH)
-		env = our_env;
-		argv;
-		*/
-	//spawn(argv)
-		//fork();
-			//PID=0
-				//launch();
-				//if -1: print("FAIL"); exit(1); send -1 to father;
-			//else
-				//continue; -> save PID next to argv in table
-				//waiting for signal to know if it failed
+	//getproperpath
+	//execve("", argv, environ);
+
 	//free_all();
+	exit(0);
 }
 
 pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
@@ -276,9 +329,9 @@ void	ms_execute(t_ast_node *pipeline)
 		else if (child->type == PIPE)
 		{ 
 			pipe(_pipe); //-1
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE, ft_itoa(_pipe[1]))); //nc
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1]))); //nc
 			pipe_i++; arg_i = 0;
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE, ft_itoa(_pipe[0]))); //nc
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
 		}
 		else if (child->type == PIPELINE)
 			ms_execute(child); // (if fail =>return -1;)

@@ -347,6 +347,7 @@ int		less_eq(int x, int y);
 int		more(int x, int y);
 int		more_eq(int x, int y);
 
+/*
 static void *my_malloc(const char* fname, int lineno, size_t size)
 {
 	void *p = malloc(size);
@@ -367,5 +368,5 @@ static void my_free(const char* fname, int lineno, void *p)
 }
 #define free(x) \
 	(void) my_free(__FILE__, __LINE__, x);
-
+*/
 #endif

@@ -99,8 +99,6 @@ enum TokenTypes {
 	REDIR,
 	REDIROP,
 	HEREDOC,
-	ASSIGN,
-
 	//for consumption
 	PIPE_IN,
 	PIPE_OUT,

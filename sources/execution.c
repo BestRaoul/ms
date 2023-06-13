@@ -194,7 +194,7 @@ void	consume_redirs(t_list *redirs)
 			if (r->type == REDIRRIGHT || r->type == APPEND)
 				temp_fd = creat(r->val, (unsigned int)00664);
 			if (r->type == REDIRLEFT)
-				;//check existence -1 => crash NO_SUCH_FILE_OR_DIRECTORY
+				{}//check existence -1 => crash NO_SUCH_FILE_OR_DIRECTORY
 			if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
 				temp_fd = ft_atoi(r->val);
 			if (temp_fd != -1)
@@ -270,7 +270,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	print_redirs(lst_redir->next);
 	consume_redirs(lst_redir->next); //-1
 	int		argc = arg_count(argv);
-	char	**my_argv = calloc(argc, sizeof(char *));//nc
+	char	**my_argv = calloc(argc, sizeof(char *) + 1);//nc
 	int	i = 0;
 	while (i < argc)
 	{

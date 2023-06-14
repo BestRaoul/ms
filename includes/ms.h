@@ -102,6 +102,7 @@ enum TokenTypes {
 	//for consumption
 	PIPE_IN,
 	PIPE_OUT,
+	PARENTHESIS,
 };
 
 /*enum NonTerminals {
@@ -135,8 +136,8 @@ void	print_type(int type);
 void	free_ast(t_ast_node *ast);
 
 /* execution */
-void	ms_execute(t_ast_node *pipeline);
-void	execute_pl(t_ast_node *pl);
+int		ms_execute(t_ast_node *pipeline);
+int		execute_pll(t_ast_node *pl);
 
 /* v1
 	Cmdline ::= PipelineList

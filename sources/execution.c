@@ -12,12 +12,32 @@
 
 #include "ms.h"
 
+//pl{}, ., pl{}, ., pl{}...
+/*pl{
+	a |
+	b |
+	()|
+	...
+}*/
+
+//(pl{}, ., pl{}, ., pl{}...)
+
 /* TODO
  . returns - RETHINK
 	- waitpid for
 	. -1
  . wrapper for malloc => garbage collector
  . fix env (static for now)
+*/
+
+/* TODO but better
+	1. pipeline node and &&/|| handling
+2. error management + nullchecks
+3. garbage collector
+4. env management
+5. wildcards
+6. builtins
+7. $? status
 */
 
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
@@ -33,6 +53,12 @@ typedef	struct s_free {
 	t_list	**redirs;
 	int		p_count;
 } t_free;
+
+typedef struct s_parenthesis
+{
+	int type;
+	t_ast_node *parent;
+} t_parenthesis;
 
 void	free_t_redir(void *ptr)
 {
@@ -215,17 +241,17 @@ void	consume_redirs(t_list *redirs)
 			int	to, from;
 			if (r->type == REDIRRIGHT)
 			{
-				to = open(r->val, __O_CLOEXEC | O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
+				to = open(r->val, O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
 				from = STDOUT_FILENO;
 			}
 			if (r->type == APPEND)
 			{
-				to = open(r->val, __O_CLOEXEC | O_WRONLY | O_CREAT | O_APPEND, (unsigned int)00664);
+				to = open(r->val, O_WRONLY | O_CREAT | O_APPEND, (unsigned int)00664);
 				from = STDOUT_FILENO;
 			}
 			if (r->type == REDIRLEFT)
 			{
-				to = open(r->val, __O_CLOEXEC | O_RDONLY, (unsigned int)00664);
+				to = open(r->val, O_RDONLY, (unsigned int)00664);
 				from = STDIN_FILENO;
 			}
 			if (r->type == HEREDOC)
@@ -261,7 +287,7 @@ int	arg_count(char **argv)
 }
 
 extern char **environ;
-void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free)
+void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free, t_parenthesis parenthesis)
 {
 	printf("(%s) [%s%d%s] -- spawned from %s%d%s\n", argv[0], BLUE, getpid(), RESET, GREEN, parent_pid, RESET);
 	printf("(%s) [%s%d%s] -- args ", argv[0], BLUE, getpid(), RESET);
@@ -270,40 +296,48 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	print_redirs(lst_redir->next);
 	consume_redirs(lst_redir->next); //-1
 	int		argc = arg_count(argv);
-	char	**my_argv = calloc(argc, sizeof(char *) + 1);//nc
+	char	**my_argv = calloc(argc + 1, sizeof(char *));//nc
 	int	i = 0;
 	while (i < argc)
 	{
 		my_argv[i] = ft_strdup(argv[i]);//nc
 		i++;
 	}
+	my_argv[i] = NULL;
 
 	close_all_pipes(to_free.redirs);
-	print_open_fds(10, 1);	
+	print_open_fds(10, STDERR_FILENO);	
 	for(int x=0; x<to_free.p_count; x++) ft_lstclear(&(to_free.redirs)[x], &free_t_redir);
 	frees2(1, 1, to_free.argvs);
 	//free_all () -> with the help of garbage collector
 
-	char *pathname = ft_getpath(my_argv[0], environ); //nc	
-	execve(pathname, my_argv, environ);
-
-	printf("EXEC ERROR or not found\n");
+	if (parenthesis.type == PARENTHESIS)
+	{
+		execute_pll(parenthesis.parent);
+	}
+	else
+	{
+		char *pathname = ft_getpath(my_argv[0], environ); //nc	
+		execve(pathname, my_argv, environ);
+		printf("EXEC ERROR or not found\n");
+	}
 	//free_all();
 	exit(0);
 }
 
-pid_t	*init_subshells(char ***argvs, t_list **redirs, int p_count)
+pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int p_count)
 {
 	t_free	to_free = (t_free){argvs, redirs, p_count};
 	pid_t	*pids = calloc(p_count + 1, sizeof(pid_t)); //nc
 	pid_t	parent = getpid();
 	int	i = 0;
+	(void) parens;
 
 	while (i < p_count)
 	{
 		pids[i] = fork(); //error -1
 		if (pids[i] == 0)
-			execute_command(argvs[i], redirs[i], parent, to_free);
+			execute_command(argvs[i], redirs[i], parent, to_free, parens[i]);
 		i++;
 	}
 	return pids;
@@ -353,7 +387,7 @@ int	heredoc_handler(char *delimiter)
 }
 
 #include <sys/wait.h>
-void	ms_execute(t_ast_node *pipeline)
+int	ms_execute(t_ast_node *pipeline)
 {
 	int arg_i = 0;
 	int	pipe_i = 0;
@@ -363,23 +397,13 @@ void	ms_execute(t_ast_node *pipeline)
 	t_ast_node	*child = get_child(pipeline, child_i++); //nc
 	char	***argvs = alloc_argvs(pipeline, p_count); //nc
 	t_list	**redirs = init_redirs(p_count); //nc //array of t_list_ptr
+	t_parenthesis *parens = calloc(p_count + 1, sizeof(t_parenthesis));
 	int	_pipe[2] = {-1, -1};
 
 	while (child != NULL)
-	{
-		/* --plan--
-		//LITERAL -done
-		//REDIR	  -done
-		//PIPE	  -done
-		//PIPELINE
-			//-r ms_exec
-			//return value management
-		//AND,OR ??
-			//'&&'/'||' found = inside parenthesis
-		*/
-		
+	{	
 		if (IS_LITERAL(child->type))// && !IS_REDIR(prev_type))
-			(argvs[pipe_i])[arg_i++] = ft_strdup(child->content); //nc
+		{ (argvs[pipe_i])[arg_i++] = ft_strdup(child->content); }//nc
 		else if (IS_REDIR(child->type))
 		{
 			t_list	*redir = alloc_redir(child->type, ft_strdup(child->content)); //nc
@@ -394,49 +418,51 @@ void	ms_execute(t_ast_node *pipeline)
 		{ 
 			pipe(_pipe); //-1
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1]))); //nc
-			pipe_i++; arg_i = 0;
+			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
 		}
-		else if (child->type == PIPELINE)
-			ms_execute(child); // (if fail =>return -1;)
-		else //&& or ||
-			printf("BIG ERROR");
+		else if (child->type == PARENTHESIS)
+		{ parens[pipe_i] = (t_parenthesis){PARENTHESIS, child}; }
+		else printf("ms_execute: BIG ERROR\n");
 		
 		child = get_child(pipeline, child_i++); //nc
 	}
 	//all argvs, redirs (left, right, append, heredocs, pipes) are ready
 //	print_open_fds(20, 1);
-	pid_t	*pids = init_subshells(argvs, redirs, p_count); //error check -1
+	pid_t	*pids = init_subshells(argvs, redirs, parens, p_count); //error check -1
 	
 	close_all_pipes(redirs);
 	//return value management
+	int status = -42;
 	for(int x=0; x<p_count; x++)
-	{	
-		waitpid(pids[x], NULL, 0);
-//		close_pipes(redirs[x]->next);
-//		print_open_fds(20, 1);
-	}
+		waitpid(pids[x], &status, 0);
+	
 	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
 	frees2(2, 1, argvs, 0, pids);
+
+	return status;
 }
 
-void	execute_pl(t_ast_node *pl)
+int	execute_pll(t_ast_node *pll)
 {
-	t_ast_node *first_child = get_child(pl, 0);
-	ms_execute(first_child);
-	/* --logic--
-	succes = 1;
-	for each (child)
+	int	child_i = 0;
+	t_ast_node *child = get_child(pll, child_i++);
+	
+	int status = 1;
+	while (child != NULL)
 	{
-		succes = exec child
-		if (!next) break;
-		if (succes)
-			AND |> exec next
-			OR |> exec next+1
-		else (!succes)
-			AND |> break
-			OR	|> exec next
+		if (status == 1)
+			status = ms_execute(child);
+		else
+			status = -42;
+		t_ast_node *next = get_child(pll, child_i++);
+		if (next == NULL) break;
+
+		if (next->type == AND)
+			status = (status == 0);
+		if (next->type == OR)
+			status = (status != 0);
+		child = get_child(pll, child_i++);
 	}
-	printf(succes ? GREEN : RED);
-	*/
+	return status==0;
 }

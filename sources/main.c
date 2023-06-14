@@ -7,11 +7,13 @@ int	main(void)
 	static char	question[100] = "";
 	char		*input;
 	t_ast_node	*ast;
+	int			success = 1;	
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
-	ft_yoloprintf(question, "%s➜  %s", BPURPLE, WHITE);
+	ft_yoloprintf(question, "%s➜  %s", success?BBLUE:BRED WHITE);
 	while (1)
 	{
+		ft_yoloprintf(question, "%s➜  %s", success?BBLUE:BRED, WHITE);
 		ast = init_ast_node_type(PIPELINELIST);
 		input = readline(question);
 		//--NULLCHECK
@@ -31,9 +33,7 @@ int	main(void)
 		ft_printf("ast:\n");
 		print_ast(ast, 0);
 		//EXECUTE here
-		execute_pl(ast);
-		if (strcmp(input, "exit") == 0)
-			break ;
+		success = execute_pll(ast);
 		free_ast(ast);
 		free(input);
 	}

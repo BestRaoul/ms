@@ -139,6 +139,9 @@ void	free_ast(t_ast_node *ast);
 int		ms_execute(t_ast_node *pipeline);
 int		execute_pll(t_ast_node *pl);
 
+/* error management */
+void	xit();
+
 /* env */
 char	**copy_env(char **env, char *excl);
 void	print_env(char **env);

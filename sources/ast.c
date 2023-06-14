@@ -12,6 +12,8 @@
 
 #include "ms.h"
 
+#define DEBUG_AST 0
+
 t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
 	t_ast_node	*res;
@@ -119,10 +121,12 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 	{
 		if (!add_ast_child(ast, NONE, ft_lst_get(lexemes, i)->content))
 			return (-1);
-		ft_printf("(CmdArg `%s`)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value);
+		if (DEBUG_AST) {
+		ft_printf("(CmdArg `%s`)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value); }
 		return (1);
 	}
-	printf("Error, expected command or command argument");
+	if (DEBUG_AST) {
+	printf("Error, expected command or command argument"); }
 	return (-1);
 }
 
@@ -132,7 +136,8 @@ int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 		return (-1);
 	if (peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ)
 	{
-		ft_printf("Heredoc delimiter expected!");
+		if (DEBUG_AST) {
+		ft_printf("Heredoc delimiter expected!"); }
 		return (-1);
 	}
 	t_dict_int_str_member *heredocmem = t_dict_int_str_member_init(HEREDOC, ((t_dict_int_str_member *)ft_lst_get(lexemes, i + 1)->content)->value);
@@ -140,7 +145,8 @@ int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 		return (-1);
 	if (!add_ast_child(ast, NONE, heredocmem))
 		return (-1);
-	ft_printf("(Heredoc %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
+	if (DEBUG_AST) {
+	ft_printf("(Heredoc %s)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value); }
 	return (2);
 }
 
@@ -155,7 +161,8 @@ int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 	peek = peek_type(i, lexemes);
 	if (peek != LITERAL_NQ && peek != LITERAL_SQ && peek != LITERAL_DQ)
 	{
-		ft_printf("Filename expected! ");
+		if (DEBUG_AST) {
+		ft_printf("Filename expected! "); }
 		return (-1);
 	}
 	current = current_type(i, lexemes);
@@ -177,7 +184,8 @@ int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 		if (!add_ast_child(ast, APPEND, ft_lst_get(lexemes, i + 1)->content))
 			return (-1);
 	}
-	ft_printf("(Redir %s %s)", redir_str, ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value);
+	if (DEBUG_AST) {
+	ft_printf("(Redir %s %s)", redir_str, ((t_dict_int_str_member *) ft_lst_get(lexemes, i + 1)->content)->value); }
 	return (2);
 }
 
@@ -193,7 +201,8 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	{
 		if (!add_ast_child(ft_lstlast(ast->children)->content, PIPE, NULL))
 			return (-1);
-		ft_printf("(Suffix | ");
+		if (DEBUG_AST) {
+		ft_printf("(Suffix | "); }
 		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 1) + 1;
 		if (pipeline_res == -1)
 		{
@@ -204,7 +213,8 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	{
 		if (!add_ast_child(ast, AND, NULL))
 			return (-1);
-		ft_printf("(Suffix && ");
+		if (DEBUG_AST) {
+		ft_printf("(Suffix && "); }
 		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 0) + 1;
 		if (pipeline_res == -1)
 		{
@@ -215,7 +225,8 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	{
 		if (!add_ast_child(ast, OR, NULL))
 			return (-1);
-		ft_printf("(Suffix || ");
+		if (DEBUG_AST) {
+		ft_printf("(Suffix || "); }
 		pipeline_res = prs_pipeline(i + 1, lexemes, ast, 0) + 1;
 		if (pipeline_res == -1)
 		{
@@ -237,7 +248,8 @@ int	prs_suffix(int i, t_list *lexemes, t_ast_node *ast)
 	{
 		return (0);
 	}
-	ft_printf(")");
+	if (DEBUG_AST) {
+	ft_printf(")"); }
 	return (redir_res + pipeline_res);
 }
 
@@ -251,7 +263,8 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 	current = current_type(i, lexemes);
 	while (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ || current == REDIRLEFT || current == REDIRRIGHT || current == APPEND || current == HEREDOCOP )
 	{
-		ft_printf("(CmdInfix ");
+		if (DEBUG_AST) {
+		ft_printf("(CmdInfix "); }
 		if (current == LITERAL_NQ || current == LITERAL_SQ || current == LITERAL_DQ)
 		{
 			prefix_res = prs_arg(i + res, lexemes, ast);
@@ -266,7 +279,8 @@ int	prs_cmdinfix(int i, t_list *lexemes, t_ast_node *ast)
 		}
 		if (prefix_res == -1)
 			return (-1);
-		ft_printf(")");
+		if (DEBUG_AST) {
+		ft_printf(")"); }
 		res += prefix_res;
 		current = current_type(i + res, lexemes);
 	}
@@ -281,28 +295,33 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	int	res;
 
 	res = 0;
-	ft_printf("(Pipeline ");
+	if (DEBUG_AST) {
+	ft_printf("(Pipeline "); }
 	current = current_type(i, lexemes);
 	if (!continued /*&& current != LPAREN*/ && !add_ast_child(ast, PIPELINE, NULL))
 		return (-1);
 	if (current == LPAREN)
 	{
-		ft_printf("(LPAREN ");
+		if (DEBUG_AST) {
+		ft_printf("(LPAREN "); }
 		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content, 0);
 		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
 		{
-			ft_printf("Closing parenthesis (')') expected!");
+			if (DEBUG_AST) {
+			ft_printf("Closing parenthesis (')') expected!"); }
 			return (-1);
 		}
 		prefix_res += 2;
-		ft_printf(" ENDLPAREN)");
+		if (DEBUG_AST) {
+		ft_printf(" ENDLPAREN)"); }
 	}
 	else
 	{
 		prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
 		if (prefix_res == 0)
 		{
-			ft_printf(" Empty Pipeline! ");
+			if (DEBUG_AST) {
+			ft_printf(" Empty Pipeline! "); }
 			return (-1);
 		}
 	}
@@ -322,7 +341,8 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	}
 	/*if (ft_lstlast(ast->children) && ft_lstsize(((t_ast_node *)(ft_lstlast(ast->children)->content))->children) == 0)
 		ft_printf("empty pipeline");*/
-	ft_printf(")");
+	if (DEBUG_AST) {
+	ft_printf(")"); }
 	return (res);
 }
 
@@ -330,20 +350,24 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast)
 {
 	int	prs_pipelinelist_res;
 
-	ft_printf("(PipelineList ");
+	if (DEBUG_AST) {
+	ft_printf("(PipelineList "); }
 	prs_pipelinelist_res = prs_pipeline(i, lexemes, ast, 0);
 	if (prs_pipelinelist_res == -1)
 	{
-		ft_printf("\n");
+		if (DEBUG_AST) {
+		ft_printf("\n"); }
 		return (-1);
 	}
 	i += prs_pipelinelist_res;
 	if (i < ft_lstsize(lexemes))
 	{
-		ft_printf("Error, trailing tokens\n");
+		if (DEBUG_AST) {
+		ft_printf("Error, trailing tokens\n"); }
 		return (-1);
 	}
-	ft_printf(")\n");
+	if (DEBUG_AST) {
+	ft_printf(")\n"); }
 	return (i);
 }
 

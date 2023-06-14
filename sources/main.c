@@ -9,7 +9,7 @@ int	main(void)
 	static char	question[100] = "";
 	char		*input;
 	t_ast_node	*ast;
-	int			success = 1;	
+	int			success_status = 0;	
 
 	/* env usage */
 	/*char **env_copy = copy_env(environ, NULL);
@@ -20,10 +20,10 @@ int	main(void)
 	free_arr((void **) env_copy);*/
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
-	ft_yoloprintf(question, "%s➜  %s", success?BBLUE:BRED WHITE);
+	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED WHITE);
 	while (1)
 	{
-		ft_yoloprintf(question, "%s➜  %s", success?BBLUE:BRED, WHITE);
+		ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, WHITE);
 		ast = init_ast_node_type(PIPELINELIST);
 		input = readline(question);
 		//--NULLCHECK
@@ -40,10 +40,10 @@ int	main(void)
 		if (prs_pipelinelist(0, lexemes, ast) == -1)
 			continue ;
 		ft_lstclear(&lexemes, free_lexeme_node);
-		ft_printf("ast:\n");
-		print_ast(ast, 0);
+//		ft_printf("ast:\n");
+//		print_ast(ast, 0);
 		//EXECUTE here
-		success = execute_pll(ast);
+		success_status = execute_pll(ast);
 		free_ast(ast);
 		free(input);
 	}

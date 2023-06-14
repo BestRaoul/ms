@@ -300,6 +300,11 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	else
 	{
 		prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
+		if (prefix_res == 0)
+		{
+			ft_printf(" Empty Pipeline! ");
+			return (-1);
+		}
 	}
 	if (prefix_res == -1)
 	{
@@ -315,6 +320,8 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 			return (-1);
 		res += suffix_res;
 	}
+	/*if (ft_lstlast(ast->children) && ft_lstsize(((t_ast_node *)(ft_lstlast(ast->children)->content))->children) == 0)
+		ft_printf("empty pipeline");*/
 	ft_printf(")");
 	return (res);
 }

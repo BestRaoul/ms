@@ -66,7 +66,8 @@ SOURCES_LIST			:= main.c\
 							ast.c\
 							print_ast.c\
 							free_lexemes.c\
-							execution.c
+							execution.c\
+							env_handler.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

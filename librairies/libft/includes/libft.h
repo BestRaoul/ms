@@ -179,6 +179,9 @@ int			ft_lstadd_chr(char c, t_list **lst);
 /* adds a string to a t_list */
 int			ft_lstadd_str(char *str, t_list **lst);
 
+/* Appends a string to a strarr */
+int			ft_strarr_append_str(char ***strarr, char *str);
+
 /* splits a string according to given set of quotes, also handles backslashes */
 /* Removed */
 /* char		**ft_quote_split(const char *str, const char *set);*/

@@ -2,12 +2,22 @@
 
 /* (cat file1 | grep '\"lol\"') && (cat file2 | grep bruh) */
 
+extern char **environ;
+
 int	main(void)
 {
 	static char	question[100] = "";
 	char		*input;
 	t_ast_node	*ast;
 	int			success = 1;	
+
+	/* env usage */
+	/*char **env_copy = copy_env(environ, NULL);
+	add_var_to_env("lol", "lel", &env_copy);
+	remove_var_from_env("_", &env_copy);
+	remove_var_from_env("_JAVA_OPTIONS", &env_copy);
+	print_env(env_copy);
+	free_arr((void **) env_copy);*/
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 	ft_yoloprintf(question, "%s➜  %s", success?BBLUE:BRED WHITE);

@@ -139,6 +139,12 @@ void	free_ast(t_ast_node *ast);
 int		ms_execute(t_ast_node *pipeline);
 int		execute_pll(t_ast_node *pl);
 
+/* env */
+char	**copy_env(char **env, char *excl);
+void	print_env(char **env);
+int		add_var_to_env(char *key, char *value, char ***env);
+int		remove_var_from_env(char *key, char ***env);
+
 /* v1
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?

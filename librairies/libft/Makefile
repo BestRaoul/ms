@@ -62,12 +62,6 @@ SRCS_BONUS_LIST		:= ft_lstnew_bonus.c\
 OBJS_BONUS_LIST		:= $(patsubst %.c, %.o, $(SRCS_BONUS_LIST))
 OBJS_BONUS			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_BONUS_LIST))
 
-GNL_DIR				:= $(SOURCES_DIRECTORY)gnl/
-SRCS_GNL_LIST		:= get_next_line.c\
-               			get_next_line_utils.c
-OBJS_GNL_LIST		:= $(patsubst %.c, %.o, $(SRCS_GNL_LIST))
-OBJS_GNL			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_GNL_LIST))
-
 MATH_DIR				:= $(SOURCES_DIRECTORY)math/
 SRCS_MATH_LIST			:= math1.c\
 							math2.c\
@@ -169,24 +163,22 @@ SRCS_PIOTR_LIST		:= comparison.c\
 						frees.c\
 						ft_atod.c\
 						ft_intr.c\
-						ft_size.c
+						ft_size.c\
+						garbage_collection.c
 OBJS_PIOTR_LIST		:= $(patsubst %.c, %.o, $(SRCS_PIOTR_LIST))
 
 INCLUDE_DIR			:= ./includes/
 
-HEADER_LIST			:= get_next_line.h\
-						libft.h
+HEADER_LIST			:= libft.h
 HEADER_FILES		:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))
 
-ALL_SRCS_LIST		:= $(SRCS_BONUS_LIST) $(SRCS_GNL_LIST) $(SRCS_MANDATORY_LIST) $(SRCS_MATH_LIST) $(SRCS_OWN_LIST) $(SRCS_DICT_LIST)  $(SRCS_PIOTR_LIST)
+ALL_SRCS_LIST		:= $(SRCS_BONUS_LIST) $(SRCS_MANDATORY_LIST) $(SRCS_MATH_LIST) $(SRCS_OWN_LIST) $(SRCS_DICT_LIST)  $(SRCS_PIOTR_LIST)
 OBJECTS_LIST		:= $(patsubst %.c, %.o, $(ALL_SRCS_LIST))
 OBJECTS				:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
-GNL_BUFFER_FLAG		:= -D BUFFER_SIZE=1000
-
 INCLUDES			:= -I$(INCLUDE_DIR)
 CC					:= cc
-CFLAGS				:= -Wall -Wextra -Werror $(DEVFLAGS) $(OPTFLAG) -fstack-protector-all $(GNL_BUFFER_FLAG)
+CFLAGS				:= -Wall -Wextra -Werror $(DEVFLAGS) $(OPTFLAG) -fstack-protector-all
 RM					:= rm -rf
 
 LIBC				:= ar rc
@@ -202,9 +194,6 @@ $(OBJECTS_DIRECTORY):
 	mkdir -p $(OBJECTS_DIRECTORY)
 # $(OBJECTS_DIRECTORY)%.o : $(SOURCES_DIRECTORY)%.c $(HEADERS)
 $(OBJECTS_DIRECTORY)%.o : $(BONUS_DIR)%.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
-
-$(OBJECTS_DIRECTORY)%.o : $(GNL_DIR)%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $(INCLUDES) $< -o $@
 
 $(OBJECTS_DIRECTORY)%.o : $(MANDATORY_DIR)%.c $(HEADERS)

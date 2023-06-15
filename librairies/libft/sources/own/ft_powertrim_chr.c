@@ -18,7 +18,7 @@ char	*ft_powertrim_chr(const char *str, char c)
 	char	*joined_set;
 	char	*res;
 
-	joined_set = malloc(sizeof(" \f\n\r\t\v") + 2);
+	joined_set = MALLOC(sizeof(" \f\n\r\t\v") + 2);
 	if (!joined_set)
 		return (NULL);
 	joined_set[0] = c;

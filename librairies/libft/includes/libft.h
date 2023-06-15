@@ -10,6 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef MALLOC
+# define MALLOC malloc
+#endif
+
 #ifndef LIBFT_H
 # define LIBFT_H
 
@@ -349,6 +353,14 @@ int		less(int x, int y);
 int		less_eq(int x, int y);
 int		more(int x, int y);
 int		more_eq(int x, int y);
+
+enum GC_ACTION {
+    ADD,
+    FREE_ALL,
+};
+
+void *gc_malloc(size_t size);
+void    *garbage_collector(int action, void *ptr);
 
 /*
 static void *my_malloc(const char* fname, int lineno, size_t size)

@@ -43,7 +43,7 @@ static char	*inttrim(const char *str)
 	i = 0;
 	while (trimmed[i] && trimmed[i] == '0')
 		i ++;
-	res = malloc(ft_strlen(trimmed) - i + 1);
+	res = MALLOC(ft_strlen(trimmed) - i + 1);
 	if (!res)
 	{
 		free(trimmed);

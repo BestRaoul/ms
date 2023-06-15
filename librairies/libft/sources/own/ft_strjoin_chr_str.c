@@ -17,7 +17,7 @@ char	*ft_strjoin_chr_str(char c, const char *str)
 	char	*tmp;
 	char	*join;
 
-	tmp = malloc(sizeof(*tmp) * 2);
+	tmp = MALLOC(sizeof(*tmp) * 2);
 	if (!tmp)
 		return (NULL);
 	tmp[0] = c;

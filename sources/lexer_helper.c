@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-/* returns -1 if a malloc fails, otherwise length of lexeme */
+/* returns -1 if a MALLOC fails, otherwise length of lexeme */
 int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int advance_len)
 {
 	t_dict_int_str_member	*member;
@@ -146,7 +146,7 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	return (insert_res);
 }
 
-/* returns -1 if a malloc fails, -2 if unknown char, otherwise length to advance */
+/* returns -1 if a MALLOC fails, -2 if unknown char, otherwise length to advance */
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {
 	char	c1;

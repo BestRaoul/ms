@@ -17,7 +17,7 @@ int	ft_lstadd_int(int i, t_list **lst)
 	t_list	*child;
 	int		*content;
 
-	content = malloc(sizeof(*content));
+	content = MALLOC(sizeof(*content));
 	if (!content)
 		return (0);
 	*content = i;

@@ -32,7 +32,7 @@ char	*ft_getpath_current(const char *binname, char **envp)
 	trimmed = ft_powertrim(binname, "");
 	if (!trimmed)
 		return (NULL);
-	sep_prefix = malloc(sizeof(*sep_prefix) * 3);
+	sep_prefix = MALLOC(sizeof(*sep_prefix) * 3);
 	if (!sep_prefix)
 		return (fr(trimmed, 0));
 	sep_prefix[0] = '.';

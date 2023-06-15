@@ -18,7 +18,7 @@ int	ft_lstadd_chr(char c, t_list **lst)
 	t_list	*child;
 	char	*content;
 
-	content = malloc(sizeof(*content));
+	content = MALLOC(sizeof(*content));
 	if (!content)
 		return (0);
 	content[0] = c;

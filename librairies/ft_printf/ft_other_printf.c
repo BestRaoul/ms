@@ -23,7 +23,7 @@ static void	*ft_realloc(void *old, int old_size, int new_size)
 {
 	void	*new;
 
-	new = malloc(new_size);
+	new = MALLOC(new_size);
 	if (new == NULL)
 		return (NULL);
 	if (old == NULL)

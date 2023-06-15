@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-//#define malloc malloc(s) printf("%s %s %u %p", __FILE__, __LINE__, )
+//#define MALLOC MALLOC(s) printf("%s %s %u %p", __FILE__, __LINE__, )
 
 t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 {
 	t_dict_int_str_member	*res;
 
-	res = malloc(sizeof(*res));
+	res = MALLOC(sizeof(*res));
 	if (!res)
 		return (NULL);
 	res->key = key;
@@ -25,7 +25,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 		res->value = NULL;
 	else
 	{
-		res->value = malloc(sizeof(*(res->value)) * (ft_strlen(value) + 1));
+		res->value = MALLOC(sizeof(*(res->value)) * (ft_strlen(value) + 1));
 		if (res->value == NULL)
 		{
 			free(res);

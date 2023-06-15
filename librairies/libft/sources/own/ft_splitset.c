@@ -58,7 +58,7 @@ static char	**handle_empty(void)
 {
 	char	**res;
 
-	res = malloc(sizeof(*res));
+	res = MALLOC(sizeof(*res));
 	if (!res)
 		return (0);
 	res[0] = 0;
@@ -88,7 +88,7 @@ char	**ft_splitset(char const *str, const char *sep)
 
 	if (!count_words_set(str, sep))
 		return (handle_empty());
-	res = malloc(sizeof(*res) * (count_words_set(str, sep) + 1));
+	res = MALLOC(sizeof(*res) * (count_words_set(str, sep) + 1));
 	if (!res)
 		return (0);
 	i = 0;
@@ -96,7 +96,7 @@ char	**ft_splitset(char const *str, const char *sep)
 	{
 		if (!ft_chr_in_str(*str, sep))
 		{
-			res[i] = malloc(next_wordlen(str, sep) + 1);
+			res[i] = MALLOC(next_wordlen(str, sep) + 1);
 			if (free_split(&res, i))
 				return (0);
 			ft_strlcpy(res[i], str, next_wordlen(str, sep) + 1);

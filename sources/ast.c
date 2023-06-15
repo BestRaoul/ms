@@ -18,10 +18,10 @@ t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
 	t_ast_node	*res;
 
-	res = malloc(sizeof(*res));
+	res = MALLOC(sizeof(*res));
 	if (!res || !lexeme)
 		return (NULL);
-	res->content = malloc(sizeof(*res->content) * (ft_strlen(lexeme->value) + 1));
+	res->content = MALLOC(sizeof(*res->content) * (ft_strlen(lexeme->value) + 1));
 	if (!res->content)
 	{
 		free (res);
@@ -40,7 +40,7 @@ t_ast_node	*init_ast_node_type(int type)
 {
 	t_ast_node	*res;
 
-	res = malloc(sizeof(*res));
+	res = MALLOC(sizeof(*res));
 	if (!res)
 		return (NULL);
 	res->content = NULL;

@@ -40,7 +40,7 @@ static char	*create_arr(t_list *lst, char sep)
 	int		wc;
 	char	*res;
 
-	res = malloc(sizeof(*res) * (combined_len(lst) + 1)
+	res = MALLOC(sizeof(*res) * (combined_len(lst) + 1)
 			+ ft_max_int(0, ft_lstsize(lst) - 1));
 	if (!res)
 		return (NULL);

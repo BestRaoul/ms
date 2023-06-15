@@ -34,19 +34,16 @@ void	xit()
 
 //(pl{}, ., pl{}, ., pl{}...)
 
-/* TODO
- . returns - RETHINK
-	- waitpid for
-	. -1
- . wrapper for malloc => garbage collector
- . fix env (static for now)
-*/
-
 /* TODO but better
 	1. pipeline node and &&/|| handling
 	. PARENTHESIS -> done?
-2. error management + nullchecks
-3. garbage collector
+	2. error management
+	- execution
+	. lexing
+	. ++main..
+3. nullchecks
+	. inside garbage collector
+4. garbage collector
 5. builtins (echo -n, cd, pwd, export, unset, env, exit)
 6. env management
 7. var replacement and $? status
@@ -249,7 +246,7 @@ t_list	*alloc_redir(int type, char *val)
 {
 	if (val == NULL)
 		return NULL;
-	t_redir *redir = malloc(sizeof(t_redir)); //nc
+	t_redir *redir = MALLOC(sizeof(t_redir)); //nc
 	redir->type = type;
 	redir->val = val;
 	t_list *_redir = ft_lstnew(redir); //nc =>free

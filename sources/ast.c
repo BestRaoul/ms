@@ -295,14 +295,17 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	int	res;
 
 	current = current_type(i, lexemes);
-	if (current == LPAREN)
-		return (prs_pipelinelist(i, lexemes, ft_lstlast(ast->children)->content, 0));
-		//return (prs_pipelinelist(i, lexemes, ast, 0));
+
 	res = 0;
 	if (DEBUG_AST) {
 	ft_printf("(Pipeline "); }
 	if (!continued /*&& current != LPAREN*/ && !add_ast_child(ast, PIPELINE, NULL))
 		return (-1);
+
+	if (current == LPAREN)
+		return (prs_pipelinelist(i, lexemes, ft_lstlast(ast->children)->content, 0));
+	//return (prs_pipelinelist(i, lexemes, ast, 0));
+
 	prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
 	if (prefix_res == 0)
 	{

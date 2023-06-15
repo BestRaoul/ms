@@ -294,16 +294,16 @@ void	consume_redirs(t_list *redirs)
 	r = get_redir(redirs, redir_i++);
 	while (r != NULL)
 	{
-		if (redir_i != in_i && redir_i != out_i)
+		if (redir_i != in_i && redir_i != out_i && r->type != PARENTHESIS)
 		{
 			int temp_fd = -1;
 			if (r->type == REDIRRIGHT || r->type == APPEND)
 				temp_fd = creat(r->val, (unsigned int)00664);
-			if (r->type == REDIRLEFT)
+			else if (r->type == REDIRLEFT)
 				temp_fd = access(r->val, R_OK);
-			if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
+			else if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
 				temp_fd = ft_atoi(r->val);
-			
+
 			if (temp_fd == -1) xit();
 			if (close(temp_fd) == -1) xit();
 		}

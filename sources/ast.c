@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define DEBUG_AST 0
+#define DEBUG_AST 1
 
 t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
@@ -389,7 +389,7 @@ void	free_ast(t_ast_node *ast)
 int	prs_ast(t_list *lexemes, t_ast_node *ast)
 {
 	int	res;
-	res = prs_pipelinelist(0, lexemes, ast, 1);
+	res = prs_pipeline(0, lexemes, ast, 0); //list
 	if (DEBUG_AST) {
 		ft_printf("\n");
 		ft_printf("res size: %d\n", res);

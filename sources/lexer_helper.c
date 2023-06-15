@@ -217,3 +217,27 @@ t_list	*scan_tokens(char *s)
 	}
 	return (res);
 }
+
+int	check_parenthesis(t_list *lexemes)
+{
+	int		open_parentheses;
+	int		i;
+	t_list	*tmp;
+	int		current_key;
+
+	open_parentheses = 0;
+	i = 0;
+	while (i < ft_lstsize(lexemes))
+	{
+		tmp = ft_lst_get(lexemes, i);
+		if (!tmp)
+			return (0);
+		current_key = ((t_dict_int_str_member *)tmp->content)->key;
+		if (current_key == LPAREN)
+			open_parentheses ++;
+		else if (current_key == RPAREN)
+
+		i ++;
+	}
+	return (1);
+}

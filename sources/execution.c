@@ -67,7 +67,7 @@ typedef	struct s_free {
 typedef struct s_parenthesis
 {
 	int type;
-	t_ast_node *parent;
+	t_list *children;
 } t_parenthesis;
 
 void	free_t_redir(void *ptr)
@@ -381,7 +381,8 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 
 	if (parenthesis.type == PARENTHESIS)
 	{
-		int status = execute_pll(parenthesis.parent);
+		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
+		int status = execute_pll(&pll);
 		//free_all();
 		exit(status);
 	}
@@ -450,8 +451,9 @@ int	ms_execute(t_ast_node *pipeline)
 			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
 		}
-		else if (child->type == PARENTHESIS)
-		{ parens[pipe_i] = (t_parenthesis){PARENTHESIS, child}; } //might be problem later whan freeing because will be double freed
+		else if (child->type == PIPELINELIST)
+		{ parens[pipe_i] = (t_parenthesis){PARENTHESIS, child->children}; 
+		child->children = NULL;} //double free?
 		else printf("ms_execute: BIG ERROR\n");
 		
 		child = get_child(pipeline, child_i++); //nc

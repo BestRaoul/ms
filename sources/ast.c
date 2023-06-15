@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define DEBUG_AST 1
+#define DEBUG_AST 0
 
 t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {

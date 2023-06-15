@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define DEBUG_AST 0
+#define DEBUG_AST 1
 
 t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 {
@@ -294,42 +294,25 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	int	current;
 	int	res;
 
+	current = current_type(i, lexemes);
+	if (current == LPAREN)
+		return (prs_pipelinelist(i, lexemes, ast, 0));
 	res = 0;
 	if (DEBUG_AST) {
 	ft_printf("(Pipeline "); }
-	current = current_type(i, lexemes);
 	if (!continued /*&& current != LPAREN*/ && !add_ast_child(ast, PIPELINE, NULL))
 		return (-1);
-	if (current == LPAREN)
+	prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
+	if (prefix_res == 0)
 	{
 		if (DEBUG_AST) {
-		ft_printf("(LPAREN "); }
-		prefix_res = prs_pipeline(i + 1, lexemes, ft_lstlast(ast->children)->content, 0);
-		if (current_type(i + prefix_res + 1, lexemes) != RPAREN)
-		{
-			if (DEBUG_AST) {
-			ft_printf("Closing parenthesis (')') expected!"); }
-			return (-1);
-		}
-		prefix_res += 2;
-		if (DEBUG_AST) {
-		ft_printf(" ENDLPAREN)"); }
-	}
-	else
-	{
-		prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
-		if (prefix_res == 0)
-		{
-			if (DEBUG_AST) {
-			ft_printf(" Empty Pipeline! "); }
-			return (-1);
-		}
+		ft_printf(" Empty Pipeline! "); }
+		return (-1);
 	}
 	if (prefix_res == -1)
 	{
 		return (-1);
 	}
-
 	res += prefix_res;
 	suffix_res = 1;
 	while (suffix_res != 0)
@@ -346,29 +329,37 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 	return (res);
 }
 
-int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast)
+int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init)
 {
 	int	prs_pipelinelist_res;
 
 	if (DEBUG_AST) {
 	ft_printf("(PipelineList "); }
-	prs_pipelinelist_res = prs_pipeline(i, lexemes, ast, 0);
-	if (prs_pipelinelist_res == -1)
+	if (!init && !add_ast_child(ast, PIPELINELIST, NULL))
+		return (-1);
+	if (!init)
+		ast = ft_lstlast(ast->children)->content;
+	if (current_type(i, lexemes) == LPAREN)
 	{
 		if (DEBUG_AST) {
-		ft_printf("\n"); }
-		return (-1);
-	}
-	i += prs_pipelinelist_res;
-	if (i < ft_lstsize(lexemes))
-	{
+			ft_printf("(LPAREN "); }
+		prs_pipelinelist_res = prs_pipelinelist(i + 1, lexemes, ast, 0);
+		if (prs_pipelinelist_res == -1)
+			return (-1);
+		if (current_type(i + prs_pipelinelist_res + 1, lexemes) != RPAREN)
+		{
+			if (DEBUG_AST) {
+				ft_printf("Closing parenthesis (')') expected!"); }
+			return (-1);
+		}
+		prs_pipelinelist_res += 2;
 		if (DEBUG_AST) {
-		ft_printf("Error, trailing tokens\n"); }
-		return (-1);
+			ft_printf(" ENDLPAREN)"); }
 	}
-	if (DEBUG_AST) {
-	ft_printf(")\n"); }
-	return (i);
+	else
+		return(prs_pipeline(i, lexemes, ast, 0));
+	//i += prs_pipelinelist_res;
+	return (prs_pipelinelist_res);
 }
 
 void	free_ast(t_ast_node *ast)
@@ -389,4 +380,24 @@ void	free_ast(t_ast_node *ast)
 		free(ast->children);
 	free(ast);
 	ast = NULL;
+}
+
+int	prs_ast(t_list *lexemes, t_ast_node *ast)
+{
+	int	res;
+	res = prs_pipelinelist(0, lexemes, ast, 1);
+	if (DEBUG_AST) {
+		ft_printf("\n");
+		ft_printf("res size: %d\n", res);
+	}
+	if (res == -1)
+		return (0);
+	if (res < ft_lstsize(lexemes))
+	{
+		if (DEBUG_AST) {
+			ft_printf("Error, trailing tokens\n");
+		}
+		return (0);
+	}
+	return (1);
 }

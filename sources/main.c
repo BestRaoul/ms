@@ -37,11 +37,12 @@ int	main(void)
 			break ;
 		//replace_envvars(lexemes);
 		//print_lexeme_tlist2(lexemes);
-		if (prs_pipelinelist(0, lexemes, ast) == -1)
+		//if (prs_pipelinelist(0, lexemes, ast, 1) == -1)
+		if (!prs_ast(lexemes, ast))
 			continue ;
 		ft_lstclear(&lexemes, free_lexeme_node);
 //		ft_printf("ast:\n");
-//		print_ast(ast, 0);
+		print_ast(ast, 0);
 		//EXECUTE here
 		success_status = execute_pll(ast);
 		free_ast(ast);

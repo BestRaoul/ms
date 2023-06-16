@@ -125,9 +125,7 @@ int	prs_arg(int i, t_list *lexemes, t_ast_node *ast)
 		ft_printf("(CmdArg `%s`)", ((t_dict_int_str_member *) ft_lst_get(lexemes, i)->content)->value); }
 		return (1);
 	}
-	if (DEBUG_AST) {
-	printf("Error, expected command or command argument"); }
-	return (-1);
+	return (write(2, "Error, expected command or command argument\n", 44), -1);
 }
 
 int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
@@ -135,11 +133,7 @@ int	prs_heredoc(int i, t_list *lexemes, t_ast_node *ast)
 	if (!ft_lst_get(lexemes, i + 1))
 		return (-1);
 	if (peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ && peek_type(i, lexemes) != LITERAL_NQ)
-	{
-		if (DEBUG_AST) {
-		ft_printf("Heredoc delimiter expected!"); }
-		return (-1);
-	}
+		return (write(2, "Heredoc delimiter expected!\n", 28), -1);
 	t_dict_int_str_member *heredocmem = t_dict_int_str_member_init(HEREDOC, ((t_dict_int_str_member *)ft_lst_get(lexemes, i + 1)->content)->value);
 	if (!heredocmem)
 		return (-1);
@@ -160,11 +154,7 @@ int	prs_redir(int i, t_list *lexemes, t_ast_node *ast)
 		return (-1);
 	peek = peek_type(i, lexemes);
 	if (peek != LITERAL_NQ && peek != LITERAL_SQ && peek != LITERAL_DQ)
-	{
-		if (DEBUG_AST) {
-		ft_printf("Filename expected! "); }
-		return (-1);
-	}
+		return (write(2, "Filename expected!\n", 19), -1);
 	current = current_type(i, lexemes);
 	redir_str = ">>";
 	if (current == REDIRLEFT)
@@ -308,11 +298,7 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 
 	prefix_res = prs_cmdinfix(i, lexemes, ft_lstlast(ast->children)->content);
 	if (prefix_res == 0)
-	{
-		if (DEBUG_AST) {
-		ft_printf(" Empty Pipeline! "); }
-		return (-1);
-	}
+		return (write(2, "Empty Pipeline!\n", 16), -1);
 	if (prefix_res == -1)
 	{
 		return (-1);
@@ -352,11 +338,7 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init)
 		if (prs_pipelinelist_res == -1)
 			return (-1);
 		if (current_type(i + prs_pipelinelist_res + 1, lexemes) != RPAREN)
-		{
-			if (DEBUG_AST) {
-				ft_printf("Closing parenthesis (')') expected!"); }
-			return (-1);
-		}
+			return (write(2, "Closing parenthesis (')') expected!\n", 36), -1);
 		if (DEBUG_AST) {
 			ft_printf(" ENDLPAREN)"); }
 		prs_pipelinelist_res += 2;
@@ -402,11 +384,6 @@ int	prs_ast(t_list *lexemes, t_ast_node *ast)
 	if (res == -1)
 		return (0);
 	if (res < ft_lstsize(lexemes))
-	{
-		if (DEBUG_AST) {
-			ft_printf("Error, trailing tokens\n");
-		}
-		return (0);
-	}
+		return (write(2, "Error, trailing tokens\n", 23), 0);
 	return (1);
 }

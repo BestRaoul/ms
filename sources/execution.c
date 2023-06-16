@@ -43,7 +43,9 @@ void	xit2(int err)
 
 /* TODO but better
 	1. pipeline node and &&/|| handling
-	. PARENTHESIS -> done?
+	- PARENTHESIS -> pretty much
+	. (ls)
+	. ((ls))
 	2. error management
 	- execution
 	. lexing

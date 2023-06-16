@@ -60,7 +60,6 @@ char	**wildmatches(char *token, char *cwd);
 //replace_envvar.c
 int		in(char c, char *str);
 int		is_azAZ09_(char c);
-void	replace_envvars(t_list *lexemes);
 
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);
@@ -148,6 +147,8 @@ char	**copy_env(char **env, char *excl);
 void	print_env(char **env);
 int		add_var_to_env(char *key, char *value, char ***env);
 int		remove_var_from_env(char *key, char ***env);
+
+int		replace_env_ast(t_ast_node *ast, t_ast_node *prev);
 
 /* v1
 	Cmdline ::= PipelineList

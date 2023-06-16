@@ -42,6 +42,7 @@ int	main(void)
 			continue ;
 		ft_lstclear(&lexemes, free_lexeme_node);
 //		ft_printf("ast:\n");
+		replace_env_ast(ast, NULL);
 		print_ast(ast, 0);
 		//EXECUTE here
 		success_status = execute_pll(ast);

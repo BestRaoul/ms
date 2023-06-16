@@ -73,26 +73,43 @@ char	*handle_env(char *literal)
 	out[j] = NULL;
 	char	*result = join(out, "");
 	//nc result
-	frees2(2, 1, out, 0, literal);
+	//frees2(2, 1, out, 0, literal);
+	frees2(1, 1, out, 0);
 	return result; //frees (out)
 }
 
-void	replace_envvars(t_list *lexemes)
+int	is_export(t_ast_node *ast)
 {
-	t_dict_int_str_member	*mem;
-	int						prev_key;
+	if (ast == NULL)
+		return (0);
+	if (ast->content == NULL)
+		return (0);
+	if (ast->type != LITERAL_SQ && ast->type != LITERAL_DQ && ast->type != LITERAL_NQ)
+		return (0);
+	return (ft_strlen("export") == ft_strlen(ast->content) && !ft_strncmp("export", ast->content, ft_strlen("export")));
+}
 
-	prev_key = -1;
-	while (lexemes != NULL)
+int	replace_env_ast(t_ast_node *ast, t_ast_node *prev)
+{
+	char	*new_val;
+	int		ret;
+
+	ret = 1;
+	if ((ast->type == LITERAL_NQ || ast->type == LITERAL_DQ) && (!prev || (prev->type != HEREDOC && !is_export(prev))))
 	{
-		mem = (t_dict_int_str_member *) lexemes->content;
-		if ((mem->key == LITERAL_NQ || mem->key == LITERAL_DQ)
-			&& prev_key != HEREDOCOP)
-		{
-			mem->value = handle_env(mem->value);
-		}
-
-		prev_key = mem->key;
-		lexemes = lexemes->next;
+		ft_printf("dupa0\n");
+		new_val = handle_env(ast->content);
+		ft_printf("dupa1\n");
+		if (!new_val)
+			return (0);
+		free(ast->content);
+		ast->content = new_val;
 	}
+	for (int i = 0; i < ft_lstsize(ast->children); ++i) {
+		if (i == 0)
+			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, NULL), 1);
+		else
+			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, ft_lst_get(ast->children, i - 1)->content), 1);
+	}
+	return (ret);
 }

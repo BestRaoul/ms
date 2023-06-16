@@ -19,7 +19,7 @@ t_ast_node	*init_ast_node(int type, t_dict_int_str_member *lexeme)
 	t_ast_node	*res;
 
 	res = MALLOC(sizeof(*res));
-	if (!res || !lexeme)
+	if (!res || !lexeme) //potential leak when malloc succesfull but lexeme NULL
 		return (NULL);
 	res->content = MALLOC(sizeof(*res->content) * (ft_strlen(lexeme->value) + 1));
 	if (!res->content)
@@ -351,26 +351,6 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init)
 		return(prs_pipeline(i, lexemes, ast, 0));
 	//i += prs_pipelinelist_res;
 	return (prs_pipelinelist_res);
-}
-
-void	free_ast(t_ast_node *ast)
-{
-	int	i;
-
-	if (!ast)
-		return ;
-	i = 0;
-	while (i < ft_lstsize(ast->children))
-	{
-		free_ast(ft_lst_get(ast->children, i)->content);
-		i ++;
-	}
-	if (ast->content)
-		free(ast->content);
-	if (ast->children)
-		free(ast->children);
-	free(ast);
-	ast = NULL;
 }
 
 int	prs_ast(t_list *lexemes, t_ast_node *ast)

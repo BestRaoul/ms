@@ -17,6 +17,17 @@ typedef struct s_garbage {
 	struct s_garbage *next;
 } t_garbage;
 
+void	free_garbage(t_garbage *g)
+{
+	if (g == NULL)
+		return;
+	if (g->next)
+		free_garbage(g->next);
+	if (g->garbage)
+		free(g->garbage);
+	free(g);
+}
+
 /*ADD -> adds PTR to garbage stack
 FREE ALL -> frees all the garbage*/
 void    *garbage_collector(int action, void *ptr)
@@ -39,13 +50,7 @@ void    *garbage_collector(int action, void *ptr)
 	else if (action == FREE_ALL)
 	{
 		write(1, "gc: fa!\n", 8);
-		new = &first;
-		while (new != NULL)
-		{
-			if (new->garbage != NULL)
-				free(new->garbage);
-			new = new->next;
-		}
+		free_garbage(first.next);
 		first = (t_garbage){NULL, NULL};
 		current = &first;
 	}

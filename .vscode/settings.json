@@ -11,6 +11,7 @@
         "signal.h": "c",
         "history.h": "c",
         "fcntl.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "ms.h": "c"
     }
 }

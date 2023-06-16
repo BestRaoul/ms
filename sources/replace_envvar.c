@@ -39,18 +39,13 @@ char	*handle_env(char *literal)
 	char	**out;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', literal)), sizeof(char *));
-	if (DEBUG_ENV) {
-	printf("%s: %d\n", literal, 2 + 2 * count('$', literal));}
+	out = calloc((2 + 2 * count('$', literal)), sizeof(char *)); //nc
 	j = 0;
 	while (*literal)
 	{
 		if (strncmp("$$", literal, 2) == 0)
 		{
-			out[j] = handle_dd();
-			if (DEBUG_ENV) {
-			printf("[%d] =dd= \'%s\'\n", j, out[j]);}
-			//NULLCHECK out[j]
+			out[j] = handle_dd(); //nc
 			literal += 2;
 			j++;
 			continue ;
@@ -62,28 +57,22 @@ char	*handle_env(char *literal)
 		if (*literal == '$')
 		{
 			literal++;
-			out[j] = handle_var(_scan2(&(literal), is_azAZ09_));
+			out[j] = handle_var(_scan2(&(literal), is_azAZ09_)); //nc
 		}
 		else
 		{
-			if (DEBUG_ENV) {
-			ft_printf("[%d] = \'%.*s\' -> ", j, x, literal);}
-			out[j] = chop(literal, x - 1);
+			out[j] = chop(literal, x - 1); //nc
 			literal+=x;
 		}
-		if (DEBUG_ENV) {
-		printf("\'%s\'\n", out[j]);}
-		//NULLCHECK out[j]
 		j++;
 	}
 	out[j] = NULL;
-	char	*result = join(out, "");
-	//nc result
-	//frees2(2, 1, out, 0, literal);
+	char	*result = join(out, ""); //nc
 	frees2(1, 1, out, 0);
-	return result; //frees (out)
+	return result;
 }
 
+/*replace env ast
 int	is_export(t_ast_node *ast, int iscommand)
 {
 	if (!iscommand)
@@ -127,7 +116,7 @@ int	replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand)
 		ft_printf("dupa1\n");
 		if (!new_val)
 			return (0);
-		free(ast->content);
+		fre e(ast->content);
 		ast->content = new_val;
 	}
 	for (int i = 0; i < ft_lstsize(ast->children); ++i) {
@@ -138,3 +127,4 @@ int	replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand)
 	}
 	return (ret);
 }
+*/

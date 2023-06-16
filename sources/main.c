@@ -17,7 +17,7 @@ int	main(void)
 	remove_var_from_env("_", &env_copy);
 	remove_var_from_env("_JAVA_OPTIONS", &env_copy);
 	print_env(env_copy);
-	free_arr((void **) env_copy);*/
+	fre_arr((void **) env_copy);*/
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED WHITE);
@@ -37,10 +37,11 @@ int	main(void)
 			break ;
 		if (!prs_ast(lexemes, ast))
 			continue ;
-		ft_lstclear(&lexemes, free_lexeme_node);
 		print_ast(ast, 0);
 		//EXECUTE here
 		success_status = execute_pll(ast);
+		//fre all
+		ft_lstclear(&lexemes, free_lexeme_node);
 		free_ast(ast);
 		free(input);
 	}

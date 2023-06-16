@@ -104,19 +104,6 @@ enum TokenTypes {
 	PARENTHESIS,
 };
 
-/*enum NonTerminals {
-
-};*/
-
-enum SymbolType {
-	TERMINAL,
-	NONTERMINAL
-};
-
-enum AstType {
-	COMMAND
-};
-
 typedef struct s_ast_node {
 	int		type;
 	char	*content;
@@ -150,6 +137,9 @@ int		remove_var_from_env(char *key, char ***env);
 
 int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
+/* builtins */
+int		cd(char *dir);
+
 /* v1
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?
@@ -172,50 +162,6 @@ int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
  	RedirOp ::= ">" | "<" | ">>"
 	Heredoc ::= "<<" Lit
 	CmdArg ::= Lit
- * */
-
-
-//CMDLINE -> CMDLINE' AND CMDLINE
-//CMDLINE -> CMDLINE' OR CMDLINE
-//CMDLINE' -> CMDLINE | epsilon
-
-/* https://www.tutorialspoint.com/compiler_design/compiler_design_syntax_analysis.htm */
-/*const t_grammar grammar = {
-		(t_rule[]) {
-				{CMDLINE, (int[]){PIPELINE}, 1, NONTERMINAL},
-				{CMDLINE, (int[]){GROUPING}, 1, NONTERMINAL},
-				{CMDLINE, (int[]){CMDLINE_, AND, CMDLINE}, 3, NONTERMINAL},
-				{CMDLINE, (int[]){CMDLINE_, OR, CMDLINE}, 3, NONTERMINAL},
-				{CMDLINE_, (int[]){CMDLINE, EPSILON}},
-				{GROUPING, (int[]){LPAREN, CMDLINE, RPAREN}, 3, NONTERMINAL},
-
-				{PIPELINE, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 1, NONTERMINAL},
-				{PIPELINE_SUFFIX, (int[]){CMD, PIPE, PIPELINE_SUFFIX}, 3, NONTERMINAL},
-				{PIPELINE_SUFFIX, (int[]){CMD}, 1, NONTERMINAL},
-
-				{CMD, (int[]){LITERAL}, 1, NONTERMINAL},
-				{CMD, (int[]){REDIR}, 1, NONTERMINAL},
-				{CMD, (int[]){CMD, LITERAL}, 2, NONTERMINAL},
-				{CMD, (int[]){CMD, REDIR}, 2, NONTERMINAL},
-				{REDIR, (int[]){REDIROP, LITERAL}, 2, NONTERMINAL},
-				{REDIROP, (int[]){REDIRLEFT}, 1, TERMINAL},
-				{REDIROP, (int[]){REDIRRIGHT}, 1, TERMINAL},
-				{REDIROP, (int[]){APPEND}, 1, TERMINAL},
-				{HEREDOC, (int[]){HEREDOCOP, LITERAL}, 2, TERMINAL},
-		},
-		18
-};*/
-
-/* OLD
-	Cmdline ::= PipelineList
-	PipelineList ::= Pipeline PipelineList?
-	Pipeline ::= Cmd PipeSuffix? | Redir PipeSuffix? | Heredoc PipeSuffix? | "("Pipeline")" PipeSuffix?
-	PipeSuffix ::= '|' Pipeline | '&&' Pipeline | '||' Pipeline
-	Cmd ::= Lit CmdSuffix?
-	CmdSuffix ::= Lit
-	Redir ::= RedirOp Lit
-	RedirOp ::= ">" | "<" | ">>"
-	Heredoc ::= "<<" Lit
  * */
 
 #endif

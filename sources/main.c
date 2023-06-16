@@ -43,7 +43,7 @@ int	main(void)
 		}
 		print_ast(ast, 0);
 		//EXECUTE here
-//		success_status = execute_pll(ast);
+		success_status = execute_pll(ast);
 		//fre all
 		garbage_collector(FREE_ALL, 0);
 //		ft_lstclear(&lexemes, free_lexeme_node);

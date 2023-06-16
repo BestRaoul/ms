@@ -214,14 +214,15 @@ int	heredoc_handler(char *delimiter)
 
 	if (pipe(_pipe) == -1) xit();
 	input = readline("|> ");//nc
-	while (strcmp(input, delimiter) != 0)
+	while (input != NULL && strcmp(input, delimiter) != 0)
 	{
 		if (write(_pipe[1], input, ft_strlen(input)) == -1
 			|| write(_pipe[1], "\n", 1) == -1)
 			xit();
-		FREE(input);
+		free(input);
 		input = readline("|> ");//nc
 	}
+	//if (input == NULL) xit();
 	if (close(_pipe[1]) == -1) xit();
 	return _pipe[0];
 }

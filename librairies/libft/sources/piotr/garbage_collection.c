@@ -82,6 +82,7 @@ void    *garbage_collector(int action, void *ptr)
 		}
 		if (i == NULL)
 		{
+			dprintf(2, "P: %p\n", ptr);
 			write(2, "gc: remove PTR not found.\n", 26);
 			exit(127);
 		}

@@ -133,10 +133,10 @@ char	*chop(char *str, int end)
 	char	*res;
 
 	if (end < 0)
-		return (strdup(""));
+		return (ft_strdup(""));
 	temp = str[end + 1];
 	str[end + 1] = 0;
-	res = strdup(str);
+	res = ft_strdup(str);
 	str[end + 1] = temp;
 	return (res);
 }

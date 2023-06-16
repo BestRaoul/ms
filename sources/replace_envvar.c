@@ -78,8 +78,10 @@ char	*handle_env(char *literal)
 	return result; //frees (out)
 }
 
-int	is_export(t_ast_node *ast)
+int	is_export(t_ast_node *ast, int iscommand)
 {
+	if (!iscommand)
+		return (0);
 	if (ast == NULL)
 		return (0);
 	if (ast->content == NULL)
@@ -89,13 +91,30 @@ int	is_export(t_ast_node *ast)
 	return (ft_strlen("export") == ft_strlen(ast->content) && !ft_strncmp("export", ast->content, ft_strlen("export")));
 }
 
-int	replace_env_ast(t_ast_node *ast, t_ast_node *prev)
+int	is_command(int i, t_list *children)
+{
+	int	literal_found;
+	t_ast_node	*node;
+
+	literal_found = -1;
+	for (int j = 0; i < ft_lstsize(children); ++i) {
+		node = ft_lst_get(children, j)->content;
+		if (node->type == LITERAL_DQ || node->type == LITERAL_NQ || node->type == LITERAL_SQ)
+		{
+			literal_found = j;
+			break ;
+		}
+	}
+	return (literal_found == i);
+}
+
+int	replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand)
 {
 	char	*new_val;
 	int		ret;
 
 	ret = 1;
-	if ((ast->type == LITERAL_NQ || ast->type == LITERAL_DQ) && (!prev || (prev->type != HEREDOC && !is_export(prev))))
+	if ((ast->type == LITERAL_NQ || ast->type == LITERAL_DQ) && (!prev || (prev->type != HEREDOC && !is_export(prev, iscommand))))
 	{
 		ft_printf("dupa0\n");
 		new_val = handle_env(ast->content);
@@ -107,9 +126,9 @@ int	replace_env_ast(t_ast_node *ast, t_ast_node *prev)
 	}
 	for (int i = 0; i < ft_lstsize(ast->children); ++i) {
 		if (i == 0)
-			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, NULL), 1);
+			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, NULL, is_command(i, ast->children)), 1);
 		else
-			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, ft_lst_get(ast->children, i - 1)->content), 1);
+			ret = ft_min_int(replace_env_ast(ft_lst_get(ast->children, i)->content, ft_lst_get(ast->children, i - 1)->content, is_command(i, ast->children)), 1);
 	}
 	return (ret);
 }

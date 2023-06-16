@@ -148,7 +148,7 @@ void	print_env(char **env);
 int		add_var_to_env(char *key, char *value, char ***env);
 int		remove_var_from_env(char *key, char ***env);
 
-int		replace_env_ast(t_ast_node *ast, t_ast_node *prev);
+int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
 /* v1
 	Cmdline ::= PipelineList

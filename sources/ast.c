@@ -336,6 +336,7 @@ int	prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued)
 int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init)
 {
 	int	prs_pipelinelist_res;
+	int	prs_suffix_res;
 
 	if (DEBUG_AST) {
 	ft_printf("(PipelineList "); }
@@ -356,9 +357,13 @@ int	prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init)
 				ft_printf("Closing parenthesis (')') expected!"); }
 			return (-1);
 		}
-		prs_pipelinelist_res += 2;
 		if (DEBUG_AST) {
 			ft_printf(" ENDLPAREN)"); }
+		prs_pipelinelist_res += 2;
+		prs_suffix_res = prs_suffix(i + prs_pipelinelist_res, lexemes, ast);
+		if (prs_suffix_res == -1)
+			return (-1);
+		return (prs_pipelinelist_res + prs_suffix_res);
 	}
 	else
 		return(prs_pipeline(i, lexemes, ast, 0));
@@ -389,7 +394,7 @@ void	free_ast(t_ast_node *ast)
 int	prs_ast(t_list *lexemes, t_ast_node *ast)
 {
 	int	res;
-	res = prs_pipeline(0, lexemes, ast, 0); //list
+	res = prs_pipelinelist(0, lexemes, ast, 1); //list
 	if (DEBUG_AST) {
 		ft_printf("\n");
 		ft_printf("res size: %d\n", res);

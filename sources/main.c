@@ -35,14 +35,9 @@ int	main(void)
 		t_list	*lexemes = scan_tokens(input);
 		if (!lexemes)
 			break ;
-		//replace_envvars(lexemes);
-		//print_lexeme_tlist2(lexemes);
-		//if (prs_pipelinelist(0, lexemes, ast, 1) == -1)
 		if (!prs_ast(lexemes, ast))
 			continue ;
 		ft_lstclear(&lexemes, free_lexeme_node);
-//		ft_printf("ast:\n");
-		replace_env_ast(ast, NULL, 0);
 		print_ast(ast, 0);
 		//EXECUTE here
 		success_status = execute_pll(ast);

@@ -1,5 +1,7 @@
 #include "ms.h"
 
+#define DEBUG_ENV 0
+
 int	in(char c, char *str)
 {
 	if (find(c, str) != -1)
@@ -38,14 +40,16 @@ char	*handle_env(char *literal)
 	int		j;
 
 	out = calloc((2 + 2 * count('$', literal)), sizeof(char *));
-	printf("%s: %d\n", literal, 2 + 2 * count('$', literal));
+	if (DEBUG_ENV) {
+	printf("%s: %d\n", literal, 2 + 2 * count('$', literal));}
 	j = 0;
 	while (*literal)
 	{
 		if (strncmp("$$", literal, 2) == 0)
 		{
 			out[j] = handle_dd();
-			printf("[%d] =dd= \'%s\'\n", j, out[j]);
+			if (DEBUG_ENV) {
+			printf("[%d] =dd= \'%s\'\n", j, out[j]);}
 			//NULLCHECK out[j]
 			literal += 2;
 			j++;
@@ -62,11 +66,13 @@ char	*handle_env(char *literal)
 		}
 		else
 		{
-			ft_printf("[%d] = \'%.*s\' -> ", j, x, literal);
+			if (DEBUG_ENV) {
+			ft_printf("[%d] = \'%.*s\' -> ", j, x, literal);}
 			out[j] = chop(literal, x - 1);
 			literal+=x;
 		}
-		printf("\'%s\'\n", out[j]);
+		if (DEBUG_ENV) {
+		printf("\'%s\'\n", out[j]);}
 		//NULLCHECK out[j]
 		j++;
 	}

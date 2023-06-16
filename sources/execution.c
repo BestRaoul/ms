@@ -360,21 +360,27 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	if (DEBUG_REDIR) {
 	printf("(%s) [%s%d%s] -- redir ", argv[0], BLUE, getpid(), RESET);
 	print_redirs(lst_redir->next); }
+	
 	consume_redirs(lst_redir->next);
 	
+	close_all_pipes(to_free.redirs, lst_redir);
+	if (DEBUG_REDIR) {
+	print_open_fds(10, STDERR_FILENO);}
+	
+
 	int		argc = arg_count(argv);
 	char	**my_argv = calloc(argc + 1, sizeof(char *));//nc
 	int	i = 0;
 	while (i < argc)
 	{
 		my_argv[i] = ft_strdup(argv[i]);//nc
+		char *temp = handle_env(my_argv[i]);//nc
+		free(my_argv[i]);
+		my_argv[i] = temp;
 		i++;
 	}
 	my_argv[i] = NULL;
 
-	close_all_pipes(to_free.redirs, lst_redir);
-	if (DEBUG_REDIR) {
-	print_open_fds(10, STDERR_FILENO);}
 	for(int x=0; x<to_free.p_count; x++) ft_lstclear(&(to_free.redirs)[x], &free_t_redir);
 	frees2(1, 1, to_free.argvs);
 	//free_all () -> with the help of garbage collector
@@ -390,7 +396,8 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	{
 		char *pathname = ft_getpath(my_argv[0], environ); //nc	
 		execve(pathname, my_argv, environ);
-		//xit(127);
+		dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
+		exit(14);
 	}
 }
 

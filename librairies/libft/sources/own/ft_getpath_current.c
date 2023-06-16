@@ -15,9 +15,9 @@
 static char	*fr(char *trimmed, char *sep_prefix)
 {
 	if (trimmed)
-		free(trimmed);
+		FREE(trimmed);
 	if (sep_prefix)
-		free(sep_prefix);
+		FREE(sep_prefix);
 	return (NULL);
 }
 

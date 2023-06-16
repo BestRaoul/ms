@@ -83,7 +83,7 @@ int	clean_qt2splt(char ***splt)
 		if (ft_strlen(clean) > 0 && !ft_lstadd_str(clean, &newsplt))
 			return (clean_ret(splt, &newsplt, 0));
 		if (ft_strlen(clean) == 0)
-			free(clean);
+			FREE(clean);
 		i ++;
 	}
 	return (clean_ret(splt, &newsplt, 1));

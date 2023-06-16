@@ -39,7 +39,7 @@ char	*handle_env(char *literal)
 	char	**out;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', literal)), sizeof(char *)); //nc
+	out = ft_calloc((2 + 2 * count('$', literal)), sizeof(char *)); //nc
 	j = 0;
 	while (*literal)
 	{

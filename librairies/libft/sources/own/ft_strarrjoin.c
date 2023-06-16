@@ -28,7 +28,7 @@ static int	add_arr(t_list **lst, char **arr)
 		}
 		if (!ft_lstadd_str(tempdup, lst))
 		{
-			free(tempdup);
+			FREE(tempdup);
 			ft_lstclear(lst, ft_delnode);
 			return (0);
 		}

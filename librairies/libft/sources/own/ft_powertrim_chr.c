@@ -26,6 +26,6 @@ char	*ft_powertrim_chr(const char *str, char c)
 			ft_strlen(" \f\n\r\t\v") + 1))
 		return (0);
 	res = ft_strtrim(str, joined_set);
-	free(joined_set);
+	FREE(joined_set);
 	return (res);
 }

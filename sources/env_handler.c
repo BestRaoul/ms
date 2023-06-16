@@ -50,7 +50,7 @@ char	**copy_env(char **env, char *excl)
 		}
 		if (!ft_lstadd_str(tmp, &lst))
 		{
-			free(tmp);
+			FREE(tmp);
 			ft_lstclear(&lst, ft_delnode);
 			return (NULL);
 		}
@@ -79,7 +79,7 @@ int	add_var_to_env(char *key, char *value, char ***env)
 	if (!res)
 		return (0);
 	int_res = ft_strarr_append_str(env, res);
-	free(res);
+	FREE(res);
 	return (int_res);
 }
 

@@ -64,7 +64,7 @@ int	add_ast_child(t_ast_node *ast, int type, t_dict_int_str_member *lexeme)
 	else
 		node = init_ast_node(type, lexeme);
 	if (node == NULL) {
-		free(lst_elem);
+		FREE(lst_elem);
 		return (0);
 	}
 	lst_elem->content = node;

@@ -25,7 +25,7 @@ char	**ft_prependstr2strarr(char *str, char **arr)
 		return (NULL);
 	if (!ft_lstadd_str(strcp, &one_lst))
 	{
-		free(strcp);
+		FREE(strcp);
 		return (NULL);
 	}
 	onearr = ft_tlst_to_strarr(one_lst);

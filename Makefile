@@ -36,7 +36,7 @@ else
 	OPTFLAG				:= -O3
 endif
 
-CC						:= cc
+CC						:= gcc
 CFLAGS					:= -Wall -Wextra -Werror -pedantic $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
 RM						:= rm -f
 
@@ -65,7 +65,6 @@ SOURCES_LIST			:= main.c\
 							print_lexeme_tlist.c\
 							ast.c\
 							print_ast.c\
-							free_lexemes.c\
 							execution.c\
 							env_handler.c\
 							builtins1.c\

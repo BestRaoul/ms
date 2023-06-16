@@ -14,7 +14,7 @@ char	*join(char **strr, char *joint)
 	while (strr[i] != NULL)
 		final_size += len(strr[i++]) + len(joint);
 	final_size -= len(joint);
-	res = calloc(final_size + 1, sizeof(char));
+	res = ft_calloc(final_size + 1, sizeof(char));
 	//--NULLCHECK
 	i = 0;
 	while (strr[i] != NULL)

@@ -14,5 +14,5 @@
 
 void	ft_delnode(void *content)
 {
-	free(content);
+	FREE(content);
 }

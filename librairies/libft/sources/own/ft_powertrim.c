@@ -21,6 +21,6 @@ char	*ft_powertrim(const char *str, const char *set)
 	if (!joined_set)
 		return (NULL);
 	res = ft_strtrim(str, joined_set);
-	free(joined_set);
+	FREE(joined_set);
 	return (res);
 }

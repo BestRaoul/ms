@@ -11,7 +11,11 @@
 /* ************************************************************************** */
 
 #ifndef MALLOC
-# define MALLOC malloc
+# define MALLOC(x) gc_malloc(__FILE__, __LINE__, x)
+#endif
+
+#ifndef FREE
+# define FREE(x) gc_free(__FILE__, __LINE__, x);
 #endif
 
 #ifndef LIBFT_H
@@ -356,10 +360,12 @@ int		more_eq(int x, int y);
 
 enum GC_ACTION {
     ADD,
+	REMOVE,
     FREE_ALL,
 };
 
-void *gc_malloc(size_t size);
+void	*gc_malloc(const char* fname, int lineno, size_t size);
+void	gc_free(const char* fname, int lineno, void *ptr);
 void    *garbage_collector(int action, void *ptr);
 
 /*

@@ -25,15 +25,15 @@ void	free_ast(t_ast_node *ast)
 		i ++;
 	}
 	if (ast->content)
-		free(ast->content);
+		FREE(ast->content);
 	if (ast->children)
-		free(ast->children);
-	free(ast);
+		FREE(ast->children);
+	FREE(ast);
 	ast = NULL;
 }
 
 void    free_lexeme_node(void *node)
 {
 	t_dict_int_str_member_free(node);
-	//free(node);
+	//FREE(node);
 }

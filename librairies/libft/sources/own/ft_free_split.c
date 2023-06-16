@@ -22,8 +22,8 @@ void	ft_free_split(char **split_res, size_t size)
 	while (i < size)
 	{
 		if (split_res[i])
-			free(split_res[i]);
+			FREE(split_res[i]);
 		i ++;
 	}
-	free(split_res);
+	FREE(split_res);
 }

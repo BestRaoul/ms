@@ -27,11 +27,11 @@ char	*ft_query_envp(char *query, char **envp)
 	{
 		if (!ft_strncmp(envp[i], query_with_equal, ft_strlen(query_with_equal)))
 		{
-			free(query_with_equal);
+			FREE(query_with_equal);
 			return (ft_strdup(envp[i] + len));
 		}
 		i ++;
 	}
-	free(query_with_equal);
+	FREE(query_with_equal);
 	return (NULL);
 }

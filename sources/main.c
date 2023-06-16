@@ -36,16 +36,22 @@ int	main(void)
 		if (!lexemes)
 			break ;
 		if (!prs_ast(lexemes, ast))
+		{ 
+			FREE(input);
+			ft_lstclear(&lexemes, free_lexeme_node);
 			continue ;
+		}
 		print_ast(ast, 0);
 		//EXECUTE here
-		success_status = execute_pll(ast);
+//		success_status = execute_pll(ast);
 		//fre all
-		ft_lstclear(&lexemes, free_lexeme_node);
-		free_ast(ast);
-		free(input);
+		garbage_collector(FREE_ALL, 0);
+//		ft_lstclear(&lexemes, free_lexeme_node);
+//		free_ast(ast);
+//		free(input); //not FREE because not allocated via malloc
 	}
-	free_ast(ast);
-	free(input);
+	garbage_collector(FREE_ALL, 0);
+//	free_ast(ast);
+//	free(input);
 	return (0);
 }

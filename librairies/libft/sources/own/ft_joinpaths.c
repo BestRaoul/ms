@@ -24,13 +24,13 @@ static int	lst_add_first(const char *frst, t_list **lst)
 		return (0);
 	had_sep = blank_trimmed[0] == ft_getsep();
 	all_trimmed = ft_powertrim_chr(blank_trimmed, ft_getsep());
-	free(blank_trimmed);
+	FREE(blank_trimmed);
 	if (!all_trimmed)
 		return (0);
 	if (had_sep)
 	{
 		sep_joined = ft_strjoin_chr_str(ft_getsep(), all_trimmed);
-		free(all_trimmed);
+		FREE(all_trimmed);
 		if (!sep_joined)
 			return (0);
 		return (ft_lstadd_str(sep_joined, lst));

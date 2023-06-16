@@ -23,6 +23,6 @@ char	*ft_strjoin_str_chr(const char *str, char c)
 	tmp[0] = c;
 	tmp[1] = 0;
 	join = ft_strjoin(str, tmp);
-	free(tmp);
+	FREE(tmp);
 	return (join);
 }

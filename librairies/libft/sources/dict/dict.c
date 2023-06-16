@@ -28,7 +28,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 		res->value = MALLOC(sizeof(*(res->value)) * (ft_strlen(value) + 1));
 		if (res->value == NULL)
 		{
-			free(res);
+			FREE(res);
 			return (NULL);
 		}
 		ft_strlcpy(res->value, value, ft_strlen(value) + 1);
@@ -42,7 +42,7 @@ void	t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member)
 	if (dict_int_str_member->value != NULL)
 	{
 		//ft_printf("freeing value (%s), %p\n", dict_int_str_member->value, dict_int_str_member->value);
-		free(dict_int_str_member->value);
+		FREE(dict_int_str_member->value);
 	}
-	free(dict_int_str_member);
+	FREE(dict_int_str_member);
 }

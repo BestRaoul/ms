@@ -23,16 +23,16 @@ int	ft_pwd_is_ex(const char *binname, char **envp)
 	joined = ft_joinpaths(pwd, binname, NULL);
 	if (!joined)
 	{
-		free(pwd);
+		FREE(pwd);
 		return (0);
 	}
 	if (ft_file_isex(joined))
 	{
-		free(pwd);
-		free(joined);
+		FREE(pwd);
+		FREE(joined);
 		return (1);
 	}
-	free(pwd);
-	free(joined);
+	FREE(pwd);
+	FREE(joined);
 	return (0);
 }

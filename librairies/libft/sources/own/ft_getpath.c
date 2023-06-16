@@ -15,7 +15,7 @@
 static char	*free_path_strarr(char **path_strarr, char *basename)
 {
 	if (basename)
-		free(basename);
+		FREE(basename);
 	ft_free_split(path_strarr,
 		ft_strarrlen(path_strarr));
 	return (NULL);
@@ -41,12 +41,12 @@ static char	*abs_local_ret(const char *binname, char **envp)
 	pwd = ft_pwd(envp);
 	if (!pwd)
 	{
-		free(basename);
+		FREE(basename);
 		return (NULL);
 	}
 	joined = ft_joinpaths(pwd, basename, NULL);
-	free(pwd);
-	free(basename);
+	FREE(pwd);
+	FREE(basename);
 	return (joined);
 }
 

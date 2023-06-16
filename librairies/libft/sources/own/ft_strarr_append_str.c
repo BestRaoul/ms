@@ -31,7 +31,7 @@ int	ft_strarr_append_str(char ***strarr, char *str)
 		}
 		if (!ft_lstadd_str(tmp, &lst))
 		{
-			free(tmp);
+			FREE(tmp);
 			ft_lstclear(&lst, ft_delnode);
 			return (0);
 		}
@@ -41,7 +41,7 @@ int	ft_strarr_append_str(char ***strarr, char *str)
 	tmp = ft_strdup(str);
 	if (!ft_lstadd_str(tmp, &lst))
 	{
-		free(tmp);
+		FREE(tmp);
 		ft_lstclear(&lst, ft_delnode);
 		return (0);
 	}

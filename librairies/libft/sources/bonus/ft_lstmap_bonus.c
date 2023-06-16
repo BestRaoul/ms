@@ -37,7 +37,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 		temp = ft_lstnew(cont);
 		if (clrlst(new_lst, temp, del))
 		{
-			free(cont);
+			FREE(cont);
 			return (0);
 		}
 		if (!new_lst)

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cd.c                                               :+:      :+:    :+:   */
+/*   builtins1.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jwikiera <jwikiera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,10 +14,10 @@
 
 int	cd(char *dir)
 {
-	if (chdir(dir) != 0)
-	{
-		perror(strerror(errno));
-		return (1);
-	}
-	return (0);
+	int status = chdir(dir);
+	int err = errno;
+	//free_all
+	if (status != 0)
+		xit2(err);
+	exit(0);
 }

@@ -24,6 +24,13 @@ void	xit()
 	exit(err);
 }
 
+void	xit2(int err)
+{
+	errno = err;
+	perror(ERROR_MSG);
+	exit(err);
+}
+
 //pl{}, ., pl{}, ., pl{}...
 /*pl{
 	a |

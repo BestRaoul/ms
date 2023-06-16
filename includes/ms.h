@@ -128,6 +128,7 @@ int		execute_pll(t_ast_node *pl);
 
 /* error management */
 void	xit();
+void	xit2(int err);
 
 /* env */
 char	**copy_env(char **env, char *excl);

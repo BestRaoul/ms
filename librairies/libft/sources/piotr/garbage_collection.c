@@ -96,7 +96,8 @@ void    *garbage_collector(int action, void *ptr)
 	}
 	else if (action == FREE_ALL)
 	{
-		write(1, "gc: fa!\n", 8);
+		if (DEBUG_ALLOC) {
+		write(1, "gc: fa!\n", 8); }
 		free_garbage(first.next);
 		first = (t_garbage){NULL, NULL};
 		current = &first;

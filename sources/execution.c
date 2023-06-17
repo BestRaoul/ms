@@ -498,7 +498,12 @@ int	execute_pll(t_ast_node *pll)
 	while (child != NULL)
 	{
 		if (status == 1)
-			status = ms_execute(child);
+		{
+			if (child->type == PIPELINE)
+				status = ms_execute(child);
+			else if (child->type == PIPELINELIST)
+				status = execute_pll(child);
+		}
 		else
 			status = -42;
 		t_ast_node *next = get_child(pll, child_i++); //nc?

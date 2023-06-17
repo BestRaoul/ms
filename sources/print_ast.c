@@ -12,25 +12,34 @@
 
 #include "ms.h"
 
+void	spaces(int s)
+{
+	int	i = 0;
+	while (i < s)
+	{
+		write(1, " ", 1);
+		i++;
+	}
+}
+
 void print_node(t_ast_node *ast, int depth)
 {
-	for (int i = 0; i < depth; ++i) {
-		ft_printf("    ");
-	}
-	ft_printf("ASTnode: [%s", RED);
+	spaces(4 * depth);
+	ft_printf("ASTnode: [");
 	print_type(ast->type);
-	ft_printf("%s]\n", RESET);
+	ft_printf("]\n");
 	if (ast->content)
 	{
-		for (int i = 0; i < depth; ++i) {
-			ft_printf("    ");
-		}
+		spaces(4 * depth);
 		ft_printf("  content: `%s%s%s`\n", GREEN, ast->content, RESET);
 	}
 }
 
 void print_ast(t_ast_node *ast, int depth)
 {
+	if (!ast) {
+		write(2, "print_ast: NULL\n", 16);
+		return ;}
 	print_node(ast, depth);
 	depth ++;
 	for (int i = 0; i < ft_lstsize(ast->children); ++i) {

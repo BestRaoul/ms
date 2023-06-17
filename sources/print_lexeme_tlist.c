@@ -31,7 +31,6 @@ void	print_lexeme_tlist(t_list *lst)
 void	print_type(int type)
 {
 	ft_printf("%s", RED);
-	//if (type < 10) ft_printf("%s", BRED);
 	switch(type)
 	{
 		case LPAREN: ft_printf("("); break;

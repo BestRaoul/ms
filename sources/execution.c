@@ -403,10 +403,15 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	}
 	else
 	{
-		char *pathname = ft_getpath(my_argv[0], environ); //nc	
-		execve(pathname, my_argv, environ);
-		dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
-		exit(14);
+		if (is_builtin(my_argv[0]))
+			exec_builtin(my_argv[0], my_argv, environ);
+		else
+		{
+			char *pathname = ft_getpath(my_argv[0], environ); //nc
+			execve(pathname, my_argv, environ);
+			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
+			exit(14);
+		}
 	}
 }
 

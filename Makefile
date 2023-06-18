@@ -65,7 +65,6 @@ SOURCES_LIST			:= main.c\
 							print_lexeme_tlist.c\
 							ast.c\
 							print_ast.c\
-							free_lexemes.c\
 							execution.c\
 							env_handler.c\
 							builtins1.c\

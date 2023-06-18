@@ -263,6 +263,9 @@ void		ft_remove_chr_lst(t_list **lst, char c);
 /* joins two NULL-terminated strarrs together */
 char		**ft_strarrjoin(char **arr1, char **arr2);
 
+/* joins a strarr to a string, with a char separator */
+char		*ft_strarr_to_str(char **strarr, char sep);
+
 /* prepends a string to a NULL-terminates strarr */
 char		**ft_prependstr2strarr(char *str, char **arr);
 
@@ -298,6 +301,9 @@ int			ft_strequal(const char *s1, const char *s2);
 
 /* ft_strlen but returns int */
 int			ft_strlen_int(const char *s);
+
+/* returns pos of char in str */
+int			ft_strchr2(char *haystack, char needle);
 
 /* math */
 int			ft_min_int(int a, int b);

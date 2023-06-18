@@ -139,7 +139,11 @@ int		remove_var_from_env(char *key, char ***env);
 int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
 /* builtins */
-int		cd(char *dir);
+int		is_builtin(char *cmd);
+int		exec_builtin(char *cmd, char **argv, char **env);
+int		cd(char **argv);
+int		echo(char **argv);
+int		export(char **argv, char **env);
 
 /* v1
 	Cmdline ::= PipelineList

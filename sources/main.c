@@ -20,6 +20,7 @@ int	main(void)
 	fre_arr((void **) env_copy);*/
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
+
 	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED WHITE);
 	while (1)
 	{

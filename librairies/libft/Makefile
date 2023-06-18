@@ -148,7 +148,9 @@ SRCS_OWN_LIST		:= ft_str_starts_ends_with.c\
 						ft_pwd_is_ex.c\
 						ft_strjoin2.c\
 						ft_strequal.c\
-						ft_strarr_append_str.c
+						ft_strarr_append_str.c\
+						ft_strarr_to_str.c\
+						ft_strchr2.c
 OBJS_OWN_LIST		:= $(patsubst %.c, %.o, $(SRCS_OWN_LIST))
 OBJS_OWN			:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_OWN_LIST))
 

@@ -147,6 +147,9 @@ int		exec_builtin(char *cmd, char **argv, char **env);
 int		cd(char **argv);
 int		echo(char **argv);
 int		export(char **argv, char **env);
+int		unset(char **argv, char **env);
+int		pwd(char **env);
+int		env_builtin(char **env);
 
 /* v1
 	Cmdline ::= PipelineList

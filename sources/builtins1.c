@@ -16,19 +16,29 @@
 
 int	is_builtin(char *cmd)
 {
-	return (ft_strequal(cmd, "cd") || ft_strequal(cmd, "cd")
-	|| ft_strequal(cmd, "export") || ft_strequal(cmd, "unset")
-	|| ft_strequal(cmd, "echo") || ft_strequal(cmd, "pwd")
-	|| ft_strequal(cmd, "env") || ft_strequal(cmd, "exit"));
+	return (ft_strequal(cmd, "echo") || ft_strequal(cmd, "cd")
+	|| ft_strequal(cmd, "pwd") || ft_strequal(cmd, "export")
+	|| ft_strequal(cmd, "unset") || ft_strequal(cmd, "env")
+	|| ft_strequal(cmd, "exit"));
 }
 
 int	exec_builtin(char *cmd, char **argv, char **env)
 {
 	(void) env;
-	if (ft_strequal(cmd, "cd"))
-		return (cd(argv));
 	if (ft_strequal(cmd, "echo"))
 		return (echo(argv));
+	if (ft_strequal(cmd, "cd"))
+		return (cd(argv));
+	if (ft_strequal(cmd, "pwd"))
+		return (pwd(env));
+	if (ft_strequal(cmd, "export"))
+		return (export(argv, env));
+	if (ft_strequal(cmd, "unset"))
+		return (unset(argv, env));
+	if (ft_strequal(cmd, "env"))
+		return (env_builtin(env));
+	if (ft_strequal(cmd, "exit"))
+		return (ft_printf("todo exit\n"));
 	return (1);
 }
 
@@ -112,6 +122,7 @@ char	*get_export_value(char *str, char **env)
 	if (!res)
 		return (NULL);
 	ft_strlcpy(res, str + ft_strchr2(str, '='), ft_strlen_int(str) - ft_strchr2(str, '=') + 1);
+	// TODO: env needs to be passed here probably
 	newval = handle_env(res);
 	free(res);
 	return (newval);
@@ -183,7 +194,7 @@ int	pwd(char **env)
 	return (0);
 }
 
-int	env(char **env)
+int	env_builtin(char **env)
 {
 	print_env(env);
 	return (0);

@@ -51,7 +51,7 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 		if (!literal)
 			return (-1);
 		insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, 2);
-		free(literal);
+		FREE(literal);
 		return (insert_res);
 	}
 	word = NULL;
@@ -71,7 +71,7 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 		return (-1);
 	}
 	insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, i + 1);
-	free(literal);
+	FREE(literal);
 	ft_lstclear(&word, ft_delnode);
 	return (insert_res);
 }
@@ -91,7 +91,7 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 		if (!literal)
 			return (-1);
 		insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, 2);
-		free(literal);
+		FREE(literal);
 		return (insert_res);
 	}
 	i = 1;
@@ -102,7 +102,7 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 		return (-1);
 	ft_strlcpy(literal, s + pos + 1, i);
 	insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, i + 1);
-	free(literal);
+	FREE(literal);
 	return (insert_res);
 }
 
@@ -141,7 +141,7 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 		return (-1);
 	}
 	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);
-	free(literal);
+	FREE(literal);
 	ft_lstclear(&word, ft_delnode);
 	return (insert_res);
 }

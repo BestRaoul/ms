@@ -122,6 +122,9 @@ void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
 void	free_ast(t_ast_node *ast);
 
+/* parse rewrite */
+t_ast_node	*parse_ast2(t_list *lexemes);
+
 /* execution */
 int		ms_execute(t_ast_node *pipeline);
 int		execute_pll(t_ast_node *pl);

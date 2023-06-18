@@ -14,7 +14,7 @@ char	*join(char **strr, char *joint)
 	while (strr[i] != NULL)
 		final_size += len(strr[i++]) + len(joint);
 	final_size -= len(joint);
-	res = calloc(final_size + 1, sizeof(char));
+	res = ft_calloc(final_size + 1, sizeof(char));
 	//--NULLCHECK
 	i = 0;
 	while (strr[i] != NULL)
@@ -133,10 +133,10 @@ char	*chop(char *str, int end)
 	char	*res;
 
 	if (end < 0)
-		return (strdup(""));
+		return (ft_strdup(""));
 	temp = str[end + 1];
 	str[end + 1] = 0;
-	res = strdup(str);
+	res = ft_strdup(str);
 	str[end + 1] = temp;
 	return (res);
 }

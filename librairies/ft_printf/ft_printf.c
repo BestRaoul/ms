@@ -65,7 +65,7 @@ static int	write_format(const char *str, va_list va, int *i, int *res)
 		if (out == NULL)
 			return (-1);
 		*res += write_str(out, data);
-		free(out);
+		FREE(out);
 		*i = j;
 		return (*res);
 	}

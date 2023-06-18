@@ -46,11 +46,11 @@ static char	*inttrim(const char *str)
 	res = MALLOC(ft_strlen(trimmed) - i + 1);
 	if (!res)
 	{
-		free(trimmed);
+		FREE(trimmed);
 		return (NULL);
 	}
 	ft_strlcpy(res, trimmed + i, ft_strlen(trimmed) - i + 1);
-	free(trimmed);
+	FREE(trimmed);
 	return (res);
 }
 
@@ -73,7 +73,7 @@ static int	has_only_digits(const char *str)
 static int	free_trimmed(char *str)
 {
 	if (str)
-		free(str);
+		FREE(str);
 	return (0);
 }
 
@@ -95,6 +95,6 @@ int	ft_str_is_int(const char *str)
 	if (ft_atoi_l(trimmed) * sign > INT_MAX
 		|| ft_atoi_l(trimmed) * sign < INT_MIN)
 		return (free_trimmed(trimmed));
-	free(trimmed);
+	FREE(trimmed);
 	return (1);
 }

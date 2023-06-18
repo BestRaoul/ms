@@ -24,14 +24,14 @@ int	ft_bin_in_path(const char *binname, const char *path)
 		return (0);
 	if (!ft_file_exists(full_path))
 	{
-		free(full_path);
+		FREE(full_path);
 		return (0);
 	}
 	if (!ft_file_isex(full_path))
 	{
-		free(full_path);
+		FREE(full_path);
 		return (0);
 	}
-	free(full_path);
+	FREE(full_path);
 	return (1);
 }

@@ -74,10 +74,10 @@ static int	free_split(char ***res, int index)
 	i = 0;
 	while (i < index)
 	{
-		free((*res)[i]);
+		FREE((*res)[i]);
 		i ++;
 	}
-	free(res);
+	FREE(res);
 	return (1);
 }
 

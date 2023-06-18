@@ -19,11 +19,11 @@ static char *handle_var(char *envvar)
 {
 	ft_printf("[] = \'%s\' -> ",envvar);
 	if (len(envvar) == 0)
-		return (strdup("$"));
+		return (ft_strdup("$"));
 	else if (getenv(envvar)) 
-		return (strdup(getenv(envvar)));
+		return (ft_strdup(getenv(envvar)));
 	else
-		return (strdup(""));	
+		return (ft_strdup(""));	
 }
 
 static char	*handle_dd()
@@ -31,7 +31,7 @@ static char	*handle_dd()
 	char	pid[64]="";
 
 	ft_yoloprintf(pid, "%d", getpid());
-	return strdup(pid);
+	return ft_strdup(pid);
 }
 
 char	*handle_env(char *literal)
@@ -39,7 +39,7 @@ char	*handle_env(char *literal)
 	char	**out;
 	int		j;
 
-	out = calloc((2 + 2 * count('$', literal)), sizeof(char *)); //nc
+	out = ft_calloc((2 + 2 * count('$', literal)), sizeof(char *)); //nc
 	j = 0;
 	while (*literal)
 	{

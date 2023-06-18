@@ -9,7 +9,7 @@ static void	test(char *input, char *expected)
 {
 	int debug = UTD || getenv("UTD") != NULL;
 	static int	n = 0; n++;
-	char	*mine = strdup(input);
+	char	*mine = ft_strdup(input);
 	replace_env_variables(mine, &mine);
 	if (strcmp(mine, expected) == 0)
 	{

@@ -179,7 +179,7 @@ OBJECTS_LIST		:= $(patsubst %.c, %.o, $(ALL_SRCS_LIST))
 OBJECTS				:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
 INCLUDES			:= -I$(INCLUDE_DIR)
-CC					:= cc
+CC					:= gcc
 CFLAGS				:= -Wall -Wextra -Werror $(DEVFLAGS) $(OPTFLAG) -fstack-protector-all
 RM					:= rm -rf
 

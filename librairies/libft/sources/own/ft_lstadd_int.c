@@ -24,7 +24,7 @@ int	ft_lstadd_int(int i, t_list **lst)
 	child = ft_lstnew(content);
 	if (!child)
 	{
-		free(content);
+		FREE(content);
 		return (0);
 	}
 	ft_lstadd_back(lst, child);

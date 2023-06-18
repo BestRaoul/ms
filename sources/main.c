@@ -8,7 +8,7 @@ int	main(void)
 {
 	static char	question[100] = "";
 	char		*input;
-	t_ast_node	*ast;
+	t_ast_node	*ast = NULL;
 	int			success_status = 0;	
 
 	/* env usage */
@@ -25,10 +25,9 @@ int	main(void)
 	while (1)
 	{
 		ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, WHITE);
-		ast = init_ast_node_type(PIPELINELIST);
 		input = readline(question);
 		//--NULLCHECK
-		if (input && *input && ast)
+		if (input && *input)
 			add_history(input);
 		else
 			break ;
@@ -36,17 +35,22 @@ int	main(void)
 		t_list	*lexemes = scan_tokens(input);
 		if (!lexemes)
 			break ;
-		if (!prs_ast(lexemes, ast))
+//		print_lexeme_tlist2(lexemes);
+		ast = parse_ast2(lexemes);
+		if (ast == NULL)//!prs_ast(lexemes, ast))
+		{ 
+			garbage_collector(FREE_ALL, 0);
+			free(input);
 			continue ;
-		print_ast(ast, 0);
+		}
+//		print_ast(ast, 0);
 		//EXECUTE here
 		success_status = execute_pll(ast);
 		//fre all
-		ft_lstclear(&lexemes, free_lexeme_node);
-		free_ast(ast);
-		free(input);
+		garbage_collector(FREE_ALL, 0);
+		free(input); //not FREE because not allocated via malloc
 	}
-	free_ast(ast);
+	garbage_collector(FREE_ALL, 0);
 	free(input);
 	return (0);
 }

@@ -83,8 +83,8 @@ void	free_t_redir(void *ptr)
 {
 	if (ptr == NULL) return;
 	if (((t_redir *)ptr)->val != NULL)
-		free(((t_redir *)ptr)->val);
-	free(ptr);
+		FREE(((t_redir *)ptr)->val);
+	FREE(ptr);
 }
 
 t_ast_node	*get_child(t_ast_node	*node, int i)
@@ -214,7 +214,7 @@ int	heredoc_handler(char *delimiter)
 
 	if (pipe(_pipe) == -1) xit();
 	input = readline("|> ");//nc
-	while (strcmp(input, delimiter) != 0)
+	while (input != NULL && strcmp(input, delimiter) != 0)
 	{
 		if (write(_pipe[1], input, ft_strlen(input)) == -1
 			|| write(_pipe[1], "\n", 1) == -1)
@@ -222,6 +222,7 @@ int	heredoc_handler(char *delimiter)
 		free(input);
 		input = readline("|> ");//nc
 	}
+	//if (input == NULL) xit();
 	if (close(_pipe[1]) == -1) xit();
 	return _pipe[0];
 }
@@ -232,7 +233,7 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 	int	j = 0;
 	t_ast_node	*child = get_child(ast, i++);
 //	printf("argv's: %d\n", count_child_pipes(ast) + 1);
-	char ***argvs = calloc(p_count + 1, sizeof(char **)); //nc
+	char ***argvs = ft_calloc(p_count + 1, sizeof(char **)); //nc
 	int literal_c = 0;
 	while (child != NULL)
 	{
@@ -240,13 +241,13 @@ char	***alloc_argvs(t_ast_node *ast, int p_count)
 		if (child->type == PIPE)
 		{
 //			printf("(%d)-th argv: %d\n", j, literal_c + 1);
-			argvs[j++] = calloc(literal_c + 1, sizeof(char *)); //nc
+			argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *)); //nc
 			literal_c = 0;
 		}
 		child = get_child(ast, i++);
 	}
 //	printf("(%d)-th argv: %d\n", j, literal_c + 1);
-	argvs[j++] = calloc(literal_c + 1, sizeof(char *));
+	argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *));
 	argvs[j] = NULL;
 	return (argvs);
 }
@@ -264,7 +265,7 @@ t_list	*alloc_redir(int type, char *val)
 
 t_list	**init_redirs(int p_count)
 {
-	t_list **redirs = calloc(p_count + 1, sizeof(t_list *)); //nc
+	t_list **redirs = ft_calloc(p_count + 1, sizeof(t_list *)); //nc
 	int	i = 0;
 
 	while (i < p_count)
@@ -378,13 +379,13 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	
 
 	int		argc = arg_count(argv);
-	char	**my_argv = calloc(argc + 1, sizeof(char *));//nc
+	char	**my_argv = ft_calloc(argc + 1, sizeof(char *));//nc
 	int	i = 0;
 	while (i < argc)
 	{
 		my_argv[i] = ft_strdup(argv[i]);//nc
 		char *temp = handle_env(my_argv[i]);//nc
-		free(my_argv[i]);
+		FREE(my_argv[i]);
 		my_argv[i] = temp;
 		i++;
 	}
@@ -392,13 +393,12 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 
 	for(int x=0; x<to_free.p_count; x++) ft_lstclear(&(to_free.redirs)[x], &free_t_redir);
 	frees2(1, 1, to_free.argvs);
-	//free_all () -> with the help of garbage collector
 
 	if (parenthesis.type == PARENTHESIS)
 	{
 		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
 		int status = execute_pll(&pll);
-		//free_all();
+		garbage_collector(FREE_ALL, 0);
 		exit(status);
 	}
 	else
@@ -419,7 +419,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int p_count)
 {
 	t_free	to_free = (t_free){argvs, redirs, p_count};
-	pid_t	*pids = calloc(p_count + 1, sizeof(pid_t)); //nc
+	pid_t	*pids = ft_calloc(p_count + 1, sizeof(pid_t)); //nc
 	pid_t	parent = getpid();
 	int	i = 0;
 	(void) parens;
@@ -447,7 +447,7 @@ int	ms_execute(t_ast_node *pipeline)
 	t_ast_node	*child = get_child(pipeline, child_i++); //nc
 	char	***argvs = alloc_argvs(pipeline, p_count); //nc
 	t_list	**redirs = init_redirs(p_count); //nc //[] of t_list heads
-	t_parenthesis *parens = calloc(p_count + 1, sizeof(t_parenthesis)); //nc
+	t_parenthesis *parens = ft_calloc(p_count + 1, sizeof(t_parenthesis)); //nc
 	int	_pipe[2] = {-1, -1};
 
 	while (child != NULL)
@@ -503,7 +503,12 @@ int	execute_pll(t_ast_node *pll)
 	while (child != NULL)
 	{
 		if (status == 1)
-			status = ms_execute(child);
+		{
+			if (child->type == PIPELINE)
+				status = ms_execute(child);
+			else if (child->type == PIPELINELIST)
+				status = execute_pll(child);
+		}
 		else
 			status = -42;
 		t_ast_node *next = get_child(pll, child_i++); //nc?

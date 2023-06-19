@@ -2,10 +2,12 @@
 #ifndef MS_GLOBAL_G
 # define MS_GLOBAL_G
 typedef struct s_global {
-	/* add env here*/
+	char	**env;
 	int		status;
 	int		dup_stdin;
 } t_global;
+
+extern t_global	g;
 #endif
 
 #ifndef MS_H
@@ -144,21 +146,21 @@ void	xit2(int err);
 
 /* env */
 char	**copy_env(char **env, char *excl);
-void	print_env(char **env);
-int		add_var_to_env(char *key, char *value, char ***env);
-int		remove_var_from_env(char *key, char ***env);
+void	print_env();
+int		add_var_to_env(char *key, char *value);
+int		remove_var_from_env(char *key);
 
 int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
 /* builtins */
 int		is_builtin(char *cmd);
-int		exec_builtin(char *cmd, char **argv, char **env);
+int		exec_builtin(char *cmd, char **argv);
 int		cd(char **argv);
 int		echo(char **argv);
-int		export(char **argv, char **env);
-int		unset(char **argv, char **env);
+int		export(char **argv);
+int		unset(char **argv);
 int		pwd_builtin();
-int		env_builtin(char **env);
+int		env_builtin();
 
 /* v1
 	Cmdline ::= PipelineList

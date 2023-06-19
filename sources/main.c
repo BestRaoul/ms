@@ -4,7 +4,7 @@
 
 extern char **environ;
 
-t_global g = {0, 0};
+t_global g = {NULL, 0, 0};
 
 int	main(void)
 {
@@ -12,17 +12,10 @@ int	main(void)
 	char		*input;
 	t_ast_node	*ast = NULL;
 
-	/* env usage */
-	/*char **env_copy = copy_env(environ, NULL);
-	add_var_to_env("lol", "lel", &env_copy);
-	remove_var_from_env("_", &env_copy);
-	remove_var_from_env("_JAVA_OPTIONS", &env_copy);
-	print_env(env_copy);
-	fre_arr((void **) env_copy);*/
-
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 
 	g.dup_stdin = dup(STDIN_FILENO);
+	g.env = copy_env(environ, NULL);
 
 	ft_yoloprintf(question, "%s➜  %s", g.status==0?BBLUE:BRED, RESET);
 	while (1)

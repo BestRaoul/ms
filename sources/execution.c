@@ -392,7 +392,6 @@ char	**realloc_argv_envreplaced(char **argv)
 }
 
 //ENS
-extern char **environ;
 void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free, t_parenthesis parenthesis)
 {
 	if (DEBUG_INIT) {
@@ -424,13 +423,13 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 
 		if (is_builtin(my_argv[0]))
 		{
-			int res = exec_builtin(my_argv[0], my_argv, environ);
+			int res = exec_builtin(my_argv[0], my_argv);
 			exit(res);
 		}
 		else
 		{
-			char *pathname = ft_getpath(my_argv[0], environ); //nc
-			execve(pathname, my_argv, environ);
+			char *pathname = ft_getpath(my_argv[0], g.env); //nc
+			execve(pathname, my_argv, g.env);
 			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
 			exit(EFAULT);
 		}
@@ -504,7 +503,7 @@ int	do_solo_exec_builtin(char **argv, t_list *redir)
 {
 	write(2, "solo exec bin\n", 14);
 	consume_redirs(redir);
-	int status = exec_builtin(argv[0], argv, environ);
+	int status = exec_builtin(argv[0], argv);
 	g.status = status;
 	return (status);
 }

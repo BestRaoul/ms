@@ -22,9 +22,8 @@ int	is_builtin(char *cmd)
 	|| ft_strequal(cmd, "exit"));
 }
 
-int	exec_builtin(char *cmd, char **argv, char **env)
+int	exec_builtin(char *cmd, char **argv)
 {
-	(void) env;
 	if (ft_strequal(cmd, "echo"))
 		return (echo(argv));
 	if (ft_strequal(cmd, "cd"))
@@ -32,11 +31,11 @@ int	exec_builtin(char *cmd, char **argv, char **env)
 	if (ft_strequal(cmd, "pwd"))
 		return (pwd_builtin());
 	if (ft_strequal(cmd, "export"))
-		return (export(argv, env));
+		return (export(argv));
 	if (ft_strequal(cmd, "unset"))
-		return (unset(argv, env));
+		return (unset(argv));
 	if (ft_strequal(cmd, "env"))
-		return (env_builtin(env));
+		return (env_builtin());
 	if (ft_strequal(cmd, "exit"))
 		return (ft_printf("todo exit\n"));
 	return (1);
@@ -97,9 +96,8 @@ char	*get_export_key(char *str)
 	return (res);
 }
 
-char	*get_export_value(char *str, char **env)
+char	*get_export_value(char *str)
 {
-	(void) env;
 	char	*res;
 	char	*newval;
 
@@ -113,7 +111,7 @@ char	*get_export_value(char *str, char **env)
 	return (newval);
 }
 
-int	export(char **argv, char **env)
+int	export(char **argv)
 {
 	char	*key;
 	char	*val;
@@ -135,22 +133,22 @@ int	export(char **argv, char **env)
 		key = get_export_key(*argv);
 		if (!key)
 			return (1);
-		val = get_export_value(*argv, env);
+		val = get_export_value(*argv);
 		if (!val)
 			return (1);
-		add_var_to_env(key, val, &env);
+		add_var_to_env(key, val);
 		frees(2, key, val);
 		argv ++;
 	}
 	return (0);
 }
 
-int	unset(char **argv, char **env)
+int	unset(char **argv)
 {
 	argv ++;
 	while (argv)
 	{
-		if (!remove_var_from_env(*argv, &env))
+		if (!remove_var_from_env(*argv))
 			return (1);
 		argv ++;
 	}
@@ -172,8 +170,8 @@ int	pwd_builtin()
 	return (0);
 }
 
-int	env_builtin(char **env)
+int	env_builtin()
 {
-	print_env(env);
+	print_env();
 	return (0);
 }

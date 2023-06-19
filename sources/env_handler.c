@@ -51,16 +51,19 @@ char	**copy_env(char **env, char *excl)
 	return (res);
 }
 
-void	print_env(char **env)
+void	print_env()
 {
-	while (*env)
+	char	**envv;
+
+	envv = g.env;
+	while (*envv)
 	{
-		ft_printf("%s\n", *env);
-		env++;
+		ft_printf("%s\n", *envv);
+		envv++;
 	}
 }
 
-int	add_var_to_env(char *key, char *value, char ***env)
+int	add_var_to_env(char *key, char *value)
 {
 	char	*res;
 	int		int_res;
@@ -68,19 +71,17 @@ int	add_var_to_env(char *key, char *value, char ***env)
 	res = ft_strjoin2(key, "=", value, NULL);
 	if (!res)
 		return (0);
-	int_res = ft_strarr_append_str(env, res);
+	int_res = ft_strarr_append_str(&(g.env), res);
 	FREE(res);
 	return (int_res);
 }
 
-int	remove_var_from_env(char *key, char ***env)
+int	remove_var_from_env(char *key)
 {
 	char	**res;
 
-	res = copy_env(*env, key);
-	if (!res)
-		return (0);
-	free_arr((void **) *env);
-	*env = res;
+	res = copy_env(g.env, key);
+	free_arr((void **) g.env);
+	g.env = res;
 	return (1);
 }

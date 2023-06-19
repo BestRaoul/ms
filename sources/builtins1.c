@@ -112,15 +112,10 @@ char	*get_export_value(char *str, char **env)
 
 	if (ft_str_endswith(str, "="))
 	{
-		res = malloc(sizeof(*res));
-		if (!res)
-			return (NULL);
 		res[0] = '\0';
 		return (res);
 	}
 	res = ft_calloc(ft_strlen_int(str) - ft_strchr2(str, '=') + 1, sizeof(*res));
-	if (!res)
-		return (NULL);
 	ft_strlcpy(res, str + ft_strchr2(str, '='), ft_strlen_int(str) - ft_strchr2(str, '=') + 1);
 	// TODO: env needs to be passed here probably
 	newval = handle_env(res);

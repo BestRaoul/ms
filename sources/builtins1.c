@@ -148,7 +148,7 @@ int	export(char **argv)
 int	unset(char **argv)
 {
 	argv ++;
-	while (argv)
+	while (*argv)
 	{
 		if (!remove_var_from_env(*argv))
 			return (1);
@@ -168,7 +168,7 @@ int	pwd_builtin()
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);
-	FREE(pwdstr);
+	free(pwdstr);
 	return (0);
 }
 

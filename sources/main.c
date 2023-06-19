@@ -21,32 +21,28 @@ int	main(void)
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 
-	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED WHITE);
+	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
 	while (1)
 	{
-		ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, WHITE);
+		ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
 		input = readline(question);
 		//--NULLCHECK
 		if (input && *input)
 			add_history(input);
 		else
 			break ;
-		ft_printf("%s", RESET);
-		t_list	*lexemes = scan_tokens(input);
-		if (!lexemes)
-			break ;
-//		print_lexeme_tlist2(lexemes);
-		ast = parse_ast2(lexemes);
-		if (ast == NULL)//!prs_ast(lexemes, ast))
-		{ 
+		t_list	*lexemes = scan_tokens(input); //?safe
+		if (lexemes == NULL) break ;
+		ast = parse_ast2(lexemes); //safe
+		if (ast == NULL)
+		{
 			garbage_collector(FREE_ALL, 0);
 			free(input);
 			continue ;
 		}
-//		print_ast(ast, 0);
-		//EXECUTE here
-		success_status = execute_pll(ast);
-		//fre all
+		success_status = execute_pll(ast); //safe
+		if (success_status != 0)
+		{	dprintf(2, "(%s%d%s) ", BRED, success_status, RESET); }
 		garbage_collector(FREE_ALL, 0);
 		free(input); //not FREE because not allocated via malloc
 	}

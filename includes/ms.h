@@ -14,6 +14,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <dirent.h>
+#include <sys/wait.h>
 
 # define RESET "\033[0m"
 //COLORS - normal

@@ -168,7 +168,7 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 			parse_suffix(*lexme_ptr, pipeline_list);
 		}
 		else if (t == RPAREN && !init) return 0;
-		else return (dprintf(2, "pl_list: parse error near unxepected `%d' token\n", _type(*lexme_ptr)), -1);
+		else return (dprintf(2, "pl_list: WUT? parse error near unxepected `%d' token\n", _type(*lexme_ptr)), -1);
 
 		*lexme_ptr = (*lexme_ptr)->next;
 	}
@@ -177,7 +177,6 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 
 t_ast_node	*parse_ast2(t_list *lexemes)
 {
-	
 	t_ast_node *ast = MALLOC(sizeof(t_ast_node));
 	ast->children = NULL;
 	ast->content = NULL;
@@ -189,7 +188,7 @@ t_ast_node	*parse_ast2(t_list *lexemes)
 
 	t_list *lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (dprintf(2, "ast2: Error trailing tokens %s->%s!",
+		return (dprintf(2, "ast2: WUT? Error trailing tokens %s->%s!",
 			_content(lexme), _content(lexme->next)), NULL);
 	return (ast);
 }

@@ -43,6 +43,7 @@ void	print_GT(t_garbage *root)
 }
 
 /*ADD -> adds PTR to garbage stack
+REMOVE -> removes PTR from garbage stack
 FREE ALL -> frees all the garbage*/
 void    *garbage_collector(int action, void *ptr)
 {

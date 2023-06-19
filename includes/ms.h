@@ -3,7 +3,7 @@
 # define MS_GLOBAL_G
 typedef struct s_global {
 	/* add env here*/
-	int		prev_status;
+	int		status;
 	int		dup_stdin;
 } t_global;
 #endif

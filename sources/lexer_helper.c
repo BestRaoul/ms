@@ -36,6 +36,11 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 	int		i;
 	t_list	*word;
 
+	if (!in('"', s + pos + 1))
+	{
+		ft_printf("Closing `\"' expected!\n");
+		return (-1);
+	}
 	/* handle empty string case */
 	if (s[pos] == '"' && s[pos + 1] == '"')
 		return (insert_token_into_lst(LITERAL_DQ, "", lst, 2));
@@ -60,6 +65,11 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 	int		insert_res;
 	int		i;
 
+	if (!in('\'', s + pos + 1))
+	{
+		ft_printf("Closing `'' expected!\n");
+		return (-1);
+	}
 	/* handle empty string case */
 	if (s[pos] == '\'' && s[pos + 1] == '\'')
 		return (insert_token_into_lst(LITERAL_SQ, "", lst, 2));
@@ -154,7 +164,7 @@ t_list	*lex(char *s)
 	{
 		advance_len = handle_lexeme(&res, s, i);
 		if (advance_len < 0)
-			return (dprintf(2, "lex: WUT? unknown error....\n"), NULL);
+			return (NULL);
 		i += advance_len;
 	}
 	return (res);

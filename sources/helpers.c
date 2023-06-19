@@ -20,7 +20,8 @@ char	*join(char **strr, char *joint)
 	while (strr[i] != NULL)
 	{
 		strcpy(&res[len(res)], strr[i++]);
-		strcpy(&res[len(res)], joint);
+		if (strr[i] != NULL)
+			strcpy(&res[len(res)], joint);
 	}
 	res[len(res)] = 0;
 	return (res);
@@ -181,5 +182,36 @@ char	*_scan2(char **str_ptr, int (*checker)(char c))
 		i = len(*str_ptr);
 	res = chop(*str_ptr, i - 1);
 	*str_ptr+=i;
+	return (res);
+}
+
+int	strarr_count(char **strarr)
+{
+	int	i;
+
+	i = 0;
+	while (strarr[i])
+		i++;
+	return (i);
+}
+
+char	**realloc_strarr_no_gc(char **strarr)
+{
+	char	**res;
+	int		i;
+
+	res = malloc((strarr_count(strarr) + 1) * sizeof(char *));
+	if (res == NULL)
+		xit();
+	i = 0;
+	while (strarr[i])
+	{
+		res[i] = malloc(ft_strlen(strarr[i]) + 1);
+		if (res[i] == NULL)
+			xit();
+		ft_strlcpy(res[i], strarr[i], ft_strlen(strarr[i]) + 1);
+		i++;
+	}
+	res[i] = NULL;
 	return (res);
 }

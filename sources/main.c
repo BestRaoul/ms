@@ -30,7 +30,7 @@ int	main(void)
 
 	g.dup_stdin = dup(STDIN_FILENO);
 	g.dup_stdout = dup(STDOUT_FILENO);
-	g.env = copy_env(environ, NULL);
+	g.env = realloc_strarr_no_gc(environ);
 	while (1)
 	{
 		garbage_collector(FREE_ALL, 0);

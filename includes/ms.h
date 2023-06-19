@@ -64,6 +64,10 @@ void	print_lexeme_tlist(t_list *lst);
 void	print_lexeme_tlist2(t_list *lst);
 void	free_lexeme_node(void *node);
 
+//gc helpers in helpers.c
+int		strarr_count(char **strarr);
+char	**realloc_strarr_no_gc(char **strarr);
+
 //wildcards
 char	**wildmatches(char *token, char *cwd);
 
@@ -146,10 +150,11 @@ void	xit();
 void	xit2(int err);
 
 /* env */
-char	**copy_env(char **env, char *excl);
 void	print_env();
 int		add_var_to_env(char *key, char *value);
 int		remove_var_from_env(char *key);
+int		find_in_env(char *key);
+
 
 int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 

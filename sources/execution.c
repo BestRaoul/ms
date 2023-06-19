@@ -348,29 +348,6 @@ void	consume_redirs(t_list *redirs)
 }
 
 //ENS
-char	**realloc_argv_envreplaced(char **argv)
-{
-	char	**my_argv;
-	char	*temp;
-	int		argc;
-	int		i;
-	
-	argc = arg_count(argv);
-	my_argv = ft_calloc(argc + 1, sizeof(char *));
-	garbage_collector(REMOVE, my_argv);
-	i = 0;
-	while (i < argc)
-	{
-		temp = handle_env(argv[i]);
-		my_argv[i] = ft_strdup(temp);
-		garbage_collector(REMOVE, my_argv[i]);
-		i++;
-	}
-	my_argv[i] = NULL;
-	return my_argv;
-}
-
-//ENS
 void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free, t_parenthesis parenthesis)
 {
 	if (DEBUG_INIT) {
@@ -397,7 +374,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	}
 	else
 	{
-		char **my_argv = realloc_argv_envreplaced(argv);
+		char **my_argv = realloc_strarr_no_gc(argv);
 		garbage_collector(FREE_ALL, 0);
 
 		if (is_builtin(my_argv[0]))
@@ -478,11 +455,11 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 	}
 }
 
-//ENS - remove write
+//ENS
 int	do_solo_exec_builtin(char **argv, t_list *redir)
 {
-	write(2, "solo exec bin\n", 14);
 	consume_redirs(redir->next);
+	argv = realloc_strarr_no_gc(argv);
 	int status = exec_builtin(argv[0], argv);
 	g.status = WIFEXITED(status) ? WEXITSTATUS(status) : status;
 	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) xit();

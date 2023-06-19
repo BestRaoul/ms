@@ -38,6 +38,7 @@ int	main(void)
 		if (input == NULL) break;
 		if (*input == 0) continue;
 		lexemes = lex(input); //safe
+		if (lexemes == NULL) continue;
 		ast = parse(lexemes); //safe
 		if (ast == NULL) continue ;
 		execute(ast); //safe

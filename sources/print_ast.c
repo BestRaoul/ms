@@ -22,7 +22,7 @@ void	spaces(int s)
 	}
 }
 
-void print_node(t_ast_node *ast, int depth)
+void	print_node(t_ast_node *ast, int depth)
 {
 	spaces(4 * depth);
 	ft_printf("ASTnode: [");
@@ -35,7 +35,7 @@ void print_node(t_ast_node *ast, int depth)
 	}
 }
 
-void print_ast(t_ast_node *ast, int depth)
+void	print_ast(t_ast_node *ast, int depth)
 {
 	if (!ast) {
 		write(2, "print_ast: NULL\n", 16);

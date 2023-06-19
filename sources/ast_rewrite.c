@@ -49,7 +49,6 @@ static char	**_content_ptr(t_list *lexeme)
 	return (&(x->value));
 }
 
-
 static int	peek_type(t_list *lexeme)
 {
 	if (lexeme->next == NULL)

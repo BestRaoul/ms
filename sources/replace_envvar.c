@@ -15,7 +15,7 @@ int	is_azAZ09_(char c)
 		|| in(c, "UVWXYZ0123456789"));
 }
 
-static char *handle_var(char *envvar)
+static char	*handle_var(char *envvar)
 {
 	ft_printf("[] = \'%s\' -> ",envvar);
 	if (len(envvar) == 0)

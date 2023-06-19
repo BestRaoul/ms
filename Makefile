@@ -62,7 +62,7 @@ SOURCES_LIST			:= main.c\
 							replace_envvar.c\
 							lexer_helper.c\
 							wildcard.c\
-							print_lexeme_tlist.c\
+							print_lex.c\
 							print_ast.c\
 							execution.c\
 							env_handler.c\

@@ -12,6 +12,8 @@
 
 #include "ms.h"
 
+extern t_global g;
+
 #define ERROR_MSG "ms_turtle"
 #define	DEBUG_INIT 0
 #define DEBUG_REDIR 0
@@ -33,23 +35,21 @@ void	xit2(int err)
 
 /* TODO but better
 -	1. pipeline node and &&/|| handling
--/2	2. error management
-	. lexing
-	. ++main..
 -	3. nullchecks
 -	4. garbage collector
-5. builtins (echo -n, cd, pwd, export, unset, env, exit)
-6. env management
-7. var replacement and $? status
+	2. error management
+	. lexing
+	. ++main..
+	5. builtins (echo -n, cd, pwd, export, unset, env, exit)
+	. implementation -jack
+	- exec flow
+6. env management -jack
+	. custom env -jack
+	- var replacement
+	. $? g.status{set} {get} -jack
 8. wildcards
 */
 
-//bultin exec flow
-//global struct
-	//envirion (jack)
-	//$? - set properly
-	//dup(STDIN) used properly
-//herdeoc take from global
 //check safety of lex, main
 
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
@@ -204,12 +204,12 @@ int	arg_count(char **argv)
 	return i;
 }
 
-extern t_global g;
-//ENS ? does the input==NULL xit not make it fail and does EOF is managed
+//ENS
 int	heredoc_handler(char *delimiter)
 {
 	int	previous_in = dup(STDIN_FILENO);
-	dup2(g.dup_stdin, STDIN_FILENO);
+	if (previous_in == -1) xit();
+	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) xit();
 
 	char	*input;
 	int		_pipe[2];
@@ -227,7 +227,7 @@ int	heredoc_handler(char *delimiter)
 //	if (input == NULL) xit();
 	free(input);
 	if (close(_pipe[1]) == -1) xit();
-	dup2(previous_in, STDIN_FILENO);
+	if (dup2(previous_in, STDIN_FILENO) == -1) xit();
 	return _pipe[0];
 }
 
@@ -499,6 +499,16 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 	}
 }
 
+//ENS - remove write
+int	do_solo_exec_builtin(char **argv, t_list *redir)
+{
+	write(2, "solo exec bin\n", 14);
+	consume_redirs(redir);
+	int status = exec_builtin(argv[0], argv, environ);
+	g.status = status;
+	return (status);
+}
+
 //ENS
 int	ms_execute(t_ast_node *pipeline)
 {
@@ -515,6 +525,9 @@ int	ms_execute(t_ast_node *pipeline)
 
 	populate_execution_data(argvs, redirs, parens, pipeline);
 	//all argvs, redirs (left, right, append, heredocs, pipes) and parens are ready!
+
+	if (pipe_count == 1 && is_builtin(argvs[0][0]))
+		return do_solo_exec_builtin(argvs[0], redirs[0]);
 
 	pids = init_subshells(argvs, redirs, parens, pipe_count);
 	

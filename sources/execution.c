@@ -33,9 +33,7 @@ void	xit2(int err)
 
 /* TODO but better
 -	1. pipeline node and &&/|| handling
-	2. error management
-	- execution
-	- parsing
+-/2	2. error management
 	. lexing
 	. ++main..
 -	3. nullchecks
@@ -45,6 +43,11 @@ void	xit2(int err)
 7. var replacement and $? status
 8. wildcards
 */
+
+//bultin exec flow
+//global struct (environ, $?, dup(STDIN))
+//herdeoc take from global
+//check safety of lex, main
 
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
 #define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)

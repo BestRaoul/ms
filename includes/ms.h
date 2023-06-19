@@ -111,6 +111,14 @@ typedef struct s_ast_node {
 	t_list	*children;
 } t_ast_node;
 
+typedef struct s_global {
+	/* add env here*/
+	int		prev_status;
+	pid_t	dup_stdin;
+} t_global;
+
+t_global g;
+
 
 t_ast_node	*init_ast_node_type(int type);
 

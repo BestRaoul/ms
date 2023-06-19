@@ -21,6 +21,8 @@ int	main(void)
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
 
+	g = (t_global){dup(STDIN_FILENO), 0};
+
 	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
 	while (1)
 	{

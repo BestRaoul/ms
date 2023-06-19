@@ -168,7 +168,7 @@ int	pwd_builtin()
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);
-	free(pwdstr);
+	garbage_collector(ADD, pwdstr);
 	return (0);
 }
 

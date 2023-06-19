@@ -5,6 +5,7 @@ typedef struct s_global {
 	char	**env;
 	int		status;
 	int		dup_stdin;
+	int		dup_stdout;
 } t_global;
 
 extern t_global	g;

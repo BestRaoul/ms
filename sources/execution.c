@@ -31,21 +31,6 @@ void	xit2(int err)
 	exit(err);
 }
 
-/* TODO but better
--	1. pipeline node and &&/|| handling
--	3. nullchecks
--	4. garbage collector
--	2. error management
-	5. builtins (echo -n, cd, pwd, export, unset, env, exit)
-	. implementation -jack
-	- exec flow
-6. env management -jack
-	. custom env -jack
-	- var replacement
-	. $? g.status{set} {get} -jack
-8. wildcards
-*/
-
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
 #define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
 
@@ -422,6 +407,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 		}
 		else
 		{
+			if (my_argv[0] == NULL) exit(EKEYEXPIRED);
 			char *pathname = ft_getpath(my_argv[0], g.env); //nc
 			execve(pathname, my_argv, g.env);
 			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
@@ -496,10 +482,12 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 int	do_solo_exec_builtin(char **argv, t_list *redir)
 {
 	write(2, "solo exec bin\n", 14);
-	consume_redirs(redir);
+	consume_redirs(redir->next);
 	int status = exec_builtin(argv[0], argv);
-	g.status = status;
-	return (status);
+	g.status = WIFEXITED(status) ? WEXITSTATUS(status) : status;
+	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) xit();
+	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) xit();
+	return (g.status);
 }
 
 //ENS
@@ -526,10 +514,10 @@ int	execute_pipeline(t_ast_node *pipeline)
 	
 	close_all_pipes(redirs, NULL);
 
+	int status = -42;
 	for(int x=0; x<pipe_count; x++)
-		waitpid(pids[x], &g.status, 0);
-	if (WIFEXITED(g.status))
-		g.status = WEXITSTATUS(g.status);
+		waitpid(pids[x], &status, 0);
+	g.status = WIFEXITED(status) ? WEXITSTATUS(status) : status;
 	return g.status;
 }
 

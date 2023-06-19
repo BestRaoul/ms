@@ -17,7 +17,7 @@
 
 extern char **environ;
 
-t_global g = {NULL, 0, 0};
+t_global g = {NULL, 0, 0, 0};
 
 char	*get_input()
 {
@@ -42,6 +42,7 @@ int	main(void)
 	t_list		*lexemes = NULL;
 
 	g.dup_stdin = dup(STDIN_FILENO);
+	g.dup_stdout = dup(STDOUT_FILENO);
 	g.env = copy_env(environ, NULL);
 	while (1)
 	{

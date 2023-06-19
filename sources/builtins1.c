@@ -16,6 +16,8 @@
 
 int	is_builtin(char *cmd)
 {
+	if (cmd == NULL)
+		return (0);
 	return (ft_strequal(cmd, "echo") || ft_strequal(cmd, "cd")
 	|| ft_strequal(cmd, "pwd") || ft_strequal(cmd, "export")
 	|| ft_strequal(cmd, "unset") || ft_strequal(cmd, "env")

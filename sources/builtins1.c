@@ -30,7 +30,7 @@ int	exec_builtin(char *cmd, char **argv, char **env)
 	if (ft_strequal(cmd, "cd"))
 		return (cd(argv));
 	if (ft_strequal(cmd, "pwd"))
-		return (pwd(env));
+		return (pwd_builtin());
 	if (ft_strequal(cmd, "export"))
 		return (export(argv, env));
 	if (ft_strequal(cmd, "unset"))
@@ -55,7 +55,6 @@ int	cd(char **argv)
 		return(1);
 	}
 	int status = chdir(argv[1]);
-	//free_arr((void **) argv);
 	if (status != 0)
 	{
 		perror(ERROR_MSG);
@@ -73,16 +72,10 @@ int	echo(char **argv)
 	if (ft_strarrlen(argv) >= 2 && ft_strequal(argv[1], "-n"))
 		i = 2;
 	res = ft_strarr_to_str(argv + i, ' ');
-	if (!res)
-	{
-		//free_arr((void **) argv);
-		return (1);
-	}
 	ft_printf("%s", res);
 	if (i == 1)
 		ft_printf("\n");
-	//free_arr((void **) argv);
-	free(res);
+	FREE(res);
 	return (0);
 }
 
@@ -111,10 +104,7 @@ char	*get_export_value(char *str, char **env)
 	char	*newval;
 
 	if (ft_str_endswith(str, "="))
-	{
-		res[0] = '\0';
-		return (res);
-	}
+		return (ft_calloc(1, sizeof(*res)));
 	res = ft_calloc(ft_strlen_int(str) - ft_strchr2(str, '=') + 1, sizeof(*res));
 	ft_strlcpy(res, str + ft_strchr2(str, '='), ft_strlen_int(str) - ft_strchr2(str, '=') + 1);
 	// TODO: env needs to be passed here probably
@@ -147,15 +137,8 @@ int	export(char **argv, char **env)
 			return (1);
 		val = get_export_value(*argv, env);
 		if (!val)
-		{
-			free(val);
 			return (1);
-		}
-		if (!add_var_to_env(key, val, &env))
-		{
-			frees(2, key, val);
-			return (1);
-		}
+		add_var_to_env(key, val, &env);
 		frees(2, key, val);
 		argv ++;
 	}
@@ -174,11 +157,11 @@ int	unset(char **argv, char **env)
 	return (0);
 }
 
-int	pwd(char **env)
+int	pwd_builtin()
 {
 	char	*pwdstr;
 
-	pwdstr = ft_query_envp("PWD", env);
+	pwdstr = getcwd(NULL, 0);
 	if (!pwdstr)
 	{
 		ft_printf("fatal error\n");

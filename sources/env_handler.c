@@ -23,7 +23,7 @@ int	key_match(char *key, char *entry)
 		free_arr((void **) spltres);
 		return (0);
 	}
-	res = !ft_strncmp(key, spltres[0], ft_strlen(key)) && ft_strlen(key) == ft_strlen(spltres[0]);
+	res = ft_strequal(key, spltres[0]);
 	free_arr((void **) spltres);
 	return (res);
 }
@@ -43,17 +43,7 @@ char	**copy_env(char **env, char *excl)
 			continue ;
 		}
 		tmp = ft_strdup(*env);
-		if (!tmp)
-		{
-			ft_lstclear(&lst, ft_delnode);
-			return (NULL);
-		}
-		if (!ft_lstadd_str(tmp, &lst))
-		{
-			FREE(tmp);
-			ft_lstclear(&lst, ft_delnode);
-			return (NULL);
-		}
+		ft_lstadd_str(tmp, &lst);
 		env++;
 	}
 	res = ft_tlst_to_strarr(lst);

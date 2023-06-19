@@ -149,7 +149,7 @@ int		cd(char **argv);
 int		echo(char **argv);
 int		export(char **argv, char **env);
 int		unset(char **argv, char **env);
-int		pwd(char **env);
+int		pwd_builtin();
 int		env_builtin(char **env);
 
 /* v1

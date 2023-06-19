@@ -14,10 +14,6 @@ extern t_global	g;
 #ifndef MS_H
 # define MS_H
 
-//#define _GNU_SOURCE             /* See feature_test_macros(7) */
-//#include <fcntl.h>              /* Obtain O_* constant definitions */
-//#include <unistd.h>
-
 # include "libft.h"
 # include <stdio.h>
 # include <readline/readline.h>
@@ -68,18 +64,16 @@ void	free_lexeme_node(void *node);
 int		strarr_count(char **strarr);
 char	**realloc_strarr_no_gc(char **strarr);
 
-//wildcards
-char	**wildmatches(char *token, char *cwd);
-
 //replace_envvar.c
 int		in(char c, char *str);
 int		is_azAZ09_(char c);
-
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);
 
+//wildcard.c
 /* stub function returning files matching wildcard */
 char	*handle_wildcard(char *s);
+char	**wildmatches(char *token, char *cwd);
 
 enum TokenTypes {
 	LPAREN,
@@ -124,22 +118,15 @@ typedef struct s_ast_node {
 	t_list	*children;
 } t_ast_node;
 
-t_ast_node	*init_ast_node_type(int type);
-
-/* parsing funcs */
-int		prs_ast(t_list *lexemes, t_ast_node *ast);
-int		prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init);
-int		prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
-
-void	print_ast(t_ast_node *ast, int depth);
-void	print_type(int type);
-void	free_ast(t_ast_node *ast);
-
 /* lexing */
 t_list	*lex(char *s);
 
 /* parsing rewrite */
 t_ast_node	*parse(t_list *lexemes);
+
+//print_ast.c
+void	print_ast(t_ast_node *ast, int depth);
+void	print_type(int type);
 
 /* execution */
 int		execute(t_ast_node *pipeline_list);
@@ -155,8 +142,8 @@ int		add_var_to_env(char *key, char *value);
 int		remove_var_from_env(char *key);
 int		find_in_env(char *key);
 
-
-int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
+//unused
+//int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
 /* builtins */
 int		is_builtin(char *cmd);

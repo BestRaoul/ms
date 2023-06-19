@@ -71,10 +71,12 @@ int	echo(char **argv)
 	if (ft_strarrlen(argv) >= 2 && ft_strequal(argv[1], "-n"))
 		i = 2;
 	res = ft_strarr_to_str(argv + i, ' ');
-	ft_printf("%s", res);
+	if (res != NULL)
+		ft_printf("%s", res);
 	if (i == 1)
 		ft_printf("\n");
-	FREE(res);
+	if (res)
+		FREE(res);
 	return (0);
 }
 
@@ -107,7 +109,7 @@ char	*get_export_value(char *str)
 	ft_strlcpy(res, str + ft_strchr2(str, '='), ft_strlen_int(str) - ft_strchr2(str, '=') + 1);
 	// TODO: env needs to be passed here probably
 	newval = handle_env(res);
-	free(res);
+	FREE(res);
 	return (newval);
 }
 
@@ -166,7 +168,7 @@ int	pwd_builtin()
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);
-	free(pwdstr);
+	FREE(pwdstr);
 	return (0);
 }
 

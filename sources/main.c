@@ -13,9 +13,11 @@ char	*get_input()
 
 	ft_yoloprintf(question, "%s➜  %s", g.status==0 ? BCYAN : BRED, RESET);
 	input = readline(question);
-	if (input == NULL) return (NULL);
+	if (input == NULL)
+		return (NULL);
 	garbage_collector(ADD, input);
-	if (*input == 0) return (input);
+	if (*input == 0)
+		return (input);
 	add_history(input);
 	return (input);
 }
@@ -31,7 +33,7 @@ int	main(void)
 	while (1)
 	{
 		garbage_collector(FREE_ALL, 0);
-		input = get_input();
+		input = get_input(); //safe
 		if (input == NULL) break;
 		if (*input == 0) continue;
 		lexemes = lex(input); //safe

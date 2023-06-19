@@ -35,9 +35,7 @@ void	xit2(int err)
 -	1. pipeline node and &&/|| handling
 -	3. nullchecks
 -	4. garbage collector
-	2. error management
-	. lexing
-	. ++main..
+-	2. error management
 	5. builtins (echo -n, cd, pwd, export, unset, env, exit)
 	. implementation -jack
 	- exec flow
@@ -47,8 +45,6 @@ void	xit2(int err)
 	. $? g.status{set} {get} -jack
 8. wildcards
 */
-
-//check safety of lex, main
 
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
 #define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
@@ -429,7 +425,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 			char *pathname = ft_getpath(my_argv[0], g.env); //nc
 			execve(pathname, my_argv, g.env);
 			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
-			exit(EFAULT);
+			exit(EKEYEXPIRED);
 		}
 	}
 }
@@ -532,6 +528,8 @@ int	execute_pipeline(t_ast_node *pipeline)
 
 	for(int x=0; x<pipe_count; x++)
 		waitpid(pids[x], &g.status, 0);
+	if (WIFEXITED(g.status))
+		g.status = WEXITSTATUS(g.status);
 	return g.status;
 }
 

@@ -45,7 +45,10 @@ void	xit2(int err)
 */
 
 //bultin exec flow
-//global struct (environ, $?, dup(STDIN))
+//global struct
+	//envirion (jack)
+	//$? - set properly
+	//dup(STDIN) used properly
 //herdeoc take from global
 //check safety of lex, main
 
@@ -517,13 +520,9 @@ int	ms_execute(t_ast_node *pipeline)
 	
 	close_all_pipes(redirs, NULL);
 
-	int status = -42;
 	for(int x=0; x<pipe_count; x++)
-		waitpid(pids[x], &status, 0);
-	return status;
-	
-//	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
-//	frees2(2, 1, argvs, 0, pids);
+		waitpid(pids[x], &g.status, 0);
+	return g.status;
 }
 
 //ENS

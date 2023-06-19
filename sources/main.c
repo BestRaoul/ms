@@ -11,7 +11,6 @@ int	main(void)
 	static char	question[100] = "";
 	char		*input;
 	t_ast_node	*ast = NULL;
-	int			success_status = 0;	
 
 	/* env usage */
 	/*char **env_copy = copy_env(environ, NULL);
@@ -25,10 +24,10 @@ int	main(void)
 
 	g.dup_stdin = dup(STDIN_FILENO);
 
-	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
+	ft_yoloprintf(question, "%s➜  %s", g.status==0?BBLUE:BRED, RESET);
 	while (1)
 	{
-		ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
+		ft_yoloprintf(question, "%s➜  %s", g.status==0?BBLUE:BRED, RESET);
 		input = readline(question);
 		//--NULLCHECK
 		if (input && *input)
@@ -44,9 +43,9 @@ int	main(void)
 			free(input);
 			continue ;
 		}
-		success_status = execute_pll(ast); //safe
-		if (success_status != 0)
-		{	dprintf(2, "(%s%d%s) ", BRED, success_status, RESET); }
+		execute_pll(ast); //safe
+		if (g.status != 0)
+		{	dprintf(2, "(%s%d%s) ", BRED, g.status, RESET); }
 		garbage_collector(FREE_ALL, 0);
 		free(input); //not FREE because not allocated via malloc
 	}

@@ -180,7 +180,7 @@ OBJECTS				:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
 INCLUDES			:= -I$(INCLUDE_DIR)
 CC					:= gcc
-CFLAGS				:= -Wall -Wextra -Werror $(DEVFLAGS) $(OPTFLAG) -fstack-protector-all
+CFLAGS				:= -Wall -Wextra -Werror -Wno-unused-variable -isystem $(DEVFLAGS) $(OPTFLAG) -fstack-protector-all
 RM					:= rm -rf
 
 LIBC				:= ar rc

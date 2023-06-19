@@ -12,6 +12,7 @@
         "history.h": "c",
         "fcntl.h": "c",
         "stdio.h": "c",
-        "ms.h": "c"
+        "ms.h": "c",
+        "wait.h": "c"
     }
 }

@@ -31,28 +31,15 @@ void	xit2(int err)
 	exit(err);
 }
 
-//pl{}, ., pl{}, ., pl{}...
-/*pl{
-	a |
-	b |
-	()|
-	...
-}*/
-
-//(pl{}, ., pl{}, ., pl{}...)
-
 /* TODO but better
-	1. pipeline node and &&/|| handling
-	- PARENTHESIS -> pretty much
-	. (ls)
-	. ((ls))
+-	1. pipeline node and &&/|| handling
 	2. error management
 	- execution
+	- parsing
 	. lexing
 	. ++main..
-3. nullchecks
-	. inside garbage collector
-4. garbage collector
+-	3. nullchecks
+-	4. garbage collector
 5. builtins (echo -n, cd, pwd, export, unset, env, exit)
 6. env management
 7. var replacement and $? status
@@ -87,6 +74,7 @@ void	free_t_redir(void *ptr)
 	FREE(ptr);
 }
 
+//ENS
 t_ast_node	*get_child(t_ast_node	*node, int i)
 {
 	t_list	*temp = ft_lst_get(node->children, i);
@@ -94,6 +82,7 @@ t_ast_node	*get_child(t_ast_node	*node, int i)
 	return (temp->content);
 }
 
+//ENS
 t_redir	*get_redir(t_list	*redir, int i)
 {
 	t_list	*temp = ft_lst_get(redir, i);
@@ -101,6 +90,7 @@ t_redir	*get_redir(t_list	*redir, int i)
 	return (temp->content);
 }
 
+//ENS
 int	count_child_pipes(t_ast_node *ast)
 {
 	int	i = 0;
@@ -115,7 +105,7 @@ int	count_child_pipes(t_ast_node *ast)
 	return (c);
 }
 
-//es
+//ENS
 void	close_pipes(t_list *redirs)
 {
 	int	redir_i = 0;
@@ -128,7 +118,8 @@ void	close_pipes(t_list *redirs)
 	}
 }
 
-//es
+//ENS
+//IGNORE own pipes as they are closed during consume_redirs
 void	close_all_pipes(t_list **redirs, t_list *ignore)
 {
 	int	i = 0;
@@ -198,6 +189,7 @@ void	print_redirs(t_list *redirs)
 	printf("\b\b%s]\n", RESET);
 }
 
+//ENS
 int	arg_count(char **argv)
 {
 	int	i = 0;
@@ -206,52 +198,58 @@ int	arg_count(char **argv)
 	return i;
 }
 
-//es
+//ENS ? does the input==NULL xit not make it fail and does EOF is managed
 int	heredoc_handler(char *delimiter)
 {
 	char	*input;
 	int		_pipe[2];
 
 	if (pipe(_pipe) == -1) xit();
-	input = readline("|> ");//nc
+	input = readline("|> "); //nc - done
 	while (input != NULL && strcmp(input, delimiter) != 0)
 	{
 		if (write(_pipe[1], input, ft_strlen(input)) == -1
 			|| write(_pipe[1], "\n", 1) == -1)
 			xit();
 		free(input);
-		input = readline("|> ");//nc
+		input = readline("|> ");//nc - done
 	}
-	//if (input == NULL) xit();
+//	if (input == NULL) xit();
+	free(input);
 	if (close(_pipe[1]) == -1) xit();
 	return _pipe[0];
 }
 
-char	***alloc_argvs(t_ast_node *ast, int p_count)
+//ENS
+char	***alloc_argvs(t_ast_node *ast, int pipe_count)
 {
-	int	i = 0;
-	int	j = 0;
-	t_ast_node	*child = get_child(ast, i++);
-//	printf("argv's: %d\n", count_child_pipes(ast) + 1);
-	char ***argvs = ft_calloc(p_count + 1, sizeof(char **)); //nc
-	int literal_c = 0;
+	char		***argvs;
+	t_ast_node	*child;
+	int			literal_c;
+	int			i;
+	int			j;
+
+	i = 0;
+	child = get_child(ast, i++);
+	argvs = ft_calloc(pipe_count + 1, sizeof(char **));
+	literal_c = 0;
+	j = 0;
 	while (child != NULL)
 	{
 		literal_c += (IS_LITERAL(child->type));
 		if (child->type == PIPE)
 		{
-//			printf("(%d)-th argv: %d\n", j, literal_c + 1);
-			argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *)); //nc
+			argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *));
 			literal_c = 0;
 		}
 		child = get_child(ast, i++);
 	}
-//	printf("(%d)-th argv: %d\n", j, literal_c + 1);
 	argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *));
 	argvs[j] = NULL;
 	return (argvs);
 }
 
+//ENS
 t_list	*alloc_redir(int type, char *val)
 {
 	if (val == NULL)
@@ -263,21 +261,22 @@ t_list	*alloc_redir(int type, char *val)
 	return _redir;
 }
 
+//ENS
 t_list	**init_redirs(int p_count)
 {
-	t_list **redirs = ft_calloc(p_count + 1, sizeof(t_list *)); //nc
+	t_list **redirs = ft_calloc(p_count + 1, sizeof(t_list *));
 	int	i = 0;
 
 	while (i < p_count)
 	{
-		redirs[i] = ft_lstnew(NULL); //nc
+		redirs[i] = ft_lstnew(NULL);
 		i++;
 	}
 	redirs[i] = NULL;
 	return redirs;
 }
 
-//es
+//ENS
 void	consume_redirs(t_list *redirs)
 {
 	int	redir_i = 0;
@@ -358,7 +357,30 @@ void	consume_redirs(t_list *redirs)
 	}
 }
 
-//es - pll exit??
+//ENS
+char	**realloc_argv_envreplaced(char **argv)
+{
+	char	**my_argv;
+	char	*temp;
+	int		argc;
+	int		i;
+	
+	argc = arg_count(argv);
+	my_argv = ft_calloc(argc + 1, sizeof(char *));
+	garbage_collector(REMOVE, my_argv);
+	i = 0;
+	while (i < argc)
+	{
+		temp = handle_env(argv[i]);
+		my_argv[i] = ft_strdup(temp);
+		garbage_collector(REMOVE, my_argv[i]);
+		i++;
+	}
+	my_argv[i] = NULL;
+	return my_argv;
+}
+
+//ENS
 extern char **environ;
 void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free, t_parenthesis parenthesis)
 {
@@ -375,24 +397,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	
 	close_all_pipes(to_free.redirs, lst_redir);
 	if (DEBUG_REDIR) {
-	print_open_fds(10, STDERR_FILENO);}
-	
-
-	int		argc = arg_count(argv);
-	char	**my_argv = ft_calloc(argc + 1, sizeof(char *));//nc
-	int	i = 0;
-	while (i < argc)
-	{
-		my_argv[i] = ft_strdup(argv[i]);//nc
-		char *temp = handle_env(my_argv[i]);//nc
-		FREE(my_argv[i]);
-		my_argv[i] = temp;
-		i++;
-	}
-	my_argv[i] = NULL;
-
-	for(int x=0; x<to_free.p_count; x++) ft_lstclear(&(to_free.redirs)[x], &free_t_redir);
-	frees2(1, 1, to_free.argvs);
+	print_open_fds(10, STDERR_FILENO);}	
 
 	if (parenthesis.type == PARENTHESIS)
 	{
@@ -403,26 +408,31 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	}
 	else
 	{
+		char **my_argv = realloc_argv_envreplaced(argv);
+		garbage_collector(FREE_ALL, 0);
+
 		if (is_builtin(my_argv[0]))
-			exec_builtin(my_argv[0], my_argv, environ);
+		{
+			int res = exec_builtin(my_argv[0], my_argv, environ);
+			exit(res);
+		}
 		else
 		{
 			char *pathname = ft_getpath(my_argv[0], environ); //nc
 			execve(pathname, my_argv, environ);
 			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
-			exit(14);
+			exit(EFAULT);
 		}
 	}
 }
 
-//es
+//ENS
 pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int p_count)
 {
 	t_free	to_free = (t_free){argvs, redirs, p_count};
-	pid_t	*pids = ft_calloc(p_count + 1, sizeof(pid_t)); //nc
+	pid_t	*pids = ft_calloc(p_count + 1, sizeof(pid_t));
 	pid_t	parent = getpid();
 	int	i = 0;
-	(void) parens;
 
 	while (i < p_count)
 	{
@@ -435,90 +445,104 @@ pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int
 	return pids;
 }
 
-#include <sys/wait.h>
-//es
-int	ms_execute(t_ast_node *pipeline)
+//ENS
+void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *parens, t_ast_node *pipeline)
 {
-	int arg_i = 0;
-	int	pipe_i = 0;
-	int	child_i = 0;
-	int	p_count = count_child_pipes(pipeline) + 1;
-
-	t_ast_node	*child = get_child(pipeline, child_i++); //nc
-	char	***argvs = alloc_argvs(pipeline, p_count); //nc
-	t_list	**redirs = init_redirs(p_count); //nc //[] of t_list heads
-	t_parenthesis *parens = ft_calloc(p_count + 1, sizeof(t_parenthesis)); //nc
-	int	_pipe[2] = {-1, -1};
-
+	int 		arg_i = 0;
+	int			pipe_i = 0;
+	int			child_i = 0;
+	int			_pipe[2] = {-1, -1};
+	t_ast_node	*child = get_child(pipeline, child_i++); //nc - done inherently
+	
 	while (child != NULL)
 	{	
 		if (IS_LITERAL(child->type))
-		{ (argvs[pipe_i])[arg_i++] = ft_strdup(child->content); }//nc
+		{ (argvs[pipe_i])[arg_i++] = child->content; child->content = NULL;}
 		else if (IS_REDIR(child->type))
 		{
-			t_list	*redir = alloc_redir(child->type, ft_strdup(child->content)); //nc
+			t_list	*redir = alloc_redir(child->type, child->content);
+			child->content = NULL;
 			ft_lstadd_back(&redirs[pipe_i], redir);
 		}
 		else if (child->type == HEREDOC)
 		{
 			int	fd_pipe_end = heredoc_handler(child->content);
-			t_list	*redir = alloc_redir(HEREDOC, ft_itoa(fd_pipe_end)); //nc
+			t_list	*redir = alloc_redir(HEREDOC, ft_itoa(fd_pipe_end));
 			ft_lstadd_back(&redirs[pipe_i], redir);
 		}
 		else if (child->type == PIPE)
 		{ 
 			if (pipe(_pipe) == -1) xit();
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1]))); //nc
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
 			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0]))); //nc
+			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
 		}
 		else if (child->type == PIPELINELIST)
-		{ parens[pipe_i] = (t_parenthesis){PARENTHESIS, child->children}; 
-		child->children = NULL;} //double free?
-		else printf("ms_execute: BIG ERROR\n");
+		{
+			parens[pipe_i] = (t_parenthesis){PARENTHESIS, child->children}; 
+			child->children = NULL;
+		}
+		else { dprintf(2, "ms_execute: BIG ERROR\n"); exit(127); }
 		
-		child = get_child(pipeline, child_i++); //nc
+		child = get_child(pipeline, child_i++); //nc - done
 	}
+}
 
-	//all argvs, redirs (left, right, append, heredocs, pipes) are ready
-	pid_t	*pids = init_subshells(argvs, redirs, parens, p_count);
+//ENS
+int	ms_execute(t_ast_node *pipeline)
+{
+	char			***argvs;
+	t_list			**redirs;
+	t_parenthesis	*parens;
+	pid_t			*pids;
+	int				pipe_count;
+
+	pipe_count = count_child_pipes(pipeline) + 1;
+	argvs = alloc_argvs(pipeline, pipe_count);
+	redirs = init_redirs(pipe_count);
+	parens = ft_calloc(pipe_count + 1, sizeof(t_parenthesis));
+
+	populate_execution_data(argvs, redirs, parens, pipeline);
+	//all argvs, redirs (left, right, append, heredocs, pipes) and parens are ready!
+
+	pids = init_subshells(argvs, redirs, parens, pipe_count);
 	
 	close_all_pipes(redirs, NULL);
 
 	int status = -42;
-	for(int x=0; x<p_count; x++)
-		waitpid(pids[x], &status, 0); //-1? i think we don care
-	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
-	frees2(2, 1, argvs, 0, pids);
-
+	for(int x=0; x<pipe_count; x++)
+		waitpid(pids[x], &status, 0);
 	return status;
+	
+//	for(int x=0; x<p_count; x++) ft_lstclear(&redirs[x], &free_t_redir);
+//	frees2(2, 1, argvs, 0, pids);
 }
 
+//ENS
 int	execute_pll(t_ast_node *pll)
 {
-	int	child_i = 0;
-	t_ast_node *child = get_child(pll, child_i++); //nc?
-	
-	int status = 1;
+	t_ast_node	*child;
+	t_ast_node	*next;
+	int			child_i;
+	int			status;
+
+	child_i = 0;
+	child = get_child(pll, child_i++); //nc - done inherently
+	status = 1;
 	while (child != NULL)
 	{
 		if (status == 1)
-		{
-			if (child->type == PIPELINE)
-				status = ms_execute(child);
-			else if (child->type == PIPELINELIST)
-				status = execute_pll(child);
-		}
+			status = ms_execute(child);
 		else
 			status = -42;
-		t_ast_node *next = get_child(pll, child_i++); //nc?
+		next = get_child(pll, child_i++); //nc - done
 		if (next == NULL) break;
 
 		if (next->type == AND)
 			status = (status == 0);
-		if (next->type == OR)
+		else if (next->type == OR)
 			status = (status != 0);
-		child = get_child(pll, child_i++); //nc?
+		child = get_child(pll, child_i++); //nc - done
 	}
 	return status;
 }

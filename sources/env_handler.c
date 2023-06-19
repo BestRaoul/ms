@@ -28,6 +28,16 @@ int	key_match(char *key, char *entry)
 	return (res);
 }
 
+void	disown_env(char **env)
+{
+	int	i;
+
+	i = 0;
+	while (env[i])
+		garbage_collector(REMOVE, env[i++]);
+	garbage_collector(REMOVE, env);
+}
+
 char	**copy_env(char **env, char *excl)
 {
 	char	**res;
@@ -48,6 +58,7 @@ char	**copy_env(char **env, char *excl)
 	}
 	res = ft_tlst_to_strarr(lst);
 	ft_lstclear(&lst, ft_delnode);
+	disown_env(res);
 	return (res);
 }
 

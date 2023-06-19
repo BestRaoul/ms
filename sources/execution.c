@@ -12,8 +12,6 @@
 
 #include "ms.h"
 
-extern t_global g;
-
 #define ERROR_MSG "ms_turtle"
 #define	DEBUG_INIT 0
 #define DEBUG_REDIR 0

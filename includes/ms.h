@@ -63,9 +63,6 @@ void	print_lexeme_tlist(t_list *lst);
 void	print_lexeme_tlist2(t_list *lst);
 void	free_lexeme_node(void *node);
 
-// lexing
-t_list	*scan_tokens(char *s);
-
 //wildcards
 char	**wildmatches(char *token, char *cwd);
 
@@ -133,12 +130,15 @@ void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
 void	free_ast(t_ast_node *ast);
 
-/* parse rewrite */
-t_ast_node	*parse_ast2(t_list *lexemes);
+/* lexing */
+t_list	*lex(char *s);
+
+/* parsing rewrite */
+t_ast_node	*parse(t_list *lexemes);
 
 /* execution */
-int		ms_execute(t_ast_node *pipeline);
-int		execute_pll(t_ast_node *pl);
+int		execute(t_ast_node *pipeline_list);
+int		execute_pipeline(t_ast_node *pipeline);
 
 /* error management */
 void	xit();

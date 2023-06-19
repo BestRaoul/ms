@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-//#define MALLOC MALLOC(s) printf("%s %s %u %p", __FILE__, __LINE__, )
 
 t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 {
@@ -25,7 +24,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 		res->value = NULL;
 	else
 	{
-		res->value = MALLOC(sizeof(*(res->value)) * (ft_strlen(value) + 1));
+		res->value = MALLOC(sizeof(*(res->value)) * (ft_strlen(value) + 1)); //should be ft_strdup
 		if (res->value == NULL)
 		{
 			FREE(res);

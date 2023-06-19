@@ -410,7 +410,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	if (parenthesis.type == PARENTHESIS)
 	{
 		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
-		int status = execute_pll(&pll);
+		int status = execute(&pll);
 		garbage_collector(FREE_ALL, 0);
 		exit(status);
 	}
@@ -490,7 +490,7 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 			parens[pipe_i] = (t_parenthesis){PARENTHESIS, child->children}; 
 			child->children = NULL;
 		}
-		else { dprintf(2, "ms_execute: BIG ERROR\n"); exit(127); }
+		else { dprintf(2, "pipeline: BIG ERROR\n"); exit(127); }
 		
 		child = get_child(pipeline, child_i++); //nc - done
 	}
@@ -507,7 +507,7 @@ int	do_solo_exec_builtin(char **argv, t_list *redir)
 }
 
 //ENS
-int	ms_execute(t_ast_node *pipeline)
+int	execute_pipeline(t_ast_node *pipeline)
 {
 	char			***argvs;
 	t_list			**redirs;
@@ -536,7 +536,7 @@ int	ms_execute(t_ast_node *pipeline)
 }
 
 //ENS
-int	execute_pll(t_ast_node *pll)
+int	execute(t_ast_node *pipeline_list)
 {
 	t_ast_node	*child;
 	t_ast_node	*next;
@@ -544,22 +544,22 @@ int	execute_pll(t_ast_node *pll)
 	int			status;
 
 	child_i = 0;
-	child = get_child(pll, child_i++); //nc - done inherently
+	child = get_child(pipeline_list, child_i++); //nc - done inherently
 	status = 1;
 	while (child != NULL)
 	{
 		if (status == 1)
-			status = ms_execute(child);
+			status = execute_pipeline(child);
 		else
 			status = -42;
-		next = get_child(pll, child_i++); //nc - done
+		next = get_child(pipeline_list, child_i++); //nc - done
 		if (next == NULL) break;
 
 		if (next->type == AND)
 			status = (status == 0);
 		else if (next->type == OR)
 			status = (status != 0);
-		child = get_child(pll, child_i++); //nc - done
+		child = get_child(pipeline_list, child_i++); //nc - done
 	}
 	return status;
 }

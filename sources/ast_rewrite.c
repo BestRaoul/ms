@@ -175,7 +175,7 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 	return 0;
 }
 
-t_ast_node	*parse_ast2(t_list *lexemes)
+t_ast_node	*parse(t_list *lexemes)
 {
 	t_ast_node *ast = MALLOC(sizeof(t_ast_node));
 	ast->children = NULL;
@@ -188,7 +188,7 @@ t_ast_node	*parse_ast2(t_list *lexemes)
 
 	t_list *lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (dprintf(2, "ast2: WUT? Error trailing tokens %s->%s!",
+		return (dprintf(2, "parse: WUT? Error trailing tokens %s->%s!",
 			_content(lexme), _content(lexme->next)), NULL);
 	return (ast);
 }

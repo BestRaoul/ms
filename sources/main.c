@@ -4,6 +4,8 @@
 
 extern char **environ;
 
+t_global g = {0, 0};
+
 int	main(void)
 {
 	static char	question[100] = "";
@@ -20,6 +22,9 @@ int	main(void)
 	fre_arr((void **) env_copy);*/
 
 	//wildmatches("tes\\**", "/Users/jwikiera/Projets/minishell");
+
+	g.dup_stdin = dup(STDIN_FILENO);
+
 	ft_yoloprintf(question, "%s➜  %s", success_status==0?BBLUE:BRED, RESET);
 	while (1)
 	{

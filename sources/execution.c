@@ -33,9 +33,7 @@ void	xit2(int err)
 
 /* TODO but better
 -	1. pipeline node and &&/|| handling
-	2. error management
-	- execution
-	- parsing
+-/2	2. error management
 	. lexing
 	. ++main..
 -	3. nullchecks
@@ -45,6 +43,11 @@ void	xit2(int err)
 7. var replacement and $? status
 8. wildcards
 */
+
+//bultin exec flow
+//global struct (environ, $?, dup(STDIN))
+//herdeoc take from global
+//check safety of lex, main
 
 #define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
 #define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
@@ -198,9 +201,13 @@ int	arg_count(char **argv)
 	return i;
 }
 
+extern t_global g;
 //ENS ? does the input==NULL xit not make it fail and does EOF is managed
 int	heredoc_handler(char *delimiter)
 {
+	int	previous_in = dup(STDIN_FILENO);
+	dup2(g.dup_stdin, STDIN_FILENO);
+
 	char	*input;
 	int		_pipe[2];
 
@@ -217,6 +224,7 @@ int	heredoc_handler(char *delimiter)
 //	if (input == NULL) xit();
 	free(input);
 	if (close(_pipe[1]) == -1) xit();
+	dup2(previous_in, STDIN_FILENO);
 	return _pipe[0];
 }
 

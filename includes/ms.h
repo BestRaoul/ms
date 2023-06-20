@@ -6,6 +6,7 @@ typedef struct s_global {
 	int		status;
 	int		dup_stdin;
 	int		dup_stdout;
+	int		print_ast;
 } t_global;
 
 extern t_global	g;

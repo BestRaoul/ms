@@ -155,6 +155,7 @@ t_list	*lex(char *s)
 	t_list	*res;
 	int		i;
 	int		advance_len;
+	t_list	*first;
 
 	res = NULL;
 	i = 0;
@@ -164,6 +165,12 @@ t_list	*lex(char *s)
 		if (advance_len < 0)
 			return (NULL);
 		i += advance_len;
+	}
+	first = ft_lst_get(res, 0);
+	if (first && ((t_dict_int_str_member * )(first->content))->value && ft_strequal( ((t_dict_int_str_member * )(first->content))->value, "ast"))
+	{
+		g.print_ast = 1;
+		ft_lst_rm(&res, 0);
 	}
 	return (res);
 }

@@ -190,5 +190,11 @@ t_ast_node	*parse(t_list *lexemes)
 	if (lexme && lexme->next)
 		return (dprintf(2, "parse: WUT? Error trailing tokens %s->%s!",
 			_content(lexme), _content(lexme->next)), NULL);
+	ast_mark_cmd(ast, 1);
+	if (g.print_ast)
+	{
+		print_ast(ast, 0);
+		g.print_ast = 0;
+	}
 	return (ast);
 }

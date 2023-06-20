@@ -44,6 +44,7 @@ void	ft_lst_rm(t_list **lst, int index)
 	if (ft_lstsize(*lst) == 1 || index == ft_lstsize(*lst) - 1)
 	{
 		ft_lstdelone(*lst, ft_delnode);
+		*lst = NULL;
 		return ;
 	}
 	if (index == 0)

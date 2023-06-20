@@ -17,7 +17,7 @@
 
 extern char **environ;
 
-t_global g = {NULL, 0, 0, 0};
+t_global g = {NULL, 0, 0, 0, 0};
 
 char	*get_input()
 {
@@ -53,8 +53,6 @@ int	main(void)
 		lexemes = lex(input); //safe
 		if (lexemes == NULL) continue;
 		ast = parse(lexemes); //safe
-		ast_mark_cmd(ast, 1);
-		print_ast(ast, 0);
 		if (ast == NULL) continue ;
 		execute(ast); //safe
 		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);

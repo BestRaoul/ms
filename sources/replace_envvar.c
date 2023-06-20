@@ -17,13 +17,18 @@ int	is_azAZ09_(char c)
 
 static char	*handle_var(char *envvar)
 {
-	ft_printf("[] = \'%s\' -> ",envvar);
+	int	x;
+	int	eq_i;
+
 	if (len(envvar) == 0)
 		return (ft_strdup("$"));
-	else if (getenv(envvar)) 
-		return (ft_strdup(getenv(envvar)));
-	else
-		return (ft_strdup(""));	
+	x = find_in_env(envvar);
+	if (x != -1)
+	{
+		eq_i = find('=', g.env[x]);
+		return (ft_strdup(&(g.env[x][eq_i + 1])));
+	}
+	return (ft_strdup(""));	
 }
 
 static char	*handle_dd()

@@ -29,6 +29,7 @@ typedef struct s_ast_node {
 	int		type;
 	char	*content;
 	t_list	*children;
+	int		node_is_cmd;
 } t_ast_node;
 
 //helpers.c
@@ -97,6 +98,7 @@ int		export(char **argv);
 int		unset(char **argv);
 int		pwd_builtin();
 int		env_builtin();
+void	exit_builtin(char **argv);
 
 enum TokenTypes {
 	LPAREN,
@@ -135,14 +137,6 @@ enum TokenTypes {
 	PARENTHESIS,
 };
 
-<<<<<<< HEAD
-typedef struct s_ast_node {
-	int		type;
-	char	*content;
-	t_list	*children;
-	int		node_is_cmd;
-} t_ast_node;
-
 t_ast_node	*init_ast_node_type(int type);
 
 /* parsing funcs */
@@ -151,44 +145,10 @@ int		prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init);
 int		prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
 int		ast_mark_cmd(t_ast_node *ast, int is_first);
 
-void	print_ast(t_ast_node *ast, int depth);
-void	print_type(int type);
+
 void	free_ast(t_ast_node *ast);
 
-/* lexing */
-t_list	*lex(char *s);
 
-/* parsing rewrite */
-t_ast_node	*parse(t_list *lexemes);
-
-/* execution */
-int		execute(t_ast_node *pipeline_list);
-int		execute_pipeline(t_ast_node *pipeline);
-
-/* error management */
-void	xit();
-void	xit2(int err);
-
-/* env */
-char	**copy_env(char **env, char *excl);
-void	print_env();
-int		add_var_to_env(char *key, char *value);
-int		remove_var_from_env(char *key);
-
-int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
-
-/* builtins */
-int		is_builtin(char *cmd);
-int		exec_builtin(char *cmd, char **argv);
-int		cd(char **argv);
-int		echo(char **argv);
-int		export(char **argv);
-int		unset(char **argv);
-int		pwd_builtin();
-int		env_builtin();
-
-=======
->>>>>>> da7cb8d734f372451a7b73c366ee9fb3b800d8d6
 /* v1
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?

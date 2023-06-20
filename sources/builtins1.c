@@ -21,7 +21,19 @@ int	is_builtin(char *cmd)
 	return (ft_strequal(cmd, "echo") || ft_strequal(cmd, "cd")
 	|| ft_strequal(cmd, "pwd") || ft_strequal(cmd, "export")
 	|| ft_strequal(cmd, "unset") || ft_strequal(cmd, "env")
-	|| ft_strequal(cmd, "exit"));
+	|| ft_strequal(cmd, "exit") || ft_strequal(cmd, ".."));
+}
+
+char	**fake_cd_argv(char *pth)
+{
+	t_list	*lst;
+	char	**res;
+
+	lst = NULL;
+	ft_lstadd_str("cd", &lst);
+	ft_lstadd_str(pth, &lst);
+	res = ft_tlst_to_strarr(lst);
+	return (res);
 }
 
 int	exec_builtin(char *cmd, char **argv)
@@ -39,7 +51,9 @@ int	exec_builtin(char *cmd, char **argv)
 	if (ft_strequal(cmd, "env"))
 		return (env_builtin());
 	if (ft_strequal(cmd, "exit"))
-		return (ft_printf("todo exit\n"));
+		exit_builtin(argv);
+	if (ft_strequal(cmd, ".."))
+		return (cd(fake_cd_argv("..")));
 	return (1);
 }
 
@@ -47,8 +61,9 @@ int	cd(char **argv)
 {
 	if (ft_strarrlen(argv) < 2)
 	{
-		write(2, "minishell: cd: not enough arguments\n", 36);
-		return(1);
+		if (ft_query_envp("HOME", g.env))
+			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
+		return(0);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
@@ -145,4 +160,14 @@ int	env_builtin()
 {
 	print_env();
 	return (0);
+}
+
+void	exit_builtin(char **argv)
+{
+	argv ++;
+	if (!*argv)
+		exit(g.status);
+	if (!ft_str_is_int(*argv))
+		exit(2);
+	exit(ft_atoi(*argv));
 }

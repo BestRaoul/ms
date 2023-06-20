@@ -31,7 +31,6 @@ void	xit2(int err)
 	exit(err);
 }
 
-#define IS_LITERAL(x) (x == LITERAL_NQ || x == LITERAL_SQ || x == LITERAL_DQ)
 #define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
 
 typedef struct s_redir {
@@ -226,7 +225,7 @@ char	***alloc_argvs(t_ast_node *ast, int pipe_count)
 	j = 0;
 	while (child != NULL)
 	{
-		literal_c += (IS_LITERAL(child->type));
+		literal_c += (child->type == LITERAL);
 		if (child->type == PIPE)
 		{
 			argvs[j++] = ft_calloc(literal_c + 1, sizeof(char *));
@@ -423,7 +422,7 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 	
 	while (child != NULL)
 	{	
-		if (IS_LITERAL(child->type))
+		if (child->type == LITERAL)
 		{ (argvs[pipe_i])[arg_i++] = child->content; child->content = NULL;}
 		else if (IS_REDIR(child->type))
 		{

@@ -44,16 +44,6 @@ int	find(char c, char *str)
 	return (-1);
 }
 
-int	find_noescape_len(char c, char *str)
-{
-	int	x;
-
-	x = find_noescape(c, str);
-	if (x == -1)
-		return len(str);
-	return (x);
-}
-
 /* 
  * Returns index of first occurence of UNSECAPED-char, else -1
  */
@@ -72,6 +62,40 @@ int	find_noescape(char c, char *str)
 		i++;
 	}
 	return (-1);
+}
+
+/* 
+ * Returns index of first occurence of UNSECAPED-char, else len of str
+ */
+int	find_noescape_len(char c, char *str)
+{
+	int	x;
+
+	x = find_noescape(c, str);
+	if (x == -1)
+		return len(str);
+	return (x);
+}
+
+/* 
+ * Returns index of first occurence of one of UNSECAPED-char from STR
+ else len of str
+ */
+int	findf_noescape_len(int (*match)(char), char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (match(str[i]))
+		{
+			if (i == 0 || str[i - 1] != '\\')
+				return (i);
+		}
+		i++;
+	}
+	return (i);
 }
 
 /* 

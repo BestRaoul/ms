@@ -73,7 +73,7 @@ static int	parse_redir(t_list *lexeme, t_ast_node *ast)
 {
 	int peek = peek_type(lexeme);
 
-	if (peek != LITERAL_NQ && peek != LITERAL_SQ && peek != LITERAL_DQ)
+	if (peek != LITERAL)
 		return (dprintf(2, "parse_redir: filename expected after token `%d`\n", _type(lexeme)), -1);
 	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme->next), 0, 0});
 	*_content_ptr(lexeme->next) = NULL;
@@ -85,7 +85,7 @@ static int	parse_heredoc(t_list *lexeme, t_ast_node *ast)
 {
 	int peek = peek_type(lexeme);
 
-	if (peek != LITERAL_NQ && peek != LITERAL_SQ && peek != LITERAL_DQ)
+	if (peek != LITERAL)
 		return (dprintf(2, "parse_heredoc: delimiter expected\n"), -1);
 	add_child(ast, (t_ast_node){HEREDOC, _content(lexeme->next), 0, 0});
 	*_content_ptr(lexeme->next) = NULL;
@@ -113,7 +113,7 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 		int t = _type(*lexme_ptr);
 		int m = 0;
 
-		if ((t == LITERAL_NQ || t == LITERAL_SQ || t == LITERAL_DQ) && (pc == 0))
+		if ((t == LITERAL) && (pc == 0))
 			{ m = parse_arg(*lexme_ptr, pipeline); ac++; }
 		else if (t == REDIRLEFT || t == REDIRRIGHT || t == APPEND)
 			{ m = parse_redir(*lexme_ptr, pipeline); rc++; }

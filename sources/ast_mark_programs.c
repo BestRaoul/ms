@@ -18,7 +18,7 @@ int	ast_mark_cmd(t_ast_node *ast, int is_first)
 	int			ret;
 
 	ret = 1;
-	if (is_first && (ast->type == LITERAL_NQ || ast->type == LITERAL_DQ || ast->type == LITERAL_SQ))
+	if (is_first && ast->type == LITERAL)
 		ast->node_is_cmd = 1;
 
 	for (int i = 0; i < ft_lstsize(ast->children); ++i) {

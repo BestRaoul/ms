@@ -34,48 +34,6 @@ int min(int x, int y)
 	return y;
 }
 
-//moves from one quote to the next + 1
-//from ->'...'X<- to
-int	add_quoted(t_list **strs_ptr, char **s_ptr)
-{
-	char 	*s;
-	char	match;
-	char	temp;
-	int		next_q;
-
-	s = *s_ptr;
-	match = *s; //' or "
-	s += 1;
-	next_q = find_noescape(match, s);
-	//readline if next_q is LEN
-	temp = s[next_q];
-	s[next_q] = 0;
-	if (match == '\'')
-		ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(s)));
-	else
-		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
-	s[next_q] = temp;
-	*s_ptr += next_q + 2;
-	return (next_q + 2);
-}
-
-int	add_unquoted(t_list **strs_ptr, char **s_ptr)
-{
-	char	*s;
-	char	temp;
-	int		next_q;
-
-	s = *s_ptr;
-	next_q = min(find_noescape_len('\'', s), find_noescape_len('\"', s));
-	next_q = min(next_q, find_noescape_len(' ', s));
-	temp = s[next_q];
-	s[next_q] = 0;
-	ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
-	s[next_q] = temp;
-	*s_ptr += next_q;
-	return (next_q);
-}
-
 char *list_2_str(t_list *lst)
 {
 	int	total_len = 0;
@@ -97,22 +55,77 @@ char *list_2_str(t_list *lst)
 	return (str);
 }
 
+//moves from one quote to the next + 1
+//from ->'...'X<- to
+int	add_quoted(t_list **strs_ptr, char **s_ptr)
+{
+	char 	*s;
+	char	match;
+	char	temp;
+	int		next_q;
+	int 	_l;
+
+	s = *s_ptr;
+	match = *s; //' or "
+	s += 1;
+	_l = len(s);
+	next_q = find_noescape(match, s);
+	//readline if next_q is LEN
+	temp = s[next_q];
+	s[next_q] = 0;
+	if (match == '\'')
+		ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(s)));
+	else
+		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
+	if (next_q != _l)
+		s[next_q] = temp;
+	*s_ptr += next_q + 2;
+	return (next_q + 2);
+}
+
+int	add_unquoted(t_list **strs_ptr, char **s_ptr)
+{
+	char	*s;
+	char	temp;
+	int		next_q;
+	int		next_s;
+
+	s = *s_ptr;
+	next_q = min(find_noescape_len('\'', s), find_noescape_len('\"', s));
+	next_s = findf_noescape_len(ft_isspace, s);
+	if (next_s <= next_q)
+	{
+		s[next_s] = 0;
+		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
+		if (next_s != next_q)
+			s[next_s] = ' ';
+		*s_ptr += next_s;
+		return (-1);
+	}
+	temp = s[next_q];
+	s[next_q] = 0;
+	ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
+	s[next_q] = temp;
+	*s_ptr += next_q;
+	return (next_q);
+}
+
 /* can fail if does not find matching*/
 int	handle_string(t_list **lst, char *s, int pos)
 {
 	t_list	*strs = NULL;
-	char	*start = s;
+	char	*start;
 
 	s += pos;
+	start = s;
 	while (*s)
 	{
 		if (*s == '\'' || *s == '\"')
 			add_quoted(&strs, &s);
-		else
-			if (add_unquoted(&strs, &s) == 0)
-				break;
+		else if (add_unquoted(&strs, &s) == -1)
+			break;
 	}
-	return insert_token_into_lst(LITERAL_NQ, list_2_str(strs), lst, (s - start));
+	return insert_token_into_lst(LITERAL, list_2_str(strs), lst, (s - start));
 }
 
 /* can fail, if quotes are not closed => returns -1

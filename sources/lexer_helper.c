@@ -69,7 +69,9 @@ int	add_quoted(t_list **strs_ptr, char **s_ptr)
 	match = *s; //' or "
 	s += 1;
 	_l = len(s);
-	next_q = find_noescape(match, s);
+	next_q = find_noescape_len(match, s);
+	if (next_q == _l)
+		return (dprintf(2, "parse: missing closing `%c'\n", match), -1);
 	//readline if next_q is LEN
 	temp = s[next_q];
 	s[next_q] = 0;
@@ -121,7 +123,7 @@ int	handle_string(t_list **lst, char *s, int pos)
 	while (*s)
 	{
 		if (*s == '\'' || *s == '\"')
-			add_quoted(&strs, &s);
+			{ if (add_quoted(&strs, &s) == -1) return -1; }
 		else if (add_unquoted(&strs, &s) == -1)
 			break;
 	}

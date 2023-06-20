@@ -50,13 +50,16 @@ int	find(char c, char *str)
 int	find_noescape(char c, char *str)
 {
 	int	i;
+	int	escape_toggle = 0;
 
 	i = 0;
 	while (str[i] != '\0')
 	{
+		if (str[i] == '\\')
+			escape_toggle = !escape_toggle;
 		if (str[i] == c)
 		{
-			if (i == 0 || str[i - 1] != '\\')
+			if (escape_toggle == 0)
 				return (i);
 		}
 		i++;
@@ -159,7 +162,7 @@ int	count(char c, char *str)
 }
 
 /* 
- * Returns allocated string (start inclusive, end exclusive)
+ * Returns allocated string (start inclusive, end inclusive)
  //printf("CHOP %c(%d) -> %c(%d)\n", str[0], 0, str[end], end);
  */
 char	*chop(char *str, int end)

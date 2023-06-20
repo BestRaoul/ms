@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_lexeme_tlist.c                               :+:      :+:    :+:   */
+/*   print_lex.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jwikiera <jwikiera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-void	print_lexeme_tlist(t_list *lst)
+void	print_lex(t_list *lst)
 {
 	int	i;
 
@@ -27,7 +27,6 @@ void	print_lexeme_tlist(t_list *lst)
 	ft_printf("\n");
 }
 
-//--IGNORE NORME
 void	print_type(int type)
 {
 	ft_printf("%s", RED);
@@ -54,7 +53,7 @@ void	print_type(int type)
 	ft_printf("%s", RESET);
 }
 
-void	print_lexeme_tlist2(t_list *lst)
+void	print_lex2(t_list *lst)
 {
 	int	i;
 

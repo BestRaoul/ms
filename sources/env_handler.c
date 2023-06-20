@@ -14,52 +14,78 @@
 
 int	key_match(char *key, char *entry)
 {
-	char	**spltres;
-	int		res;
+	int		eq_i;
 
-	spltres = ft_split(entry, '=');
-	if (!spltres || ft_strarrlen(spltres) < 2)
-	{
-		free_arr((void **) spltres);
-		return (0);
-	}
-	res = ft_strequal(key, spltres[0]);
-	free_arr((void **) spltres);
-	return (res);
+	eq_i = find('=', entry);
+	if (eq_i == -1)
+		return (-1);
+	return (ft_strncmp(key, entry, eq_i) == 0);
 }
 
-void	disown_env(char **env)
+//-1 if not found
+int	find_in_env(char *key)
 {
 	int	i;
 
 	i = 0;
-	while (env[i])
-		garbage_collector(REMOVE, env[i++]);
-	garbage_collector(REMOVE, env);
+	while (g.env[i])
+	{
+		if (key_match(key, g.env[i]))
+			return (i);
+		i++;
+	}
+	return (-1);
 }
 
-char	**copy_env(char **env, char *excl)
+/* only reallocates the env PTR
+the others are just ported over*/
+int	add_var_to_env(char *key, char *value)
 {
-	char	**res;
-	t_list	*lst;
-	char	*tmp;
+	char	**old;
+	int		i;
 
-	lst = NULL;
-	while (*env)
+	old = g.env;
+	g.env = ft_calloc(strarr_count(old) + 1 + 1, sizeof(char *));
+	garbage_collector(REMOVE, g.env);
+	garbage_collector(ADD, old);
+	i = 0;
+	while (old[i])
 	{
-		if (excl && key_match(excl, *env))
-		{
-			env ++;
-			continue ;
-		}
-		tmp = ft_strdup(*env);
-		ft_lstadd_str(tmp, &lst);
-		env++;
+		g.env[i] = old[i];
+		i++;
 	}
-	res = ft_tlst_to_strarr(lst);
-	ft_lstclear(&lst, ft_delnode);
-	disown_env(res);
-	return (res);
+	g.env[i] = ft_strjoin2(key, "=", value, NULL);
+	garbage_collector(REMOVE, g.env[i]);
+	g.env[++i] = NULL;
+	return (0);
+}
+
+/* if does not find KEY return 0
+else removes it and return 1*/
+int	remove_var_from_env(char *key)
+{
+	char	**old;
+	int		i;
+	int		j;
+
+	if (find_in_env(key) == -1)
+		return (0);
+	old = g.env;
+	g.env = ft_calloc(strarr_count(old), sizeof(char *));
+	garbage_collector(REMOVE, g.env);
+	garbage_collector(ADD, old);
+	i = 0;
+	j = 0;
+	while (old[i])
+	{
+		if (key_match(key, old[i]))
+			garbage_collector(ADD, old[i]);
+		else
+			g.env[j++] = old[i];
+		i++;
+	}
+	g.env[j] = NULL;
+	return (1);
 }
 
 void	print_env()
@@ -72,27 +98,4 @@ void	print_env()
 		ft_printf("%s\n", *envv);
 		envv++;
 	}
-}
-
-int	add_var_to_env(char *key, char *value)
-{
-	char	*res;
-	int		int_res;
-
-	res = ft_strjoin2(key, "=", value, NULL);
-	if (!res)
-		return (0);
-	int_res = ft_strarr_append_str(&(g.env), res);
-	FREE(res);
-	return (int_res);
-}
-
-int	remove_var_from_env(char *key)
-{
-	char	**res;
-
-	res = copy_env(g.env, key);
-	free_arr((void **) g.env);
-	g.env = res;
-	return (1);
 }

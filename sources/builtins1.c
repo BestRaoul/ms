@@ -72,47 +72,14 @@ int	echo(char **argv)
 	i = 1;
 	if (ft_strarrlen(argv) >= 2 && ft_strequal(argv[1], "-n"))
 		i = 2;
-	res = ft_strarr_to_str(argv + i, ' ');
+	res = NULL;
+	if (argv[i] != NULL)
+		res = join(&argv[i], " ");
 	if (res != NULL)
 		ft_printf("%s", res);
 	if (i == 1)
 		ft_printf("\n");
-	if (res)
-		FREE(res);
 	return (0);
-}
-
-char	*get_export_key(char *str)
-{
-	char	*res;
-	char	**spltres;
-
-	spltres = ft_split(str, '=');
-	if (!spltres)
-		return (NULL);
-	if (ft_strarrlen(spltres) == 0)
-	{
-		free_arr((void **) spltres);
-		return (NULL);
-	}
-	res = ft_strdup(spltres[0]);
-	free_arr((void **) spltres);
-	return (res);
-}
-
-char	*get_export_value(char *str)
-{
-	char	*res;
-	char	*newval;
-
-	if (ft_str_endswith(str, "="))
-		return (ft_calloc(1, sizeof(*res)));
-	res = ft_calloc(ft_strlen_int(str) - ft_strchr2(str, '=') + 1, sizeof(*res));
-	ft_strlcpy(res, str + ft_strchr2(str, '='), ft_strlen_int(str) - ft_strchr2(str, '=') + 1);
-	// TODO: env needs to be passed here probably
-	newval = handle_env(res);
-	FREE(res);
-	return (newval);
 }
 
 int	export(char **argv)
@@ -134,14 +101,14 @@ int	export(char **argv)
 			argv ++;
 			continue ;
 		}
-		key = get_export_key(*argv);
-		if (!key)
-			return (1);
-		val = get_export_value(*argv);
-		if (!val)
-			return (1);
+
+		int split = find('=', *argv);
+		(*argv)[split] = '\0';
+		key = &((*argv)[0]);
+		val = &((*argv)[split + 1]);
+		if (find_in_env(key) != -1)
+			remove_var_from_env(key); //TODO: optimise to replace KEY by VAL
 		add_var_to_env(key, val);
-		frees(2, key, val);
 		argv ++;
 	}
 	return (0);

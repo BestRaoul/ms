@@ -14,11 +14,8 @@ extern t_global	g;
 #ifndef MS_H
 # define MS_H
 
-//#define _GNU_SOURCE             /* See feature_test_macros(7) */
-//#include <fcntl.h>              /* Obtain O_* constant definitions */
-//#include <unistd.h>
-
 # include "libft.h"
+# include "colors.h"
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -26,27 +23,13 @@ extern t_global	g;
 # include <string.h>
 # include <unistd.h>
 # include <dirent.h>
-#include <sys/wait.h>
+# include <sys/wait.h>
 
-# define RESET "\033[0m"
-//COLORS - normal
-# define BLACK "\033[0;30m"
-# define RED "\033[0;31m"
-# define GREEN "\033[0;32m"
-# define YELLOW "\033[0;33m"
-# define BLUE "\033[0;34m"
-# define PURPLE "\033[0;35m"
-# define CYAN "\033[0;36m"
-# define WHITE "\033[0;37m"
-//COLORS - bold
-# define BBLACK "\033[1;30m"
-# define BRED "\033[1;31m"
-# define BGREEN "\033[1;32m"
-# define BYELLOW "\033[1;33m"
-# define BBLUE "\033[1;34m"
-# define BPURPLE "\033[1;35m"
-# define BCYAN "\033[1;36m"
-# define BWHITE "\033[1;37m"
+typedef struct s_ast_node {
+	int		type;
+	char	*content;
+	t_list	*children;
+} t_ast_node;
 
 //helpers.c
 int		find(char c, char *str);
@@ -60,22 +43,60 @@ char	*_scan(char *str, int (*f)(char));
 char	*_scan_nt(char *str, int (*f)(char));
 char	*_scan2(char **str_ptr, int (*f)(char));
 char	*join(char **strr, char *joint);
-void	print_lexeme_tlist(t_list *lst);
-void	print_lexeme_tlist2(t_list *lst);
-void	free_lexeme_node(void *node);
 
-//wildcards
-char	**wildmatches(char *token, char *cwd);
+//gc helpers in helpers.c
+int		strarr_count(char **strarr);
+char	**realloc_strarr_no_gc(char **strarr);
 
 //replace_envvar.c
 int		in(char c, char *str);
 int		is_azAZ09_(char c);
-
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);
 
+//wildcard.c
 /* stub function returning files matching wildcard */
 char	*handle_wildcard(char *s);
+char	**wildmatches(char *token, char *cwd);
+
+/* lexing */
+t_list	*lex(char *s);
+//print_lex.c
+void	print_lex(t_list *lst);
+void	print_lex2(t_list *lst);
+
+/* parsing rewrite */
+t_ast_node	*parse(t_list *lexemes);
+//print_ast.c
+void	print_ast(t_ast_node *ast, int depth);
+void	print_type(int type);
+
+/* execution */
+int		execute(t_ast_node *pipeline_list);
+int		execute_pipeline(t_ast_node *pipeline);
+
+/* error management */
+void	xit();
+void	xit2(int err);
+
+/* env */
+void	print_env();
+int		add_var_to_env(char *key, char *value);
+int		remove_var_from_env(char *key);
+int		find_in_env(char *key);
+
+//unused
+//int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
+
+/* builtins */
+int		is_builtin(char *cmd);
+int		exec_builtin(char *cmd, char **argv);
+int		cd(char **argv);
+int		echo(char **argv);
+int		export(char **argv);
+int		unset(char **argv);
+int		pwd_builtin();
+int		env_builtin();
 
 enum TokenTypes {
 	LPAREN,
@@ -114,6 +135,7 @@ enum TokenTypes {
 	PARENTHESIS,
 };
 
+<<<<<<< HEAD
 typedef struct s_ast_node {
 	int		type;
 	char	*content;
@@ -165,6 +187,8 @@ int		unset(char **argv);
 int		pwd_builtin();
 int		env_builtin();
 
+=======
+>>>>>>> da7cb8d734f372451a7b73c366ee9fb3b800d8d6
 /* v1
 	Cmdline ::= PipelineList
 	PipelineList ::= Pipeline PipelineList?

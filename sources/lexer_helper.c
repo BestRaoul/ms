@@ -27,7 +27,7 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int a
 	return (advance_len);
 }
 
-/* cannot fail
+/* can fail if no closing "
  expansion, but no wildcards */
 int	handle_double_quote(t_list **lst, char *s, int pos)
 {
@@ -57,7 +57,7 @@ int	handle_double_quote(t_list **lst, char *s, int pos)
 //	ft_lstclear(&word, ft_delnode);
 }
 
-/* cannot fail
+/* can fail if no closing '
  no expansion, no substitution, no escapes, we only and only stop at a second ' */
 int	handle_single_quote(t_list **lst, char *s, int pos)
 {
@@ -111,12 +111,10 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	literal = ft_tlst_to_str(word);
 	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);
 	return (insert_res);
-//	FREE(literal);
-//	ft_lstclear(&word, ft_delnode);
 }
 
-/* cannot fail
-if illegal char on a quoted, else length to advance */
+/* can fail, if quotes are not closed => returns -1
+else returns length to advance */
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {
 	char	c1;

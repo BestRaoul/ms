@@ -62,15 +62,18 @@ SOURCES_LIST			:= main.c\
 							replace_envvar.c\
 							lexer_helper.c\
 							wildcard.c\
-							print_lexeme_tlist.c\
-							ast.c\
+							print_lex.c\
 							print_ast.c\
 							execution.c\
 							env_handler.c\
 							builtins1.c\
+<<<<<<< HEAD
 							free_helpers.c\
 							ast_rewrite.c\
 							ast_mark_programs.c
+=======
+							ast_rewrite.c
+>>>>>>> da7cb8d734f372451a7b73c366ee9fb3b800d8d6
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

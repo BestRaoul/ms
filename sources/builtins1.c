@@ -63,7 +63,8 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		return(0);
+		write(2, "minishell: cd: HOME not set\n", 28);
+		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
@@ -134,8 +135,7 @@ int	unset(char **argv)
 	argv ++;
 	while (*argv)
 	{
-		if (!remove_var_from_env(*argv))
-			return (1);
+		remove_var_from_env(*argv);
 		argv ++;
 	}
 	return (0);
@@ -162,7 +162,7 @@ int	env_builtin()
 	return (0);
 }
 
-void	exit_builtin(char **argv)
+void	exit_builtin(char **argv) 
 {
 	argv ++;
 	if (!*argv)

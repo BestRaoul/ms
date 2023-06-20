@@ -118,6 +118,7 @@ typedef struct s_ast_node {
 	int		type;
 	char	*content;
 	t_list	*children;
+	int		node_is_cmd;
 } t_ast_node;
 
 t_ast_node	*init_ast_node_type(int type);
@@ -126,6 +127,7 @@ t_ast_node	*init_ast_node_type(int type);
 int		prs_ast(t_list *lexemes, t_ast_node *ast);
 int		prs_pipelinelist (int i, t_list *lexemes, t_ast_node *ast, int init);
 int		prs_pipeline(int i, t_list *lexemes, t_ast_node *ast, int continued);
+int		ast_mark_cmd(t_ast_node *ast, int is_first);
 
 void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);

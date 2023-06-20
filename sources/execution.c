@@ -390,7 +390,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 
 	if (parenthesis.type == PARENTHESIS)
 	{
-		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
+		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children, 0};
 		int status = execute(&pll);
 		garbage_collector(FREE_ALL, 0);
 		exit(status);

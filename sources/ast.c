@@ -46,6 +46,7 @@ t_ast_node	*init_ast_node_type(int type)
 	res->content = NULL;
 	res->type = type;
 	res->children = NULL;
+	res->node_is_cmd = 0;
 	return (res);
 }
 

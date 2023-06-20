@@ -27,6 +27,8 @@ void print_node(t_ast_node *ast, int depth)
 	spaces(4 * depth);
 	ft_printf("ASTnode: [");
 	print_type(ast->type);
+	if (ast->node_is_cmd)
+		ft_printf(" (cmd)");
 	ft_printf("]\n");
 	if (ast->content)
 	{

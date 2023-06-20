@@ -86,10 +86,11 @@ int	handle_single_quote(t_list **lst, char *s, int pos)
 /* function that tells if a char can be part of an unquoted literal */
 int	valid_noquote_chr(char c)
 {
-	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>' && !ft_isspace(c));
+	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>'
+		&& !ft_isspace(c) && c != '\'' && c != '\"');
 }
 
-/* cannot fail
+/* can fail, if does not find closing quote of subquote
  like double quote but stops at non literal chars and handles wildcards
  * important to remember that lol\ lel is one word ('lol lel')
  * variable substitution happens prior to wildcard matching
@@ -107,6 +108,23 @@ int	handle_noquote(t_list **lst, char *s, int pos)
 	{
 		ft_lstadd_chr(s[pos + i], &word);
 		i++;
+	}
+	char match_quote = 0;
+	if (s[pos + i])
+		match_quote = '\'' * (s[pos + i] == '\'') + '\"' * (s[pos + i] == '\"');
+	if (match_quote)
+	{
+		i++;
+		int	end = find_noescape(match_quote, &(s[pos + i]));
+		if (end == -1) return (dprintf(2, "parse: no closing `%c' found\n", match_quote), -1);
+		int	j = 0;
+		dprintf(2, "%.*s\n", end, &(s[pos + i]));
+		while (j < end)
+		{
+			ft_lstadd_chr(s[pos + i + j], &word);
+			j++;
+		}
+		i += j + 1;
 	}
 	literal = ft_tlst_to_str(word);
 	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);

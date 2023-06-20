@@ -64,7 +64,7 @@ static int	peek_type(t_list *lexeme)
 static int	parse_arg(t_list *lexeme, t_ast_node *ast)
 {
 	int	t = _type(lexeme);
-	if (t == LITERAL_NQ || t == LITERAL_DQ)
+	if (t == LITERAL_NQ && _content(lexeme)[0] == '$')
 	{
 		char *temp = handle_env(_content(lexeme));
 		int	i = 0;
@@ -76,6 +76,10 @@ static int	parse_arg(t_list *lexeme, t_ast_node *ast)
 			while (temp[i] && ft_isspace(temp[i]))
 				temp[i++] = 0;
 		}
+	}
+	else if (t == LITERAL_DQ)
+	{
+		add_child(ast, (t_ast_node){_type(lexeme), handle_env(_content(lexeme)), 0, 0});
 	}
 	else
 	{

@@ -44,6 +44,16 @@ int	find(char c, char *str)
 	return (-1);
 }
 
+int	find_noescape_len(char c, char *str)
+{
+	int	x;
+
+	x = find_noescape(c, str);
+	if (x == -1)
+		return len(str);
+	return (x);
+}
+
 /* 
  * Returns index of first occurence of UNSECAPED-char, else -1
  */

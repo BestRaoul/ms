@@ -27,108 +27,92 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int a
 	return (advance_len);
 }
 
-/* can fail if no closing "
- expansion, but no wildcards */
-int	handle_double_quote(t_list **lst, char *s, int pos)
+int min(int x, int y)
 {
-	char	*literal;
-	int		insert_res;
-	int		i;
-	t_list	*word;
-
-	if (!in('"', s + pos + 1))
-	{
-		ft_printf("Closing `\"' expected!\n");
-		return (-1);
-	}
-	/* handle empty string case */
-	if (s[pos] == '"' && s[pos + 1] == '"')
-		return (insert_token_into_lst(LITERAL_DQ, "", lst, 2));
-	word = NULL;
-	i = 1;
-	while (s[pos + i] && (s[pos + i] != '"' || ft_chr_escaped(pos + i, s + pos))) {
-		ft_lstadd_chr(s[pos + i], &word);
-		i++;
-	}
-	literal = ft_tlst_to_str(word);
-	insert_res = insert_token_into_lst(LITERAL_DQ, literal, lst, i + 1);
-	return (insert_res);
-//	FREE(literal);
-//	ft_lstclear(&word, ft_delnode);
+	if (x < y)
+		return x;
+	return y;
 }
 
-/* can fail if no closing '
- no expansion, no substitution, no escapes, we only and only stop at a second ' */
-int	handle_single_quote(t_list **lst, char *s, int pos)
+//moves from one quote to the next + 1
+//from ->'...'X<- to
+int	add_quoted(t_list **strs_ptr, char **s_ptr)
 {
-	char	*literal;
-	int		insert_res;
-	int		i;
+	char 	*s;
+	char	match;
+	char	temp;
+	int		next_q;
 
-	if (!in('\'', s + pos + 1))
-	{
-		ft_printf("Closing `'' expected!\n");
-		return (-1);
-	}
-	/* handle empty string case */
-	if (s[pos] == '\'' && s[pos + 1] == '\'')
-		return (insert_token_into_lst(LITERAL_SQ, "", lst, 2));
-	i = 1;
-	while (s[pos + i] && s[pos + i] != '\'')
-		i ++;
-	literal = ft_calloc((i - 1), sizeof(*literal));
-	ft_strlcpy(literal, s + pos + 1, i);
-	insert_res = insert_token_into_lst(LITERAL_SQ, literal, lst, i + 1);
-	return (insert_res);
-//	FREE(literal);
+	s = *s_ptr;
+	match = *s; //' or "
+	s += 1;
+	next_q = find_noescape(match, s);
+	//readline if next_q is LEN
+	temp = s[next_q];
+	s[next_q] = 0;
+	if (match == '\'')
+		ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(s)));
+	else
+		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
+	s[next_q] = temp;
+	*s_ptr += next_q + 2;
+	return (next_q + 2);
 }
 
-/* function that tells if a char can be part of an unquoted literal */
-int	valid_noquote_chr(char c)
+int	add_unquoted(t_list **strs_ptr, char **s_ptr)
 {
-	return (c != '(' && c != ')' && c != '|' && c != '<' && c != '>'
-		&& !ft_isspace(c) && c != '\'' && c != '\"');
+	char	*s;
+	char	temp;
+	int		next_q;
+
+	s = *s_ptr;
+	next_q = min(find_noescape_len('\'', s), find_noescape_len('\"', s));
+	next_q = min(next_q, find_noescape_len(' ', s));
+	temp = s[next_q];
+	s[next_q] = 0;
+	ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
+	s[next_q] = temp;
+	*s_ptr += next_q;
+	return (next_q);
 }
 
-/* can fail, if does not find closing quote of subquote
- like double quote but stops at non literal chars and handles wildcards
- * important to remember that lol\ lel is one word ('lol lel')
- * variable substitution happens prior to wildcard matching
- * */
-int	handle_noquote(t_list **lst, char *s, int pos)
+char *list_2_str(t_list *lst)
 {
-	char	*literal;
-	int		insert_res;
-	int		i;
-	t_list	*word;
+	int	total_len = 0;
+	t_list *i = lst;
+	while (i)
+	{
+		total_len += len(lst->content);
+		i = i->next;
+	}
+	char *str = MALLOC(total_len + 1);
+	int	j = 0;
+	i = lst;
+	while (i)
+	{
+		ft_strlcpy(&(str[j]), i->content, len(i->content) + 1);
+		j += len(i->content);
+		i = i->next;
+	}
+	return (str);
+}
 
-	word = NULL;
-	i = 0;
-	while (s[pos + i] && (valid_noquote_chr(s[pos + i]) || ft_chr_escaped(pos + i, s + pos)))
+/* can fail if does not find matching*/
+int	handle_string(t_list **lst, char *s, int pos)
+{
+	t_list	*strs = NULL;
+	char	*start = s;
+
+	s += pos;
+	while (*s)
 	{
-		ft_lstadd_chr(s[pos + i], &word);
-		i++;
+		if (*s == '\'' || *s == '\"')
+			add_quoted(&strs, &s);
+		else
+			if (add_unquoted(&strs, &s) == 0)
+				break;
 	}
-	char match_quote = 0;
-	if (s[pos + i])
-		match_quote = '\'' * (s[pos + i] == '\'') + '\"' * (s[pos + i] == '\"');
-	if (match_quote)
-	{
-		i++;
-		int	end = find_noescape(match_quote, &(s[pos + i]));
-		if (end == -1) return (dprintf(2, "parse: no closing `%c' found\n", match_quote), -1);
-		int	j = 0;
-		dprintf(2, "%.*s\n", end, &(s[pos + i]));
-		while (j < end)
-		{
-			ft_lstadd_chr(s[pos + i + j], &word);
-			j++;
-		}
-		i += j + 1;
-	}
-	literal = ft_tlst_to_str(word);
-	insert_res = insert_token_into_lst(LITERAL_NQ, literal, lst, i);
-	return (insert_res);
+	return insert_token_into_lst(LITERAL_NQ, list_2_str(strs), lst, (s - start));
 }
 
 /* can fail, if quotes are not closed => returns -1
@@ -160,12 +144,8 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 		return (insert_token_into_lst(APPEND, NULL, lst, 2));
 	else if (ft_isspace(c1))
 		return (1);
-	else if (c1 == '\'')
-		return (handle_single_quote(lst, s, pos));
-	else if (c1 == '"')
-		return (handle_double_quote(lst, s, pos));
-	else // literals probably cant start with something
-		return (handle_noquote(lst, s, pos));
+	else if (c1 == '\'' || c1 == '\"' || 1)
+		return (handle_string(lst, s, pos));
 }
 
 t_list	*lex(char *s)

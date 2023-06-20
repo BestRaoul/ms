@@ -55,9 +55,7 @@ char	*handle_env(char *literal)
 			j++;
 			continue ;
 		}
-		int x = find_noescape('$', literal);
-		if (x == -1)
-			x = len(literal);
+		int x = find_noescape_len('$', literal);
 
 		if (*literal == '$')
 		{

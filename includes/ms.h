@@ -36,6 +36,7 @@ typedef struct s_ast_node {
 //helpers.c
 int		find(char c, char *str);
 int		find_noescape(char c, char *str);
+int		find_noescape_len(char c, char *str);
 int		findf(int (*f)(char), char *str);
 int		findf_nt(int (*f)(char), char *str);
 int		len(char *str);

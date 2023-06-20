@@ -125,7 +125,14 @@ int	handle_string(t_list **lst, char *s, int pos)
 		else if (add_unquoted(&strs, &s) == -1)
 			break;
 	}
-	return insert_token_into_lst(LITERAL, list_2_str(strs), lst, (s - start));
+	while (strs != NULL)
+	{
+		char **split = ft_splitset(strs->content, " \n\t\r\v\f");
+		while (*split != NULL)
+			insert_token_into_lst(LITERAL, *split++, lst, 0);
+		strs = strs->next;
+	}
+	return s - start;
 }
 
 /* can fail, if quotes are not closed => returns -1

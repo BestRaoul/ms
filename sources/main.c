@@ -41,9 +41,6 @@ int	main(void)
 	t_ast_node	*ast = NULL;
 	t_list		*lexemes = NULL;
 
-	char *str = "abaaababaaaaab";
-	char *pattern = "*";
-	ft_printf("str `%s` match pattern `%s`: %d\n", str, pattern, match(str, pattern));
 	g.dup_stdin = dup(STDIN_FILENO);
 	g.dup_stdout = dup(STDOUT_FILENO);
 	g.env = realloc_strarr_no_gc(environ);

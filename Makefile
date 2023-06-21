@@ -60,6 +60,7 @@ SOURCES_DIRECTORY		:= ./sources/
 SOURCES_LIST			:= main.c\
 							helpers.c\
 							replace_envvar.c\
+							replace_envvar_helpers.c\
 							lexer_helper.c\
 							wildcard.c\
 							print_lex.c\

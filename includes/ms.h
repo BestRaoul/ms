@@ -48,7 +48,11 @@ int		strarr_count(char **strarr);
 char	**realloc_strarr_no_gc(char **strarr);
 
 //replace_envvar.c
-int		is_azAZ09_(char c);
+int		is_aznum(char c);
+char	*handle_dd(void);
+char	*handle_status(void);
+char	*handle_var(char *envvar);
+
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);
 char	*handle_env_until(char *str, int end);

@@ -119,19 +119,20 @@ void	logic(int ij[2], int **t, char *str, char *pattern)
 		t[i][j] = 0;
 }
 
-void	free_lookup(int m, int **t)
+int	free_lookup(int m, int n, int **t)
 {
 	int	i;
+	int	res;
 
+	res = t[n][m];
 	i = 0;
-	while (i < m + 1)
+	while (i < n + 1)
 	{
-		ft_printf("freeing t[x] at address %p\n", &(t[i]));
 		FREE(t[i]);
 		i ++;
 	}
-	ft_printf("freeing t at address %p\n", &t);
 	FREE(t);
+	return (res);
 }
 
 /* implementation source: https://www.geeksforgeeks.org/wildcard-pattern-matching/ */
@@ -160,6 +161,5 @@ int	match(char *str, char *pattern)
 		}
 		ij[0]++;
 	}
-	//free_lookup(m, t);
-	return (t[n][m]);
+	return (free_lookup(m, n, t));
 }

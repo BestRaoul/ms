@@ -42,7 +42,7 @@ int	main(void)
 	t_list		*lexemes = NULL;
 
 	char *str = "abaaababaaaaab";
-	char *pattern = "ab*";
+	char *pattern = "*";
 	ft_printf("str `%s` match pattern `%s`: %d\n", str, pattern, match(str, pattern));
 	g.dup_stdin = dup(STDIN_FILENO);
 	g.dup_stdout = dup(STDOUT_FILENO);

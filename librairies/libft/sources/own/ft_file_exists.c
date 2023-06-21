@@ -17,7 +17,8 @@ int	ft_file_exists(const char *fname)
 	int	fd;
 
 	fd = open(fname, O_RDONLY);
-	close(fd);
+	if (fd != -1)
+		close(fd);
 	if (fd == -1)
 		return (0);
 	return (1);

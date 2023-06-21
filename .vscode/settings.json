@@ -13,6 +13,24 @@
         "fcntl.h": "c",
         "stdio.h": "c",
         "ms.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "atomic": "c",
+        "*.tcc": "c",
+        "chrono": "c",
+        "cmath": "c",
+        "compare": "c",
+        "deque": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "vector": "c",
+        "memory_resource": "c",
+        "string_view": "c",
+        "algorithm": "c",
+        "limits": "c",
+        "numeric": "c",
+        "ostream": "c",
+        "stop_token": "c",
+        "streambuf": "c",
+        "libft.h": "c"
     }
 }

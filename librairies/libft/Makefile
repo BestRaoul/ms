@@ -163,6 +163,7 @@ PIOTR_DIR			:= $(SOURCES_DIRECTORY)piotr/
 SRCS_PIOTR_LIST		:= comparison.c\
 						free_arr.c\
 						frees.c\
+						finds.c\
 						ft_atod.c\
 						ft_intr.c\
 						ft_size.c\

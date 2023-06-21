@@ -16,7 +16,7 @@ int	key_match(char *key, char *entry)
 {
 	int		eq_i;
 
-	eq_i = find('=', entry);
+	eq_i = ft_find('=', entry);
 	if (eq_i == -1)
 		return (-1);
 	return (ft_strncmp(key, entry, eq_i) == 0);

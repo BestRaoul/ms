@@ -15,7 +15,7 @@
 //"diuoxXfFeEgGaAcspn%"
 int	ft_is_specifier(char c)
 {
-	return (ft_find(c, "diuxXcsp%") != -1);
+	return (in(c, "diuxXcsp%"));
 }
 
 int	ft_is_flag(char c)

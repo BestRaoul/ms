@@ -55,90 +55,105 @@ char *list_2_str(t_list *lst)
 	return (str);
 }
 
-//moves from one quote to the next + 1
-//from ->'...'X<- to
-int	add_quoted(t_list **strs_ptr, char **s_ptr)
+//reuses the litst's CONTENT pointers, so no need to free them
+//sets them NULL
+char	**list_2_strr(t_list *lst)
 {
-	char 	*s;
-	char	match;
-	char	temp;
-	int		next_q;
-	int 	_l;
-
-	s = *s_ptr;
-	match = *s; //' or "
-	s += 1;
-	_l = len(s);
-	next_q = find_noescape_len(match, s);
-	if (next_q == _l)
-		return (dprintf(2, "parse: missing closing `%c'\n", match), -1);
-	//readline if next_q is LEN
-	temp = s[next_q];
-	s[next_q] = 0;
-	if (match == '\'')
-		ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(s)));
-	else
-		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
-	if (next_q != _l)
-		s[next_q] = temp;
-	*s_ptr += next_q + 2;
-	return (next_q + 2);
-}
-
-int	add_unquoted(t_list **strs_ptr, char **s_ptr)
-{
-	char	*s;
-	char	temp;
-	int		next_q;
-	int		next_s;
-
-	s = *s_ptr;
-	next_q = min(find_noescape_len('\'', s), find_noescape_len('\"', s));
-	next_s = findf_noescape_len(ft_isspace, s);
-	if (next_s <= next_q)
+	char **res = ft_calloc(ft_lstsize(lst) + 1, sizeof(char *));
+	int i = 0;
+	while (lst)
 	{
-		s[next_s] = 0;
-		ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
-		if (next_s != next_q)
-			s[next_s] = ' ';
-		*s_ptr += next_s;
-		return (-1);
+		res[i++] = lst->content;
+		lst->content = NULL;
+		lst = lst->next;
 	}
-	temp = s[next_q];
-	s[next_q] = 0;
-	ft_lstadd_back(strs_ptr, ft_lstnew(handle_env(s)));
-	s[next_q] = temp;
-	*s_ptr += next_q;
-	return (next_q);
+	res[i] = NULL;
+	return (res);
 }
 
-/* can fail if does not find matching*/
-int	handle_string(t_list **lst, char *s, int pos)
+char	**ft_splitf(char *s, int (*next)(char *))
+{
+	t_list	*strs = NULL;
+	int		next_end;
+
+	while (*s)
+	{
+		next_end = next(s);
+		if (next_end > 0)
+			ft_lstadd_back(&strs, ft_lstnew(chop(s, next_end - 1)));
+		s += next_end;
+		if (!*s)
+			break;
+		s++;
+	}
+	return (list_2_strr(strs));
+}
+
+//can fail if no closing quote -1
+int	add_until(t_list **strs_ptr, char *s)
+{
+	int		next;
+	int		is_q;
+
+	is_q = (*s == '\'' || *s == '\"');
+	if (*s == '\'') next = finds_noescape("\'", s + 1);
+	else if (*s == '\"') next = finds_noescape("\"", s + 1);
+	else next = finds_noescape("\'\")"IS_SPACE, s);
+	if (is_q && next == len(s))
+		return (dprintf(2, "lex: missing closing `%c'\n", *s), -1);
+	//readline if next_q is LEN
+	ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(chop(s + is_q, next - 1))));
+	return (next + 2 * is_q);
+}
+
+//can fail -1
+int	add_string(t_list **lst, char *s)
 {
 	t_list	*strs = NULL;
 	char	*start;
-
-	s += pos;
+	int		move;
+	
 	start = s;
 	while (*s)
 	{
-		if (*s == '\'' || *s == '\"')
-			{ if (add_quoted(&strs, &s) == -1) return -1; }
-		else if (add_unquoted(&strs, &s) == -1)
-			break;
+		move = add_until(&strs, s);
+		if (move == -1) return -1;
+		s += move;
 	}
-	while (strs != NULL)
-	{
-		char **split = ft_splitset(strs->content, " \n\t\r\v\f");
-		while (*split != NULL)
-			insert_token_into_lst(LITERAL, *split++, lst, 0);
-		strs = strs->next;
-	}
+	insert_token_into_lst(LITERAL, list_2_str(strs), lst, 0);
 	return s - start;
 }
 
-/* can fail, if quotes are not closed => returns -1
-else returns length to advance */
+int find_literal_end(char *s)
+{
+
+	return finds_ne_nq(")"IS_SPACE, s);
+}
+
+// can fail -1
+int	handle_string(t_list **lst, char *s, int pos)
+{
+	char	**split;
+	char	*s2;
+	int		end;
+	int		move;	
+	
+	s += pos;
+	end = find_literal_end(s);
+	s2 = handle_env_until(s, end);
+	split = ft_splitf(s2, find_literal_end	);
+	while (*split != NULL)
+	{
+		move = add_string(lst, *split++);
+		if (move == -1)
+			return (-1);
+		s += move;
+	}
+	return (end);
+}
+
+// can fail -1
+// else returns length to advance
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {
 	char	c1;

@@ -2,13 +2,6 @@
 
 #define DEBUG_ENV 0
 
-int	in(char c, char *str)
-{
-	if (find(c, str) != -1)
-		return (1);
-	return (0);
-}
-
 int	is_azAZ09_(char c)
 {
 	return (in(c, "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST")
@@ -25,7 +18,8 @@ static char	*handle_var(char *envvar)
 	x = find_in_env(envvar);
 	if (x != -1)
 	{
-		eq_i = find('=', g.env[x]);
+		eq_i = ft_find('=', g.env[x]);
+		if (eq_i == -1) {dprintf(2, "env: no `=' in envvar WUT?\n"); exit(69); }
 		return (ft_strdup(&(g.env[x][eq_i + 1])));
 	}
 	return (ft_strdup(""));	
@@ -47,6 +41,18 @@ static char	*handle_status()
 	return ft_strdup(status);
 }
 
+char	*handle_env_until(char *str, int end)
+{
+	char	*res;
+	char	temp;
+
+	temp = str[end];
+	str[end] = 0;
+	res = handle_env(str);
+	str[end] = temp;
+	return (res);
+}
+
 char	*handle_env(char *literal)
 {
 	char	**out;
@@ -56,7 +62,7 @@ char	*handle_env(char *literal)
 	j = 0;
 	while (*literal)
 	{
-		int x = find_noescape_len('$', literal);
+		int x = find_ne_nqs('$', literal, "\'");
 		out[j] = chop(literal, x - 1); 
 		literal += len(out[j]);
 		j++;

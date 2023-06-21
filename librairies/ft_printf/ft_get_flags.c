@@ -84,7 +84,7 @@ t_pfpd	ft_get_flags(const char *str, va_list va)
 	i += read_width(&str[i], &data, va);
 	i += read_preci(&str[i], &data, va);
 	data.specifier = str[i];
-	if (ft_find(data.specifier, "diuxX") != -1 && data.precision != 0)
+	if (in(data.specifier, "diuxX") && data.precision != 0)
 		data.flags |= 1U << ft_is_flag('0');
 	return (data);
 }

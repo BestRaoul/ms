@@ -30,17 +30,3 @@ int	ft_max(int x, int y)
 		return (x);
 	return (y);
 }
-
-int	ft_find(char c, const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-	{
-		if (s[i] == c)
-			return (i);
-		i++;
-	}
-	return (-1);
-}

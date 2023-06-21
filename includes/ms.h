@@ -62,6 +62,7 @@ char	*handle_env(char *s);
 /* stub function returning files matching wildcard */
 char	*handle_wildcard(char *s);
 char	**wildmatches(char *token, char *cwd);
+int		match(char *str, char *pattern);
 
 /* lexing */
 t_list	*lex(char *s);

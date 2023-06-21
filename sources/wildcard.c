@@ -73,3 +73,107 @@ char	**wildmatches(char *token, char *cwd)
 	closedir(d);
 	return (NULL);
 }
+
+int	**init_lookup(int m, int n)
+{
+	int	i;
+	int	**t;
+
+	t = ft_calloc(m + 1, sizeof(*t));
+	ft_printf("malloced t at address %p\n", &t);
+	i = 0;
+	while (i < m + 1)
+	{
+		t[i] = ft_calloc(n + 1, sizeof(**t));
+		ft_printf("malloced t[x] at address %p\n", &(t[i]));
+		i ++;
+	}
+	t[0][0] = 1;
+	return (t);
+}
+
+int  **int_2d_arr(int x, int y)
+{
+	int **res = ft_calloc(x, sizeof(int *));
+	int i = 0;
+	while (i < x)
+	{
+		res[i] = ft_calloc(y, sizeof(int));
+		i++;
+	}
+	return res;
+}
+
+void	init_first_row(int m, int **t, char *pattern)
+{
+	int	i;
+
+	i = 1;
+	while (i < m + 1)
+	{
+		if (pattern[i - 1] == '*')
+			t[0][i] = t[0][i - 1];
+		i ++;
+	}
+}
+
+void	logic(int ij[2], int **t, char *str, char *pattern)
+{
+	int	i;
+	int	j;
+
+	i = ij[0];
+	j = ij[1];
+
+	if (pattern[j - 1] == '*')
+		t[i][j] = t[i][j - 1] || t[i - 1][j];
+	else if (str[i - 1] == pattern[j - 1])
+		t[i][j] = t[i - 1][j - 1];
+	else
+		t[i][j] = 0;
+}
+
+void	free_lookup(int m, int **t)
+{
+	int	i;
+
+	i = 0;
+	while (i < m + 1)
+	{
+		ft_printf("freeing t[x] at address %p\n", &(t[i]));
+		FREE(t[i]);
+		i ++;
+	}
+	ft_printf("freeing t at address %p\n", &t);
+	FREE(t);
+}
+
+/* implementation source: https://www.geeksforgeeks.org/wildcard-pattern-matching/ */
+/* approach explanation: https://www.youtube.com/watch?v=Ak_GhOHkf8A */
+int	match(char *str, char *pattern)
+{
+	int	m;
+	int	n;
+	int	**t;
+	int	ij[2];
+
+	m = ft_strlen_int(pattern);
+	n = ft_strlen_int(str);
+	if (m == 0)
+		return (n == 0);
+	t = init_lookup(m, n);
+	init_first_row(m, t, pattern);
+	ij[0] = 1;
+	while (ij[0] < n + 1)
+	{
+		ij[1] = 1;
+		while (ij[1] < m + 1)
+		{
+			logic(ij, t, str, pattern);
+			ij[1]++;
+		}
+		ij[0]++;
+	}
+	//free_lookup(m, t);
+	return (t[n][m]);
+}

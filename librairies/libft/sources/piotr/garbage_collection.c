@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-#define DEBUG_ALLOC 0
+#define DEBUG_ALLOC 1
 
 typedef struct s_garbage {
 	void *garbage;

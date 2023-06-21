@@ -385,8 +385,11 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 		{
 			if (my_argv[0] == NULL) exit(EKEYEXPIRED);
 			char *pathname = ft_getpath(my_argv[0], g.env); //nc
+			if (pathname == NULL)
+				exit(127);
 			execve(pathname, my_argv, g.env);
 			dprintf(2, "ms_turtle: command not found: %s\n", my_argv[0]);
+			garbage_collector(FREE_ALL, 0);
 			exit(EKEYEXPIRED);
 		}
 	}

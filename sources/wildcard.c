@@ -79,29 +79,15 @@ int	**init_lookup(int m, int n)
 	int	i;
 	int	**t;
 
-	t = ft_calloc(m + 1, sizeof(*t));
-	ft_printf("malloced t at address %p\n", &t);
+	t = ft_calloc(n + 1, sizeof(*t));
 	i = 0;
-	while (i < m + 1)
+	while (i < n + 1)
 	{
-		t[i] = ft_calloc(n + 1, sizeof(**t));
-		ft_printf("malloced t[x] at address %p\n", &(t[i]));
+		t[i] = ft_calloc(m + 1, sizeof(**t));
 		i ++;
 	}
 	t[0][0] = 1;
 	return (t);
-}
-
-int  **int_2d_arr(int x, int y)
-{
-	int **res = ft_calloc(x, sizeof(int *));
-	int i = 0;
-	while (i < x)
-	{
-		res[i] = ft_calloc(y, sizeof(int));
-		i++;
-	}
-	return res;
 }
 
 void	init_first_row(int m, int **t, char *pattern)

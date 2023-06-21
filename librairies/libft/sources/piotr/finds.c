@@ -80,7 +80,7 @@ int	find_noescape(char c, char *str)
 }
 
 /* 
- * Returns index of first occurence of UNSECAPED-char in cs, else -1
+ * Returns index of first occurence of UNSECAPED-char in cs, else LEN
  */
 int	finds_noescape(char *cs, char *str)
 {

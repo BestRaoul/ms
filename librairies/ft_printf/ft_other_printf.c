@@ -51,7 +51,7 @@ static int	expand_format(char **format_ptr, va_list va, char **str, int *i)
 		*str = ft_realloc(*str, *i, *i + v.len + 1);
 		if (*str == NULL)
 		{
-			//TODO: return in one line
+			//CDO: return in one line
 			FREE(v.out);
 			return (-1);
 		}

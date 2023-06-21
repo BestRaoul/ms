@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "ms_turtle"
+# define ERROR_MSG SHELL_MSG"builtin: "
 
 int	is_builtin(char *cmd)
 {
@@ -63,12 +63,12 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		write(2, "minishell: cd: HOME not set\n", 28);
+		write(2, ERROR_MSG"cd: HOME not set\n", 28);
 		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
-		write(2, "minishell: cd: too many arguments\n", 34);
+		write(2, ERROR_MSG"cd: too many arguments\n", 34);
 		return(1);
 	}
 	int status = chdir(argv[1]);
@@ -98,8 +98,6 @@ int	echo(char **argv)
 	return (0);
 }
 
-
-//TODO: $ or any non alpha start -> not identifier
 int	export(char **argv)
 {
 	char	*key;
@@ -108,14 +106,14 @@ int	export(char **argv)
 	argv ++;
 	while (*argv)
 	{
-		if (!in('=', *argv))
+		if (!ft_isalpha(argv[0][0]))
 		{
+			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
 			argv ++;
 			continue ;
 		}
-		if (ft_str_startswith(*argv, "="))
+		if (!in('=', *argv))
 		{
-			ft_printf("%s: export: `%s': not a valid identifier\n", ERROR_MSG, *argv);
 			argv ++;
 			continue ;
 		}
@@ -125,7 +123,7 @@ int	export(char **argv)
 		key = &((*argv)[0]);
 		val = &((*argv)[split + 1]);
 		if (find_in_env(key) != -1)
-			remove_var_from_env(key); //TODO: optimise to replace KEY by VAL
+			remove_var_from_env(key); //CDO: optimise to replace KEY by VAL
 		add_var_to_env(key, val);
 		argv ++;
 	}
@@ -150,7 +148,7 @@ int	pwd_builtin()
 	pwdstr = getcwd(NULL, 0);
 	if (!pwdstr)
 	{
-		ft_printf("fatal error\n");
+		ft_printf(ERROR_MSG"fatal error\n");
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);

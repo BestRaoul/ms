@@ -11,12 +11,11 @@
 /* ************************************************************************** */
 
 #include "ms.h"
-//We do not free here as it is cheaper to keep it for later
-// and FREE_ALL with the garbage_collector
 
-/* cannot fail
- returns length of lexeme */
-int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int advance_len)
+#define ERROR_MSG SHELL_MSG"lex: "
+
+// cannot fail returns i
+int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i)
 {
 	t_dict_int_str_member	*member;
 	t_list					*new;
@@ -24,7 +23,7 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int a
 	member = t_dict_int_str_member_init(type, value);
 	new = ft_lstnew(member);
 	ft_lstadd_back(lst, new);
-	return (advance_len);
+	return (i);
 }
 
 int min(int x, int y)
@@ -55,8 +54,8 @@ char *list_2_str(t_list *lst)
 	return (str);
 }
 
-//reuses the litst's CONTENT pointers, so no need to free them
-//sets them NULL
+//reuses the litst's CONTENT pointers, and sets them NULL
+//so no need to free them
 char	**list_2_strr(t_list *lst)
 {
 	char **res = ft_calloc(ft_lstsize(lst) + 1, sizeof(char *));
@@ -89,21 +88,27 @@ char	**ft_splitf(char *s, int (*next)(char *))
 	return (list_2_strr(strs));
 }
 
-//can fail if no closing quote -1
+int find_literal_end(char *s)
+{
+
+	return finds_ne_nq(")"IS_SPACE, s);
+}
+
+//can fail, no closing quote -1
 int	add_until(t_list **strs_ptr, char *s)
 {
 	int		next;
 	int		is_q;
 
 	is_q = (*s == '\'' || *s == '\"');
-	if (*s == '\'') next = finds_noescape("\'", s + 1);
-	else if (*s == '\"') next = finds_noescape("\"", s + 1);
+	if (*s == '\'') next = finds_noescape("\'", s + 1) + 1;
+	else if (*s == '\"') next = finds_noescape("\"", s + 1) + 1;
 	else next = finds_noescape("\'\")"IS_SPACE, s);
 	if (is_q && next == len(s))
-		return (dprintf(2, "lex: missing closing `%c'\n", *s), -1);
-	//readline if next_q is LEN
-	ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(chop(s + is_q, next - 1))));
-	return (next + 2 * is_q);
+		return (printf(ERROR_MSG"missing closing `%c'\n", *s), -1);
+	//CDO: readline if next_q is LEN
+	ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(chop(s + is_q, next - 1 - is_q))));
+	return (next + 1 * is_q);
 }
 
 //can fail -1
@@ -122,12 +127,6 @@ int	add_string(t_list **lst, char *s)
 	}
 	insert_token_into_lst(LITERAL, list_2_str(strs), lst, 0);
 	return s - start;
-}
-
-int find_literal_end(char *s)
-{
-
-	return finds_ne_nq(")"IS_SPACE, s);
 }
 
 // can fail -1
@@ -152,6 +151,7 @@ int	handle_string(t_list **lst, char *s, int pos)
 	return (end);
 }
 
+//can fail -1
 int	handle_heredoc(t_list **lst, char *s, int pos)
 {
 	char	*start;
@@ -171,7 +171,7 @@ int	handle_heredoc(t_list **lst, char *s, int pos)
 	return (s - start);
 }
 
-// can fail -1
+// can fail -1, no closing quote
 // else returns length to advance
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {

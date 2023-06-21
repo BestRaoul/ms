@@ -16,6 +16,7 @@ extern t_global	g;
 # define MS_H
 
 # define IS_SPACE " \n\t\r\v\f"
+# define SHELL_MSG "ms: "
 
 # include "libft.h"
 # include "colors.h"

@@ -13,6 +13,8 @@
 #include "ms.h"
 
 #define DEBUG_AST 0
+#define ERROR_MSG SHELL_MSG"parser: "
+
 
 static int	parse_pipelinelist (t_list **lexeme_ptr, t_ast_node *ast, int init);
 
@@ -49,6 +51,24 @@ static char	**_content_ptr(t_list *lexeme)
 	return (&(x->value));
 }
 
+static char	*_type_str(t_list *lexme)
+{
+	switch(_type(lexme))
+	{
+		case LPAREN: return ft_strdup("(");
+		case RPAREN: return ft_strdup(")");
+		case PIPE: return ft_strdup("|");
+		case REDIRLEFT: return ft_strdup("<");
+		case REDIRRIGHT: return ft_strdup(">");
+		case HEREDOCOP: return ft_strdup("<<");
+		case APPEND: return ft_strdup(">>");
+		case AND: return ft_strdup("&&");
+		case OR: return ft_strdup("||");
+		case LITERAL: return ft_strdup(_content(lexme));
+		default: return ft_strdup("internal error");
+	}
+}
+
 static int	peek_type(t_list *lexeme)
 {
 	if (lexeme->next == NULL)
@@ -74,7 +94,7 @@ static int	parse_redir(t_list *lexeme, t_ast_node *ast)
 	int peek = peek_type(lexeme);
 
 	if (peek != LITERAL)
-		return (dprintf(2, "parse_redir: filename expected after token `%d`\n", _type(lexeme)), -1);
+		return (printf(ERROR_MSG"(0) filename expected after token `%s`\n", _type_str(lexeme)), -1);
 	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme->next), 0, 0});
 	*_content_ptr(lexeme->next) = NULL;
 	return 2;
@@ -86,7 +106,7 @@ static int	parse_heredoc(t_list *lexeme, t_ast_node *ast)
 	int peek = peek_type(lexeme);
 
 	if (peek != LITERAL)
-		return (dprintf(2, "parse_heredoc: delimiter expected\n"), -1);
+		return (printf(ERROR_MSG"(1) delimiter expected\n"), -1);
 	add_child(ast, (t_ast_node){HEREDOC, _content(lexeme->next), 0, 0});
 	*_content_ptr(lexeme->next) = NULL;
 	return 2;
@@ -128,10 +148,10 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 			pc++;
 		}
 		else if (t == AND || t == OR || t == RPAREN) break;
-		else //parse ERROR 
+		else //parse ERROR TODO str_type() returns char for int 
 		{
 			if (ac + rc + pc == 0) break;
-			return (dprintf(2, "pl: parse error 3 near unexpected `%d' token\n", _type(*lexme_ptr)), -1);
+			return (printf(ERROR_MSG"(2) error near unexpected `%s' token\n", _type_str(*lexme_ptr)), -1);
 		}
 		
 		if (m == -1) return -1;
@@ -140,7 +160,7 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 		if (m == 2)	*lexme_ptr = (*lexme_ptr)->next;
 	}
 	if (ac + rc + pc == 0)
-		return (dprintf(2, "pl: missing tokens\n"), -1); // heredoc handle here
+		return (printf(ERROR_MSG"(3) missing tokens\n"), -1);
 	return 0;
 }
 
@@ -151,23 +171,23 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 	if (init) pipeline_list = ast;
 	else pipeline_list = add_child(ast, (t_ast_node){PIPELINELIST, 0, 0, 0});
 
-	if (*lexme_ptr == NULL) return (dprintf(2, "parse: pl_list: missing tokens\n"), -1);
+	if (*lexme_ptr == NULL) return (printf(ERROR_MSG"(4) missing tokens\n"), -1);
 	while (*lexme_ptr != NULL)
 	{
 		if (parse_pipeline(lexme_ptr, pipeline_list) == -1) return -1;
 		if (*lexme_ptr == NULL)
 		{
 			if (init) return 0;
-			return (dprintf(2, "parse: pl_list: missing closing `)' token\n"), -1);
+			return (printf(ERROR_MSG"(5) missing closing `)' token\n"), -1);
 		}
 		int t = _type(*lexme_ptr);
 		if (t == AND || t == OR) 
 		{
-			if ((*lexme_ptr)->next == NULL) return (dprintf(2, "parse: pl_list: missing token after `%d' token\n", _type(*lexme_ptr)), -1);
+			if ((*lexme_ptr)->next == NULL) return (printf(ERROR_MSG"(6) missing token after `%s' token\n", _type_str(*lexme_ptr)), -1);
 			parse_suffix(*lexme_ptr, pipeline_list);
 		}
 		else if (t == RPAREN && !init) return 0;
-		else return (dprintf(2, "parse: pl_list: WUT? parse error near unxepected `%d' token\n", _type(*lexme_ptr)), -1);
+		else return (printf(ERROR_MSG"(7) parse error near unxepected `%s' token\n", _type_str(*lexme_ptr)), -1);
 
 		*lexme_ptr = (*lexme_ptr)->next;
 	}
@@ -188,7 +208,7 @@ t_ast_node	*parse(t_list *lexemes)
 
 	t_list *lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (dprintf(2, "parse: WUT? Error trailing tokens %s->%s!",
+		return (printf(ERROR_MSG"(8) trailing tokens %s->%s!",
 			_content(lexme), _content(lexme->next)), NULL);
 	ast_mark_cmd(ast, 1);
 	if (g.print_ast)

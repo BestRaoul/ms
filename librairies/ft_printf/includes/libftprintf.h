@@ -38,7 +38,6 @@ int		ft_is_specifier(char c);
 char	*last(char *s);
 int		ft_min(int x, int y);
 int		ft_max(int x, int y);
-int		ft_find(char c, const char *s);
 //ft_helpers2.c
 void	ft_append_num(char *str, long x, int width, char *base);
 void	ft_append_ul(char *str, unsigned long x, int width, char *base);

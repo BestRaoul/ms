@@ -151,23 +151,23 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 	if (init) pipeline_list = ast;
 	else pipeline_list = add_child(ast, (t_ast_node){PIPELINELIST, 0, 0, 0});
 
-	if (*lexme_ptr == NULL) return (dprintf(2, "pl_list: missing tokens\n"), -1);
+	if (*lexme_ptr == NULL) return (dprintf(2, "parse: pl_list: missing tokens\n"), -1);
 	while (*lexme_ptr != NULL)
 	{
 		if (parse_pipeline(lexme_ptr, pipeline_list) == -1) return -1;
 		if (*lexme_ptr == NULL)
 		{
 			if (init) return 0;
-			return (dprintf(2, "pl_list: missing closing `)' token\n"), -1);
+			return (dprintf(2, "parse: pl_list: missing closing `)' token\n"), -1);
 		}
 		int t = _type(*lexme_ptr);
 		if (t == AND || t == OR) 
 		{
-			if ((*lexme_ptr)->next == NULL) return (dprintf(2, "pl_list: missing token after `%d' token\n", _type(*lexme_ptr)), -1);
+			if ((*lexme_ptr)->next == NULL) return (dprintf(2, "parse: pl_list: missing token after `%d' token\n", _type(*lexme_ptr)), -1);
 			parse_suffix(*lexme_ptr, pipeline_list);
 		}
 		else if (t == RPAREN && !init) return 0;
-		else return (dprintf(2, "pl_list: WUT? parse error near unxepected `%d' token\n", _type(*lexme_ptr)), -1);
+		else return (dprintf(2, "parse: pl_list: WUT? parse error near unxepected `%d' token\n", _type(*lexme_ptr)), -1);
 
 		*lexme_ptr = (*lexme_ptr)->next;
 	}

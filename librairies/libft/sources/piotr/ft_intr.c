@@ -28,6 +28,7 @@ int	get_intr(int (*compare)(int, int), int *r, int size)
 	return (best);
 }
 
+//returns index of X in int array, else -1
 int	find_intr(int x, int *r, int size)
 {
 	int	i;

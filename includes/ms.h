@@ -15,6 +15,8 @@ extern t_global	g;
 #ifndef MS_H
 # define MS_H
 
+# define IS_SPACE " \n\t\r\v\f"
+
 # include "libft.h"
 # include "colors.h"
 # include <stdio.h>
@@ -34,13 +36,6 @@ typedef struct s_ast_node {
 } t_ast_node;
 
 //helpers.c
-int		find(char c, char *str);
-int		find_noescape(char c, char *str);
-int		find_noescape_len(char c, char *str);
-int		findf_noescape_len(int (*match)(char), char *str);
-int		findf(int (*f)(char), char *str);
-int		findf_nt(int (*f)(char), char *str);
-int		len(char *str);
 int		count(char c, char *str);
 char	*chop(char *str, int end);
 char	*_scan(char *str, int (*f)(char));
@@ -53,10 +48,10 @@ int		strarr_count(char **strarr);
 char	**realloc_strarr_no_gc(char **strarr);
 
 //replace_envvar.c
-int		in(char c, char *str);
 int		is_azAZ09_(char c);
 /* stub function replacing $vars with their values */
 char	*handle_env(char *s);
+char	*handle_env_until(char *str, int end);
 
 //wildcard.c
 /* stub function returning files matching wildcard */

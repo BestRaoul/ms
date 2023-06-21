@@ -98,6 +98,8 @@ int	echo(char **argv)
 	return (0);
 }
 
+
+//TODO: $ or any non alpha start -> not identifier
 int	export(char **argv)
 {
 	char	*key;

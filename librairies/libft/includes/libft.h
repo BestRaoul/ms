@@ -363,6 +363,21 @@ int		less(int x, int y);
 int		less_eq(int x, int y);
 int		more(int x, int y);
 int		more_eq(int x, int y);
+/* finds.c */
+int		in(char c, char *str);
+int		len(char *str);
+
+int 	ft_find(char c, const char *str);
+int		find(char c, char *str);
+int		find_noescape(char c, char *str);
+int		finds_noescape(char *cs, char *str);
+int		findf_noescape(int (*match)(char), char *str);
+int		findf_ne_nq(int (*match)(char), char *s);
+int		finds_ne_nq(char *cs, char *s);
+int		find_ne_nqs(char c, char *s, char *quotes);
+int		findf(int (*f)(char), char *str);
+int		findf_nt(int (*f)(char), char *str);
+
 
 enum GC_ACTION {
     ADD,

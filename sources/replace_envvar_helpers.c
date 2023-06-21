@@ -53,7 +53,7 @@ char	*handle_var(char *envvar)
 	int	x;
 	int	eq_i;
 
-	if (len(envvar) == 0)
+	if (ft_strlen_int(envvar) == 0)
 		return (ft_strdup("$"));
 	x = find_in_env(envvar);
 	if (x != -1)

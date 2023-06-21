@@ -129,7 +129,7 @@ fclean: clean
 re: fclean all
 
 norm:
-	norminette includes/ sources/ libs/libft/ libs/libprintf/
+	norminette includes/*.h sources/*.c librairies/libft/sources/ librairies/ft_printf/
 
 funcs: $(NAME)
 	@echo "Functions used in $(NAME):"

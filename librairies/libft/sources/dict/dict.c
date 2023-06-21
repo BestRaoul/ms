@@ -24,23 +24,15 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 		res->value = NULL;
 	else
 	{
-		res->value = MALLOC(sizeof(*(res->value)) * (ft_strlen(value) + 1)); //should be ft_strdup
-		if (res->value == NULL)
-		{
-			FREE(res);
-			return (NULL);
-		}
-		ft_strlcpy(res->value, value, ft_strlen(value) + 1);
-		//ft_printf("allocated value (%s), %p\n", res->value, res->value);
+		res->value = ft_strdup(value);
 	}
 	return (res);
 }
 
-void	t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member)
+void	t_dict_int_str_member_free(t_dict_int_str_member *dict_int_str_member)
 {
 	if (dict_int_str_member->value != NULL)
 	{
-		//ft_printf("freeing value (%s), %p\n", dict_int_str_member->value, dict_int_str_member->value);
 		FREE(dict_int_str_member->value);
 	}
 	FREE(dict_int_str_member);

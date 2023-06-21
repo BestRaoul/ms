@@ -22,7 +22,7 @@ int	get_intr(int (*compare)(int, int), int *r, int size)
 	while (i < size)
 	{
 		if (compare(r[i], best))
-				best = r[i];
+			best = r[i];
 		i++;
 	}
 	return (best);

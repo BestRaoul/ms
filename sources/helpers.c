@@ -12,18 +12,18 @@ char	*join(char **strr, char *joint)
 	final_size = 0;
 	i = 0;
 	while (strr[i] != NULL)
-		final_size += len(strr[i++]) + len(joint);
-	final_size -= len(joint);
+		final_size += ft_strlen_int(strr[i++]) + ft_strlen_int(joint);
+	final_size -= ft_strlen_int(joint);
 	res = ft_calloc(final_size + 1, sizeof(char));
 	//--NULLCHECK
 	i = 0;
 	while (strr[i] != NULL)
 	{
-		strcpy(&res[len(res)], strr[i++]);
+		strcpy(&res[ft_strlen_int(res)], strr[i++]);
 		if (strr[i] != NULL)
-			strcpy(&res[len(res)], joint);
+			strcpy(&res[ft_strlen_int(res)], joint);
 	}
-	res[len(res)] = 0;
+	res[ft_strlen_int(res)] = 0;
 	return (res);
 }
 

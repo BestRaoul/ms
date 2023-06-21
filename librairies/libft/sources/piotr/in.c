@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strarr_to_str.c                                 :+:      :+:    :+:   */
+/*   in.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pkondrac <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,24 +12,9 @@
 
 #include "libft.h"
 
-char	*ft_strarr_to_str(char **strarr, char sep)
+int	in(char c, char *str)
 {
-	size_t	i;
-	t_list	*lst;
-	char	*res;
-
-	lst = NULL;
-	i = 0;
-	while (i < ft_strarrlen(strarr))
-	{
-		if (!ft_lstadd_str(strarr[i], &lst))
-		{
-			ft_lstclear(&lst, ft_delnode);
-			return (NULL);
-		}
-		i ++;
-	}
-	res = ft_str_tlst_to_str_join(lst, sep);
-	ft_lstclear(&lst, ft_delnode);
-	return (res);
+	if (ft_find(c, str) != -1)
+		return (1);
+	return (0);
 }

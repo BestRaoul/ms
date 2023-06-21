@@ -1,4 +1,4 @@
-FT_PRINTF_NAMES	= ft_printf ft_other_printf ft_get_flags ft_get_flags_helpers ft_helpers ft_helpers2 get_char get_str get_int get_uint get_ptr get_hex
+FT_PRINTF_NAMES	= ft_printf ft_other_printf ft_get_flags ft_get_flags_helpers ft_helpers ft_helpers2 get_char get_str get_int get_uint get_ptr get_hex ret
 
 LIB_SRCS	= $(foreach wrd,$(FT_PRINTF_NAMES), ./$(wrd).c)
 

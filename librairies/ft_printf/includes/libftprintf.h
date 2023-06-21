@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_PRINTF_H
-# define FT_PRINTF_H
+#ifndef LIBFTPRINTF_H
+# define LIBFTPRINTF_H
 
 # include "libft.h"
 # include <stdarg.h>
@@ -51,4 +51,5 @@ char	*get_int(t_pfpd data, va_list va);
 char	*get_uint(t_pfpd data, va_list va);
 char	*get_ptr(t_pfpd data, va_list va);
 char	*get_hex(t_pfpd data, va_list va);
+int		expand_format_ret(void	*out);
 #endif

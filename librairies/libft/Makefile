@@ -148,7 +148,6 @@ SRCS_OWN_LIST		:= ft_str_starts_ends_with.c\
 						ft_pwd_is_ex.c\
 						ft_strjoin2.c\
 						ft_strequal.c\
-						ft_strarr_append_str.c\
 						ft_strarr_to_str.c\
 						ft_strchr2.c
 OBJS_OWN_LIST		:= $(patsubst %.c, %.o, $(SRCS_OWN_LIST))
@@ -164,6 +163,7 @@ SRCS_PIOTR_LIST		:= comparison.c\
 						free_arr.c\
 						frees.c\
 						finds.c\
+						in.c\
 						ft_atod.c\
 						ft_intr.c\
 						ft_size.c\

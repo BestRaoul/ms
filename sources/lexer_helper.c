@@ -39,7 +39,7 @@ char *list_2_str(t_list *lst)
 	t_list *i = lst;
 	while (i)
 	{
-		total_len += len(lst->content);
+		total_len += ft_strlen_int(lst->content);
 		i = i->next;
 	}
 	char *str = MALLOC(total_len + 1);
@@ -47,8 +47,8 @@ char *list_2_str(t_list *lst)
 	i = lst;
 	while (i)
 	{
-		ft_strlcpy(&(str[j]), i->content, len(i->content) + 1);
-		j += len(i->content);
+		ft_strlcpy(&(str[j]), i->content, ft_strlen_int(i->content) + 1);
+		j += ft_strlen_int(i->content);
 		i = i->next;
 	}
 	return (str);
@@ -104,7 +104,7 @@ int	add_until(t_list **strs_ptr, char *s)
 	if (*s == '\'') next = finds_noescape("\'", s + 1) + 1;
 	else if (*s == '\"') next = finds_noescape("\"", s + 1) + 1;
 	else next = finds_noescape("\'\")"IS_SPACE, s);
-	if (is_q && next == len(s))
+	if (is_q && next == ft_strlen_int(s))
 		return (printf(ERROR_MSG"missing closing `%c'\n", *s), -1);
 	//CDO: readline if next_q is LEN
 	ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(chop(s + is_q, next - 1 - is_q))));

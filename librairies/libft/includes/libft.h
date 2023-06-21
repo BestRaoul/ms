@@ -365,7 +365,6 @@ int		more(int x, int y);
 int		more_eq(int x, int y);
 /* finds.c */
 int		in(char c, char *str);
-int		len(char *str);
 
 int 	ft_find(char c, const char *str);
 int		find(char c, char *str);

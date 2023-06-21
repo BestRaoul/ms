@@ -141,7 +141,7 @@ int	handle_string(t_list **lst, char *s, int pos)
 	s += pos;
 	end = find_literal_end(s);
 	s2 = handle_env_until(s, end);
-	split = ft_splitf(s2, find_literal_end	);
+	split = ft_splitf(s2, find_literal_end);
 	while (*split != NULL)
 	{
 		move = add_string(lst, *split++);
@@ -150,6 +150,25 @@ int	handle_string(t_list **lst, char *s, int pos)
 		s += move;
 	}
 	return (end);
+}
+
+int	handle_heredoc(t_list **lst, char *s, int pos)
+{
+	char	*start;
+	char	*s2;
+	int		end;
+
+	insert_token_into_lst(HEREDOCOP, NULL, lst, 2);
+	start = s;
+	s += pos + 2;
+	while (ft_isspace(*s))
+		s++;
+	end = find_literal_end(s);
+	s2 = chop(s, end - 1);
+	if (add_string(lst, s2) == -1)
+		return -1;
+	s += end;
+	return (s - start);
 }
 
 // can fail -1
@@ -176,7 +195,7 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	else if (c1 == '|')
 		return (insert_token_into_lst(OR, NULL, lst, 2));
 	else if (c1 == '<')
-		return (insert_token_into_lst(HEREDOCOP, NULL, lst, 2));
+		return (handle_heredoc(lst, s, pos));
 	else if (c1 == '>')
 		return (insert_token_into_lst(APPEND, NULL, lst, 2));
 	else if (ft_isspace(c1))

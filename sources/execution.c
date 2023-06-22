@@ -134,20 +134,6 @@ void	close_all_pipes(t_list *ignore, int do_crash)
 }
 
 //not es
-void	print_open_fds(int	max, int fd)
-{
-	int	i = 0;
-	ft_dprintf(fd, "[%d] fds: [", getpid());
-	while (i < max)
-	{
-		int is = fcntl(i, F_GETFL);
-		ft_dprintf(fd, "%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
-		i++;
-	}
-	ft_dprintf(fd, "\b\b]\n");
-}
-
-//not es
 void	print_argvs(char ***argvs, int p_count)
 {
 	for (int k=0; k<p_count; k++)
@@ -302,7 +288,7 @@ int	consume_redirs(t_list *redirs)
 		{
 			int temp_fd = -1;
 			if (r->type == REDIRRIGHT || r->type == APPEND)
-				temp_fd = creat(r->val, (unsigned int)00664);
+				temp_fd = open(r->val, O_CREAT | O_WRONLY | O_TRUNC, (unsigned int)00664);
 			else if (r->type == REDIRLEFT)
 				temp_fd = access(r->val, R_OK);
 			else if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
@@ -383,8 +369,6 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_parenth
 		exit(err);
 	
 	close_all_pipes(lst_redir, 1);
-	if (DEBUG_REDIR) {
-	print_open_fds(10, STDERR_FILENO);}	
 
 	if (parenthesis.type == PARENTHESIS)
 	{

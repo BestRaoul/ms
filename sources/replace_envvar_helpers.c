@@ -36,18 +36,6 @@ char	*handle_status(void)
 	return (ft_strdup(status));
 }
 
-char	*handle_env_until(char *str, int end)
-{
-	char	*res;
-	char	temp;
-
-	temp = str[end];
-	str[end] = 0;
-	res = handle_env(str);
-	str[end] = temp;
-	return (res);
-}
-
 char	*handle_var(char *envvar)
 {
 	int	x;

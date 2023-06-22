@@ -17,6 +17,20 @@
 #define DEBUG_REDIR 0
 #define DEBUG_ARGV 0
 
+#define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
+
+typedef struct s_redir {
+	int		type;
+	char	*val;
+} t_redir;
+
+typedef struct s_parenthesis
+{
+	int type;
+	t_list *children;
+} t_parenthesis;
+
+
 void	set_g_status(int err)
 {
 	g.status = WIFEXITED(err) ? WEXITSTATUS(err) : err;
@@ -30,44 +44,24 @@ void	reown(char **strr)
 		garbage_collector(ADD, strr[i++]);
 }
 
-void	close_all_pipes(t_list **redirs, t_list *ignore, int crash);
-void	close_and_free_all(t_list **redirs)
+void	close_all_pipes(t_list *ignore, int crash);
+void	close_and_free_all()
 {
-	if (redirs != NULL)
-		close_all_pipes(redirs, NULL, 0);
+	close_all_pipes(NULL, 0);
 	close(g.dup_stdin);
 	close(g.dup_stdout);
 	reown(g.env);
 	garbage_collector(FREE_ALL, 0);
 }
 
-void	crash(t_list **redirs)
+void	crash()
 {
 	int err = errno;
-	close_and_free_all(redirs);
+	close_and_free_all();
 	errno = err;
 	perror(ERROR_MSG);
 	exit(err);
 }
-
-#define IS_REDIR(x) (x == REDIRLEFT || x == REDIRRIGHT || x == APPEND)
-
-typedef struct s_redir {
-	int		type;
-	char	*val;
-} t_redir;
-
-typedef	struct s_free {
-	char	***argvs;
-	t_list	**redirs;
-	int		p_count;
-} t_free;
-
-typedef struct s_parenthesis
-{
-	int type;
-	t_list *children;
-} t_parenthesis;
 
 void	free_t_redir(void *ptr)
 {
@@ -110,27 +104,27 @@ int	count_child_pipes(t_ast_node *ast)
 
 //ENS
 //IGNORE own pipes as they are closed during consume_redir
-void	close_all_pipes(t_list **redirs, t_list *ignore, int do_crash)
+void	close_all_pipes(t_list *ignore, int do_crash)
 {
 	int redir_i;
 	t_redir *r;
 
 
 	int	i = 0;
-	while (redirs[i] != NULL)
+	while (g.redirs[i] != NULL)
 	{
-		if (redirs[i] != ignore)
+		if (g.redirs[i] != ignore)
 		{
 			redir_i = 0;
-			r = get_redir(redirs[i], redir_i++);
+			r = get_redir(g.redirs[i], redir_i++);
 			while (r != NULL)
 			{
 				if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
 					if (close(ft_atoi(r->val)) == -1)
 					{
-						if (do_crash) crash(redirs);
+						if (do_crash) crash();
 					}
-				r = get_redir(redirs[i], redir_i++);
+				r = get_redir(g.redirs[i], redir_i++);
 			}
 		}
 		i++;
@@ -330,7 +324,7 @@ int	consume_redirs(t_list *redirs)
 	{
 		if (redir_i == in_i || redir_i == out_i)
 		{
-			int	to, from;
+			int	to = 0, from = 0;
 			if (r->type == REDIRRIGHT)
 			{
 				to = open(r->val, O_WRONLY | O_CREAT | O_TRUNC, (unsigned int)00664);
@@ -369,7 +363,7 @@ int	consume_redirs(t_list *redirs)
 
 //ENS
 //exit point -> never returns
-void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to_free, t_parenthesis parenthesis)
+void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_parenthesis parenthesis)
 {
 	if (DEBUG_INIT) {
 	printf("(%s) [%s%d%s] -- spawned from %s%d%s\n", argv[0], BLUE, getpid(), RESET, GREEN, parent_pid, RESET);}
@@ -382,19 +376,19 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	
 	int err = consume_redirs(lst_redir);
 	if (err == -1)
-		crash(to_free.redirs);
+		crash();
 	else if (err > 0)
 		exit(err);
 	
-	close_all_pipes(to_free.redirs, lst_redir, 1);
+	close_all_pipes(lst_redir, 1);
 	if (DEBUG_REDIR) {
 	print_open_fds(10, STDERR_FILENO);}	
 
 	if (parenthesis.type == PARENTHESIS)
 	{
-		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children, 0};
+		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
 		execute(&pll);
-		close_and_free_all(NULL);
+		close_and_free_all();
 		exit(g.status);
 	}
 	else
@@ -402,7 +396,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 		if (is_builtin(argv[0]))
 		{
 			int status = exec_builtin(argv[0], argv);
-			close_and_free_all(NULL);
+			close_and_free_all();
 			exit(status);
 		}
 		else
@@ -417,7 +411,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 				execve(pathname, my_argv, g.env);
 			dprintf(2, "%s: command not found\n", my_argv[0]);
 			reown(my_argv);
-			close_and_free_all(NULL);
+			close_and_free_all();
 			exit(127);
 		}
 	}
@@ -426,9 +420,8 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 //ENS
 //crashes if sc fail
 //always non-null return value
-pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int p_count)
+pid_t	*init_subshells(char ***argvs, t_parenthesis *parens, int p_count)
 {
-	t_free	to_free = (t_free){argvs, redirs, p_count};
 	pid_t	*pids = ft_calloc(p_count + 1, sizeof(pid_t));
 	pid_t	parent = getpid();
 	int	i = 0;
@@ -436,16 +429,16 @@ pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int
 	while (i < p_count)
 	{
 		pids[i] = fork();
-		if (pids[i] == -1) crash(redirs);
+		if (pids[i] == -1) crash();
 		if (pids[i] == 0)
-			execute_command(argvs[i], redirs[i], parent, to_free, parens[i]);
+			execute_command(argvs[i], g.redirs[i], parent, parens[i]);
 		i++;
 	}
 	return pids;
 }
 
 //ENS sc
-void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *parens, t_ast_node *pipeline)
+void	populate_execution_data(char ***argvs, t_parenthesis *parens, t_ast_node *pipeline)
 {
 	int 		arg_i = 0;
 	int			pipe_i = 0;
@@ -461,21 +454,21 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 		{
 			t_list	*redir = alloc_redir(child->type, child->content);
 			child->content = NULL;
-			ft_lstadd_back(&redirs[pipe_i], redir);
+			ft_lstadd_back(&g.redirs[pipe_i], redir);
 		}
 		else if (child->type == HEREDOC)
 		{
 			int	fd_pipe_end = heredoc_handler(child->content);
-			if (fd_pipe_end == -1) crash(redirs);
+			if (fd_pipe_end == -1) crash();
 			t_list	*redir = alloc_redir(HEREDOC, ft_itoa(fd_pipe_end));
-			ft_lstadd_back(&redirs[pipe_i], redir);
+			ft_lstadd_back(&g.redirs[pipe_i], redir);
 		}
 		else if (child->type == PIPE)
 		{ 
-			if (pipe(_pipe) == -1) crash(redirs);
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
+			if (pipe(_pipe) == -1) crash();
+			ft_lstadd_back(&g.redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
 			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
-			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
+			ft_lstadd_back(&g.redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
 		}
 		else if (child->type == PIPELINELIST)
 		{
@@ -489,22 +482,23 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 }
 
 //ENS
-int	do_solo_exec_builtin(char **argv, t_list **redirs)
+int	do_solo_exec_builtin(char **argv)
 {
-	int err = consume_redirs(redirs[0]);
+	int err = consume_redirs(g.redirs[0]);
 	if (err > 0) return (err);
-	if (err == -1) crash(redirs);
+	if (err == -1) crash();
 	int status = exec_builtin(argv[0], argv);
-	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash(redirs);
-	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash(redirs);
+	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash();
+	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash();
 	return (status);
 }
 
+void	execute(t_ast_node *pipeline_list);
+
 //ENS
-int	execute_pipeline(t_ast_node *pipeline)
+static int	execute_pipeline(t_ast_node *pipeline)
 {
 	char			***argvs;
-	t_list			**redirs;
 	t_parenthesis	*parens;
 	pid_t			*pids;
 	int				pipe_count;
@@ -512,26 +506,26 @@ int	execute_pipeline(t_ast_node *pipeline)
 	//sc
 	pipe_count = count_child_pipes(pipeline) + 1;
 	argvs = alloc_argvs(pipeline, pipe_count);
-	redirs = ft_calloc(pipe_count + 1, sizeof(t_list *));
+	g.redirs = ft_calloc(pipe_count + 1, sizeof(t_list *));
 	parens = ft_calloc(pipe_count + 1, sizeof(t_parenthesis));
 
 	//sc
-	populate_execution_data(argvs, redirs, parens, pipeline);
+	populate_execution_data(argvs, parens, pipeline);
 
 	//sc
 	if (pipe_count == 1 && is_builtin(argvs[0][0]))
-		return (do_solo_exec_builtin(argvs[0], redirs));
+		return (do_solo_exec_builtin(argvs[0]));
 
 	//sc
-	pids = init_subshells(argvs, redirs, parens, pipe_count);
+	pids = init_subshells(argvs, parens, pipe_count);
 	
 	//sc
-	close_all_pipes(redirs, NULL, 1);
+	close_all_pipes(NULL, 1);
 
 	int status = -42;
 	for(int x=0; x<pipe_count; x++)
 		if (waitpid(pids[x], &status, 0) == -1)
-			crash(NULL);
+			crash();
 	return status;
 }
 

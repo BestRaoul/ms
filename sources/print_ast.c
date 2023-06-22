@@ -12,23 +12,64 @@
 
 #include "ms.h"
 
-void	spaces(int s)
+static void	spaces(int s)
 {
 	int	i = 0;
 	while (i < s)
 	{
-		write(1, " ", 1);
+		if (write(1, " ", 1)) {}
 		i++;
 	}
 }
 
-void	print_node(t_ast_node *ast, int depth)
+static int	print_type2(int type)
+{
+	int	t;
+
+	if (type == LITERAL)
+		ft_printf("literal");
+	if (type == PIPELINE)
+		ft_printf("pipeline");
+	if (type == PIPELINELIST)
+		ft_printf("pipeline lst");
+	if (type == HEREDOC)
+		ft_printf("heredoc");
+	t = type;
+	return (t == LITERAL
+		|| t == PIPELINE || t == PIPELINELIST || t == HEREDOC);
+}
+
+static void	print_type(int type)
+{
+	ft_printf("%s", RED);
+	if (type == LPAREN)
+		ft_printf("(");
+	else if (type == RPAREN)
+		ft_printf(")");
+	else if (type == PIPE)
+		ft_printf("|");
+	else if (type == REDIRLEFT)
+		ft_printf("<");
+	else if (type == REDIRRIGHT)
+		ft_printf(">");
+	else if (type == HEREDOCOP)
+		ft_printf("<<");
+	else if (type == APPEND)
+		ft_printf(">>");
+	else if (type == AND)
+		ft_printf("&&");
+	else if (type == OR)
+		ft_printf("||");
+	else if (!print_type2(type))
+		ft_printf("BIG ERROR");
+	ft_printf("%s", RESET);
+}
+
+static void	print_node(t_ast_node *ast, int depth)
 {
 	spaces(4 * depth);
 	ft_printf("ASTnode: [");
 	print_type(ast->type);
-	if (ast->node_is_cmd)
-		ft_printf(" (cmd)");
 	ft_printf("]\n");
 	if (ast->content)
 	{
@@ -40,7 +81,7 @@ void	print_node(t_ast_node *ast, int depth)
 void	print_ast(t_ast_node *ast, int depth)
 {
 	if (!ast) {
-		write(2, "print_ast: NULL\n", 16);
+		if (write(2, "print_ast: NULL\n", 16)) {}
 		return ;}
 	print_node(ast, depth);
 	depth ++;

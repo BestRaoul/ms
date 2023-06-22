@@ -14,7 +14,7 @@
 
 //returns next MATCH-ing UN-\ UN-'-"
 //else LEN
-int	findf_ne_nq(int (*match)(char), char *s)
+int	findf_ne_nq(int (*f)(char), char *s)
 {
 	int		i;
 
@@ -27,7 +27,7 @@ int	findf_ne_nq(int (*match)(char), char *s)
 			if (i == ft_strlen_int(s))
 				break;
 		}
-		if (match(s[i]))
+		if (f(s[i]))
 			if (i == 0 || s[i - 1] != '\\')
 				break;
 		i++;
@@ -84,14 +84,14 @@ int	find_ne_nqs(char c, char *s, char *quotes)
 /*
  * Returns index of first matching char, else LEN
  */
-int	findf(int (*match)(char), char *str)
+int	findf(int (*f)(char), char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i])
 	{
-		if (match(str[i]))
+		if (f(str[i]))
 			return (i);
 		i++;
 	}
@@ -101,14 +101,14 @@ int	findf(int (*match)(char), char *str)
 /*
  * Returns index of first NON-matching char, else LEN
  */
-int	findf_nt(int (*match)(char c), char *str)
+int	findf_nt(int (*f)(char c), char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i])
 	{
-		if (match(str[i]) == 0)
+		if (f(str[i]) == 0)
 			return (i);
 		i++;
 	}

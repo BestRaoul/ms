@@ -63,12 +63,14 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		write(2, ERROR_MSG"cd: HOME not set\n", 4 + 17);
+		if (write(2, ERROR_MSG"cd: HOME not set\n", 4 + 17) == -1)
+			crash();
 		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
-		write(2, ERROR_MSG"cd: too many arguments\n", 4 + 23);
+		if (write(2, ERROR_MSG"cd: too many arguments\n", 4 + 23) == -1)
+			crash();
 		return(1);
 	}
 	if (chdir(argv[1]) == -1)
@@ -168,13 +170,14 @@ void	exit_builtin(char **argv)
 {
 	int	n;
 
-	write(2, "exit\n", 5);
-	if (!argv[1])
+	if (write(2, "exit\n", 5))
+		crash();
+	if (!argv || !argv[1])
 		n = g.status;
 	else if (!ft_str_is_int(argv[1]))
 		n = 2;
 	else 
 		n = ft_atoi(argv[1]);
-	close_and_free_all(NULL);
+	close_and_free_all();
 	exit(n);
 }

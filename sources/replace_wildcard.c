@@ -15,7 +15,7 @@ int    add_wildmatches_in_dir(char *dirname, t_list **lst, char *pattern)
 	if (!in('*', pattern))
         return (0);
     d = opendir(dirname);
-    if (d == NULL) crash(NULL);
+    if (d == NULL) crash();
     
     count = 0;
     while ((dir = readdir(d)) != NULL)

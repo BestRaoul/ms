@@ -29,7 +29,7 @@ else
 endif
 
 ifdef DEBUG
-	DEVFLAGS			:= -ggdb $(FSANITIZE) -Wno-unused-function
+	DEVFLAGS			:= -ggdb $(FSANITIZE) -Wunused-function
 	OPTFLAG				:= -O0
 else
 	DEVFLAGS			:=
@@ -37,7 +37,7 @@ else
 endif
 
 CC						:= gcc
-CFLAGS					:= -g -Wall -Wextra -Werror -isystem $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
+CFLAGS					:= -g -Wall -Wextra -Werror -isystem -Wno-unused-function $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
 RM						:= rm -f
 
 LIB_DIRECTORY			:= ./librairies/
@@ -63,13 +63,11 @@ SOURCES_LIST			:= main.c\
 							replace_envvar_helpers.c\
 							lexer_helper.c\
 							wildcard.c\
-							print_lex.c\
 							print_ast.c\
 							execution.c\
 							env_handler.c\
 							builtins1.c\
 							ast_rewrite.c\
-							ast_mark_programs.c\
 							replace_wildcard.c\
 							unwrap.c
 

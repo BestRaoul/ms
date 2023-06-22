@@ -17,7 +17,7 @@
 
 extern char **environ;
 
-t_global g = {NULL, 0, 0, 0, 0};
+t_global g = {NULL, 0, 0, 0, 0, NULL};
 
 char	*get_input()
 {
@@ -27,7 +27,7 @@ char	*get_input()
 	ft_yoloprintf(question, "%s➜  %s", g.status==0 ? BCYAN : BRED, RESET);
 	input = readline(question);
 	if (input == NULL)
-		return (ft_strdup("exit"));
+		exit_builtin(NULL);
 	garbage_collector(ADD, input);
 	if (*input == 0)
 		return (input);
@@ -67,6 +67,6 @@ int	main(void)
 		execute(ast); //safe
 		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
 	}
-	close_and_free_all(NULL);
+	close_and_free_all();
 	return (0);
 }

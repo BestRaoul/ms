@@ -69,12 +69,13 @@ SOURCES_LIST			:=	ast_helpers2.c\
 							replace_envvar.c\
 							replace_envvar_helpers.c\
 							print_ast.c\
+							helpers.c\
+							helpers2.c\
+							wildcard.c\
+							wildcard_helpers.c\
 							ast.c\
 							execution.c\
-							helpers.c\
 							main.c\
-							replace_wildcard.c\
-							wildcard.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

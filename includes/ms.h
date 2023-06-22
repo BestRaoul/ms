@@ -16,6 +16,7 @@
 # include <unistd.h>
 # include <dirent.h>
 # include <sys/wait.h>
+# include <sys/types.h>
 
 typedef struct s_global {
 	char	**env;

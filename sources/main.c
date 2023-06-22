@@ -17,7 +17,7 @@
 
 extern char **environ;
 
-t_global g = {NULL, 0, 0, 0, 0};
+t_global g = {NULL, 0, 0, 0, 0, NULL};
 
 char	*get_input()
 {
@@ -27,7 +27,7 @@ char	*get_input()
 	ft_yoloprintf(question, "%s➜  %s", g.status==0 ? BCYAN : BRED, RESET);
 	input = readline(question);
 	if (input == NULL)
-		return (NULL);
+		exit_builtin(NULL);
 	garbage_collector(ADD, input);
 	if (*input == 0)
 		return (input);
@@ -58,7 +58,6 @@ int	main(void)
 	{
 		garbage_collector(FREE_ALL, 0);
 		input = get_input(); //safe
-		if (input == NULL) break;
 		if (*input == 0) continue;
 		lexemes = lex(input); //cannot fail
 		unwraps = unwrap(lexemes); // safe
@@ -66,11 +65,8 @@ int	main(void)
 		ast = parse(unwraps); //safe
 		if (ast == NULL) continue ;
 		execute(ast); //safe
-		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
+		if (g.status != 0) ft_dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
 	}
-	close(g.dup_stdin);
-	close(g.dup_stdout);
-//TODOmsh	reown(g.env);
-	garbage_collector(FREE_ALL, 0);
+	close_and_free_all();
 	return (0);
 }

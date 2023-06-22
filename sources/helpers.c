@@ -12,18 +12,19 @@ char	*join(char **strr, char *joint)
 	final_size = 0;
 	i = 0;
 	while (strr[i] != NULL)
-		final_size += ft_strlen_int(strr[i++]) + ft_strlen_int(joint);
-	final_size -= ft_strlen_int(joint);
+		final_size += len(strr[i++]) + len(joint);
+	final_size -= len(joint);
 	res = ft_calloc(final_size + 1, sizeof(char));
 	//--NULLCHECK
 	i = 0;
 	while (strr[i] != NULL)
 	{
-		strcpy(&res[ft_strlen_int(res)], strr[i++]);
+		ft_strlcpy(&res[len(res)], strr[i], len(strr[i]) + 1);
+		i++;
 		if (strr[i] != NULL)
-			strcpy(&res[ft_strlen_int(res)], joint);
+			ft_strlcpy(&res[len(res)], joint, len(joint) + 1);
 	}
-	res[ft_strlen_int(res)] = 0;
+	res[len(res)] = 0;
 	return (res);
 }
 
@@ -115,16 +116,13 @@ char	**realloc_strarr_no_gc(char **strarr)
 	char	**res;
 	int		i;
 
-	res = malloc((strarr_count(strarr) + 1) * sizeof(char *));
-	if (res == NULL)
-		(perror("malloc: no gc"), exit(69));
+	res = ft_calloc((strarr_count(strarr) + 1), sizeof(char *));
+	garbage_collector(REMOVE, res);
 	i = 0;
 	while (strarr[i])
 	{
-		res[i] = malloc(ft_strlen(strarr[i]) + 1);
-		if (res[i] == NULL)
-			(perror("malloc: no gc"), exit(69));
-		ft_strlcpy(res[i], strarr[i], ft_strlen(strarr[i]) + 1);
+		res[i] = ft_strdup(strarr[i]);
+		garbage_collector(REMOVE, res[i]);
 		i++;
 	}
 	res[i] = NULL;

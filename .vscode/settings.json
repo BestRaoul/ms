@@ -31,6 +31,7 @@
         "ostream": "c",
         "stop_token": "c",
         "streambuf": "c",
-        "libft.h": "c"
+        "libft.h": "c",
+        "limits.h": "c"
     }
 }

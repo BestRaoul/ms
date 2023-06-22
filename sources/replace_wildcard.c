@@ -5,8 +5,6 @@
 # include <sys/types.h>
 # include <dirent.h>
 
-//TODO: error management -> return NULL -> crash
-
 //returns count of matches added
 int    add_wildmatches_in_dir(char *dirname, t_list **lst, char *pattern)
 {
@@ -17,7 +15,7 @@ int    add_wildmatches_in_dir(char *dirname, t_list **lst, char *pattern)
 	if (!in('*', pattern))
         return (0);
     d = opendir(dirname);
-    if (d == NULL) return (-1);
+    if (d == NULL) crash();
     
     count = 0;
     while ((dir = readdir(d)) != NULL)
@@ -39,8 +37,6 @@ void	add_wildmatches(t_list **lst, char *pattern)
     int count;
 
 	count = add_wildmatches_in_dir(".", lst, pattern);
-    if (count == -1)
-        crash(NULL, NULL); //TODO better error management
     if (count == 0)
         ft_lstadd_back(lst, ft_lstnew(ft_strdup(pattern)));
 }

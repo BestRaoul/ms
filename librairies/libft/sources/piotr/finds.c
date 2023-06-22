@@ -88,14 +88,14 @@ int	finds_noescape(char *cs, char *str)
  * returns next match of UN-\ in STR
  else LEN
  */
-int	findf_noescape(int (*match)(char), char *str)
+int	findf_noescape(int (*f)(char), char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i] != '\0')
 	{
-		if (match(str[i]))
+		if (f(str[i]))
 		{
 			if (i == 0 || str[i - 1] != '\\')
 				return (i);

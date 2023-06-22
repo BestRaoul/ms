@@ -83,7 +83,7 @@ static int	peek_type(t_list *lexeme)
 // lit nq, ', "
 static int	parse_arg(t_list *lexeme, t_ast_node *ast)
 {
-	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme), 0, 0});
+	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme), 0});
 	*_content_ptr(lexeme) = NULL;
 	return 1;
 }
@@ -94,8 +94,8 @@ static int	parse_redir(t_list *lexeme, t_ast_node *ast)
 	int peek = peek_type(lexeme);
 
 	if (peek != LITERAL)
-		return (printf(ERROR_MSG"(0) filename expected after token `%s`\n", _type_str(lexeme)), -1);
-	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme->next), 0, 0});
+		return (ft_dprintf(2, ERROR_MSG"(0) filename expected after token `%s`\n", _type_str(lexeme)), -1);
+	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme->next), 0});
 	*_content_ptr(lexeme->next) = NULL;
 	return 2;
 }
@@ -106,8 +106,8 @@ static int	parse_heredoc(t_list *lexeme, t_ast_node *ast)
 	int peek = peek_type(lexeme);
 
 	if (peek != LITERAL)
-		return (printf(ERROR_MSG"(1) delimiter expected\n"), -1);
-	add_child(ast, (t_ast_node){HEREDOC, _content(lexeme->next), 0, 0});
+		return (ft_dprintf(2, ERROR_MSG"(1) delimiter expected\n"), -1);
+	add_child(ast, (t_ast_node){HEREDOC, _content(lexeme->next), 0});
 	*_content_ptr(lexeme->next) = NULL;
 	return 2;
 }
@@ -115,14 +115,14 @@ static int	parse_heredoc(t_list *lexeme, t_ast_node *ast)
 // '|' '&&' '||'
 static int	parse_suffix(t_list *lexeme, t_ast_node *ast)
 {
-	add_child(ast, (t_ast_node){_type(lexeme), 0, 0, 0});
+	add_child(ast, (t_ast_node){_type(lexeme), 0, 0});
 	return 1;
 }
 
 // lit, redir, <<, |, '(' => pipeline_list, [')', '&&', '||'] => exit
 static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 {
-	t_ast_node	*pipeline = add_child(ast, (t_ast_node){PIPELINE, 0, 0, 0});
+	t_ast_node	*pipeline = add_child(ast, (t_ast_node){PIPELINE, 0, 0});
 	
 	int ac = 0;
 	int	rc = 0;
@@ -148,10 +148,10 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 			pc++;
 		}
 		else if (t == AND || t == OR || t == RPAREN) break;
-		else //parse ERROR TODO str_type() returns char for int 
+		else 
 		{
 			if (ac + rc + pc == 0) break;
-			return (printf(ERROR_MSG"(2) error near unexpected `%s' token\n", _type_str(*lexme_ptr)), -1);
+			return (ft_dprintf(2, ERROR_MSG"(2) error near unexpected `%s' token\n", _type_str(*lexme_ptr)), -1);
 		}
 		
 		if (m == -1) return -1;
@@ -160,7 +160,7 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 		if (m == 2)	*lexme_ptr = (*lexme_ptr)->next;
 	}
 	if (ac + rc + pc == 0)
-		return (printf(ERROR_MSG"(3) missing tokens\n"), -1);
+		return (ft_dprintf(2, ERROR_MSG"(3) missing tokens\n"), -1);
 	return 0;
 }
 
@@ -169,25 +169,25 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 {
 	t_ast_node	*pipeline_list;
 	if (init) pipeline_list = ast;
-	else pipeline_list = add_child(ast, (t_ast_node){PIPELINELIST, 0, 0, 0});
+	else pipeline_list = add_child(ast, (t_ast_node){PIPELINELIST, 0, 0});
 
-	if (*lexme_ptr == NULL) return (printf(ERROR_MSG"(4) missing tokens\n"), -1);
+	if (*lexme_ptr == NULL) return (ft_dprintf(2, ERROR_MSG"(4) missing tokens\n"), -1);
 	while (*lexme_ptr != NULL)
 	{
 		if (parse_pipeline(lexme_ptr, pipeline_list) == -1) return -1;
 		if (*lexme_ptr == NULL)
 		{
 			if (init) return 0;
-			return (printf(ERROR_MSG"(5) missing closing `)' token\n"), -1);
+			return (ft_dprintf(2, ERROR_MSG"(5) missing closing `)' token\n"), -1);
 		}
 		int t = _type(*lexme_ptr);
 		if (t == AND || t == OR) 
 		{
-			if ((*lexme_ptr)->next == NULL) return (printf(ERROR_MSG"(6) missing token after `%s' token\n", _type_str(*lexme_ptr)), -1);
+			if ((*lexme_ptr)->next == NULL) return (ft_dprintf(2, ERROR_MSG"(6) missing token after `%s' token\n", _type_str(*lexme_ptr)), -1);
 			parse_suffix(*lexme_ptr, pipeline_list);
 		}
 		else if (t == RPAREN && !init) return 0;
-		else return (printf(ERROR_MSG"(7) syntax error near unxepected `%s' token\n", _type_str(*lexme_ptr)), -1);
+		else return (ft_dprintf(2, ERROR_MSG"(7) syntax error near unxepected `%s' token\n", _type_str(*lexme_ptr)), -1);
 
 		*lexme_ptr = (*lexme_ptr)->next;
 	}
@@ -200,7 +200,6 @@ t_ast_node	*parse(t_list *lexemes)
 	ast->children = NULL;
 	ast->content = NULL;
 	ast->type = PIPELINELIST;
-	ast->node_is_cmd = 0;
 
 	t_list **lexme_ptr = &lexemes;
 	int res = parse_pipelinelist(lexme_ptr, ast, 1);
@@ -208,8 +207,7 @@ t_ast_node	*parse(t_list *lexemes)
 
 	t_list *lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (printf(ERROR_MSG"(8) syntax error near unexpected token `%s'\n", _type_str(lexme->next)), NULL);
-	ast_mark_cmd(ast, 1);
+		return (ft_dprintf(2, ERROR_MSG"(8) syntax error near unexpected token `%s'\n", _type_str(lexme->next)), NULL);
 	if (g.print_ast)
 	{
 		print_ast(ast, 0);

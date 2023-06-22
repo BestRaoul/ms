@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-# define ERROR_MSG SHELL_MSG"builtin: "
+# define ERROR_MSG SHELL_MSG""
 
 int	is_builtin(char *cmd)
 {
@@ -63,19 +63,19 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		write(2, ERROR_MSG"cd: HOME not set\n", 28);
+		ft_dprintf(2, ERROR_MSG"cd: HOME not set\n");
 		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
-		write(2, ERROR_MSG"cd: too many arguments\n", 34);
+		ft_dprintf(2, ERROR_MSG"cd: too many arguments\n");
 		return(1);
 	}
-	int status = chdir(argv[1]);
-	if (status != 0)
+	if (chdir(argv[1]) == -1)
 	{
-		perror(ERROR_MSG);
-		return (status);
+		int err = errno;
+		ft_dprintf(2, ERROR_MSG"cd: %s: %s\n", argv[1], strerror(errno));
+		return (err);
 	}
 	return (0);
 }
@@ -91,15 +91,16 @@ int	echo(char **argv)
 	res = NULL;
 	if (argv[i] != NULL)
 		res = join(&argv[i], " ");
-	if (res != NULL)
-		ft_printf("%s", res);
-	if (i == 1)
-		ft_printf("\n");
+	if (res != NULL && write(1, res, len(res)) == -1)
+		crash();
+	if (i == 1 && write(1, "\n", 1) == -1)
+		crash();
 	return (0);
 }
 
 int	export(char **argv)
 {
+	int		crapped = 0;
 	char	*key;
 	char	*val;
 
@@ -108,7 +109,8 @@ int	export(char **argv)
 	{
 		if (!ft_isalpha(argv[0][0]))
 		{
-			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
+			ft_dprintf(2, ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
+			crapped = 1;
 			argv ++;
 			continue ;
 		}
@@ -127,7 +129,7 @@ int	export(char **argv)
 		add_var_to_env(key, val);
 		argv ++;
 	}
-	return (0);
+	return (crapped);
 }
 
 int	unset(char **argv)
@@ -148,7 +150,7 @@ int	pwd_builtin()
 	pwdstr = getcwd(NULL, 0);
 	if (!pwdstr)
 	{
-		ft_printf(ERROR_MSG"fatal error\n");
+		ft_dprintf(2, ERROR_MSG"pwd: fatal error\n");
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);
@@ -166,14 +168,13 @@ void	exit_builtin(char **argv)
 {
 	int	n;
 
-	garbage_collector(REMOVE, argv[1]);
-	close_and_free_all(NULL, NULL);
-	if (!argv[1])
+	ft_dprintf(2, "exit\n");
+	if (!argv || !argv[1])
 		n = g.status;
 	else if (!ft_str_is_int(argv[1]))
 		n = 2;
 	else 
 		n = ft_atoi(argv[1]);
-	free(argv[1]);
+	close_and_free_all();
 	exit(n);
 }

@@ -304,7 +304,7 @@ char		*ft_strjoin2(const char *word, ...);
 int			ft_strequal(const char *s1, const char *s2);
 
 /* ft_strlen but returns int */
-int			ft_strlen_int(const char *s);
+int			len(const char *s);
 
 /* returns pos of char in str */
 int			ft_strchr2(char *haystack, char needle);
@@ -347,6 +347,7 @@ void					t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member)
 
 /* piotr */
 int		ft_printf(const char *format, ...);
+int		ft_dprintf(int _fd, const char *format, ...);
 char	*ft_allocprintf(const char *format, ...);
 char	*ft_yoloprintf(char *str, const char *format, ...);
 double	ft_atod(const char *str);

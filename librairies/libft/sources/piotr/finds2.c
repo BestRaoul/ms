@@ -14,7 +14,7 @@
 
 //returns next MATCH-ing UN-\ UN-'-"
 //else LEN
-int	findf_ne_nq(int (*match)(char), char *s)
+int	findf_ne_nq(int (*f)(char), char *s)
 {
 	int		i;
 
@@ -24,10 +24,10 @@ int	findf_ne_nq(int (*match)(char), char *s)
 		if (s[i] == '\'' || s[i] == '\"')
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break ;
 		}
-		if (match(s[i]))
+		if (f(s[i]))
 			if (i == 0 || s[i - 1] != '\\')
 				break ;
 		i++;
@@ -47,7 +47,7 @@ int	finds_ne_nq(char *cs, char *s)
 		if (s[i] == '\'' || s[i] == '\"')
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break ;
 		}
 		if (in(s[i], cs))
@@ -70,7 +70,7 @@ int	find_ne_nqs(char c, char *s, char *quotes)
 		if (in(s[i], quotes))
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break ;
 		}
 		if (s[i] == c)
@@ -84,14 +84,14 @@ int	find_ne_nqs(char c, char *s, char *quotes)
 /*
  * Returns index of first matching char, else LEN
  */
-int	findf(int (*match)(char), char *str)
+int	findf(int (*f)(char), char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i])
 	{
-		if (match(str[i]))
+		if (f(str[i]))
 			return (i);
 		i++;
 	}
@@ -101,14 +101,14 @@ int	findf(int (*match)(char), char *str)
 /*
  * Returns index of first NON-matching char, else LEN
  */
-int	findf_nt(int (*match)(char c), char *str)
+int	findf_nt(int (*f)(char c), char *str)
 {
 	int	i;
 
 	i = 0;
 	while (str[i])
 	{
-		if (match(str[i]) == 0)
+		if (f(str[i]) == 0)
 			return (i);
 		i++;
 	}

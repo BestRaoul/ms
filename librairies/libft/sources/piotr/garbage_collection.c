@@ -83,7 +83,7 @@ void	*garbage_collector(int action, void *ptr)
 		}
 		if (i == NULL)
 		{
-			dprintf(2, "P: %p\n", ptr);
+			ft_dprintf(2, "P: %p\n", ptr);
 			write(2, "gc: remove PTR not found.\n", 26);
 			exit(127);
 		}
@@ -107,7 +107,7 @@ void	*garbage_collector(int action, void *ptr)
 	}
 	else
 	{
-		write(STDERR_FILENO, "GC: incorrect action\n", 21);
+		write(2, "GC: incorrect action\n", 21);
 		exit(1);
 	}
 	

@@ -170,7 +170,7 @@ void	exit_builtin(char **argv)
 {
 	int	n;
 
-	if (write(2, "exit\n", 5))
+	if (write(2, "exit\n", 5) == -1)
 		crash();
 	if (!argv || !argv[1])
 		n = g.status;

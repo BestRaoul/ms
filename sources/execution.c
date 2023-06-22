@@ -47,7 +47,8 @@ void	reown(char **strr)
 void	close_all_pipes(t_list *ignore, int crash);
 void	close_and_free_all()
 {
-	close_all_pipes(NULL, 0);
+	if (g.redirs != NULL)
+		close_all_pipes(NULL, 0);
 	close(g.dup_stdin);
 	close(g.dup_stdout);
 	reown(g.env);
@@ -129,6 +130,7 @@ void	close_all_pipes(t_list *ignore, int do_crash)
 		}
 		i++;
 	}
+	g.redirs = NULL;
 }
 
 //not es

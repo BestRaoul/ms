@@ -12,11 +12,10 @@
 
 #include "libft.h"
 
-
 //else -1
 int	ft_find(char c, const char *str)
 {
-    int	i;
+	int	i;
 
 	i = 0;
 	while (str[i] != '\0')

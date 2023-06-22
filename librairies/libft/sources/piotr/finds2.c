@@ -25,11 +25,11 @@ int	findf_ne_nq(int (*match)(char), char *s)
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
 			if (i == ft_strlen_int(s))
-				break;
+				break ;
 		}
 		if (match(s[i]))
 			if (i == 0 || s[i - 1] != '\\')
-				break;
+				break ;
 		i++;
 	}
 	return (i);
@@ -48,11 +48,11 @@ int	finds_ne_nq(char *cs, char *s)
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
 			if (i == ft_strlen_int(s))
-				break;
+				break ;
 		}
 		if (in(s[i], cs))
 			if (i == 0 || s[i - 1] != '\\')
-				break;
+				break ;
 		i++;
 	}
 	return (i);
@@ -71,11 +71,11 @@ int	find_ne_nqs(char c, char *s, char *quotes)
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
 			if (i == ft_strlen_int(s))
-				break;
+				break ;
 		}
 		if (s[i] == c)
 			if (i == 0 || s[i - 1] != '\\')
-				break;
+				break ;
 		i++;
 	}
 	return (i);

@@ -15,14 +15,14 @@
 #define DEBUG_ALLOC 0
 
 typedef struct s_garbage {
-	void *garbage;
-	struct s_garbage *next;
-} t_garbage;
+	void				*garbage;
+	struct s_garbage	*next;
+}	t_garbage;
 
 void	free_garbage(t_garbage *g)
 {
 	if (g == NULL)
-		return;
+		return ;
 	if (g->next)
 		free_garbage(g->next);
 	if (g->garbage)
@@ -30,7 +30,7 @@ void	free_garbage(t_garbage *g)
 	free(g);
 }
 
-void	print_GT(t_garbage *root)
+void	print_gt(t_garbage *root)
 {
 	printf("(%p)", root->garbage);
 	root = root->next;
@@ -45,10 +45,10 @@ void	print_GT(t_garbage *root)
 /*ADD -> adds PTR to garbage stack
 REMOVE -> removes PTR from garbage stack
 FREE ALL -> frees all the garbage*/
-void    *garbage_collector(int action, void *ptr)
+void	*garbage_collector(int action, void *ptr)
 {
-	static t_garbage 	first = (t_garbage){NULL, NULL};
-	static t_garbage 	*current = &first;
+	static t_garbage	first = (t_garbage){NULL, NULL};
+	static t_garbage	*current = &first;
 	t_garbage			*new;
 	static int			total = 0;
 
@@ -112,7 +112,7 @@ void    *garbage_collector(int action, void *ptr)
 	}
 	
 	if (DEBUG_ALLOC) {
-	print_GT(&first);
+		print_gt(&first);
 	printf("%d\n", total); }
 	return (ptr);
 }
@@ -120,7 +120,7 @@ void    *garbage_collector(int action, void *ptr)
 /*Allocate SIZE of bytes, and store in garbage collector*/
 void	*gc_malloc(const char* fname, int lineno, size_t size)
 {
-	void    *p;
+	void	*p;
     int		err;
 
 	if (DEBUG_ALLOC)

@@ -57,23 +57,23 @@ LIBRARIES				:= -lreadline -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINT
 INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES)
 
 SOURCES_DIRECTORY		:= ./sources/
-SOURCES_LIST			:=	lex.c\
+SOURCES_LIST			:=	ast_helpers2.c\
+							ast_helpers.c\
+							lex.c\
 							lex_helpers.c\
 							unwrap.c\
 							unwrap_helpers.c\
-							ast_helpers.c\
-							ast_helpers2.c\
 							replace_envvar.c\
 							replace_envvar_helpers.c\
 							ast.c\
+							builtins1.c\
+							env_handler.c\
 							execution.c\
 							helpers.c\
-							wildcard.c\
-							print_ast.c\
-							env_handler.c\
-							builtins1.c\
 							main.c\
-							replace_wildcard.c
+							print_ast.c\
+							replace_wildcard.c\
+							wildcard.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

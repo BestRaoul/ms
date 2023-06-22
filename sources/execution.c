@@ -33,7 +33,7 @@ typedef struct s_parenthesis
 
 void	set_g_status(int err)
 {
-	g.status = WIFEXITED(err) ? WEXITSTATUS(err) : err;
+	g_.status = WIFEXITED(err) ? WEXITSTATUS(err) : err;
 }
 
 void	reown(char **strr)
@@ -47,11 +47,11 @@ void	reown(char **strr)
 void	close_all_pipes(t_list *ignore, int crash);
 void	close_and_free_all(void)
 {
-	if (g.redirs != NULL)
+	if (g_.redirs != NULL)
 		close_all_pipes(NULL, 0);
-	close(g.dup_stdin);
-	close(g.dup_stdout);
-	reown(g.env);
+	close(g_.dup_stdin);
+	close(g_.dup_stdout);
+	reown(g_.env);
 	garbage_collector(FREE_ALL, 0);
 }
 
@@ -112,12 +112,12 @@ void	close_all_pipes(t_list *ignore, int do_crash)
 
 
 	int	i = 0;
-	while (g.redirs[i] != NULL)
+	while (g_.redirs[i] != NULL)
 	{
-		if (g.redirs[i] != ignore)
+		if (g_.redirs[i] != ignore)
 		{
 			redir_i = 0;
-			r = get_redir(g.redirs[i], redir_i++);
+			r = get_redir(g_.redirs[i], redir_i++);
 			while (r != NULL)
 			{
 				if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
@@ -125,12 +125,12 @@ void	close_all_pipes(t_list *ignore, int do_crash)
 					{
 						if (do_crash) crash();
 					}
-				r = get_redir(g.redirs[i], redir_i++);
+				r = get_redir(g_.redirs[i], redir_i++);
 			}
 		}
 		i++;
 	}
-	g.redirs = NULL;
+	g_.redirs = NULL;
 }
 
 //not es
@@ -192,7 +192,7 @@ int	heredoc_handler(char *delimiter)
 {
 	int	previous_in = dup(STDIN_FILENO);
 	if (previous_in == -1) return -1;
-	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) return -1;
+	if (dup2(g_.dup_stdin, STDIN_FILENO) == -1) return -1;
 
 	char	*input;
 	int		_pipe[2];
@@ -375,7 +375,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_parenth
 		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children};
 		execute(&pll);
 		close_and_free_all();
-		exit(g.status);
+		exit(g_.status);
 	}
 	else
 	{
@@ -389,12 +389,12 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_parenth
 		{
 			char **my_argv = realloc_strarr_no_gc(argv);
 			garbage_collector(FREE_ALL, 0);
-			close(g.dup_stdin);
-			close(g.dup_stdout);
+			close(g_.dup_stdin);
+			close(g_.dup_stdout);
 
-			char *pathname = ft_getpath(my_argv[0], g.env);
+			char *pathname = ft_getpath(my_argv[0], g_.env);
 			if (pathname != NULL)
-				execve(pathname, my_argv, g.env);
+				execve(pathname, my_argv, g_.env);
 			ft_dprintf(2, "%s: command not found\n", my_argv[0]);
 			reown(my_argv);
 			close_and_free_all();
@@ -417,7 +417,7 @@ pid_t	*init_subshells(char ***argvs, t_parenthesis *parens, int p_count)
 		pids[i] = fork();
 		if (pids[i] == -1) crash();
 		if (pids[i] == 0)
-			execute_command(argvs[i], g.redirs[i], parent, parens[i]);
+			execute_command(argvs[i], g_.redirs[i], parent, parens[i]);
 		i++;
 	}
 	return pids;
@@ -440,21 +440,21 @@ void	populate_execution_data(char ***argvs, t_parenthesis *parens, t_ast_node *p
 		{
 			t_list	*redir = alloc_redir(child->type, child->content);
 			child->content = NULL;
-			ft_lstadd_back(&g.redirs[pipe_i], redir);
+			ft_lstadd_back(&g_.redirs[pipe_i], redir);
 		}
 		else if (child->type == HEREDOC)
 		{
 			int	fd_pipe_end = heredoc_handler(child->content);
 			if (fd_pipe_end == -1) crash();
 			t_list	*redir = alloc_redir(HEREDOC, ft_itoa(fd_pipe_end));
-			ft_lstadd_back(&g.redirs[pipe_i], redir);
+			ft_lstadd_back(&g_.redirs[pipe_i], redir);
 		}
 		else if (child->type == PIPE)
 		{ 
 			if (pipe(_pipe) == -1) crash();
-			ft_lstadd_back(&g.redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
+			ft_lstadd_back(&g_.redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
 			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
-			ft_lstadd_back(&g.redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
+			ft_lstadd_back(&g_.redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
 		}
 		else if (child->type == PIPELINELIST)
 		{
@@ -470,12 +470,12 @@ void	populate_execution_data(char ***argvs, t_parenthesis *parens, t_ast_node *p
 //ENS
 int	do_solo_exec_builtin(char **argv)
 {
-	int err = consume_redirs(g.redirs[0]);
+	int err = consume_redirs(g_.redirs[0]);
 	if (err > 0) return (err);
 	if (err == -1) crash();
 	int status = exec_builtin(argv[0], argv);
-	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash();
-	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash();
+	if (dup2(g_.dup_stdin, STDIN_FILENO) == -1) crash();
+	if (dup2(g_.dup_stdin, STDOUT_FILENO) == -1) crash();
 	return (status);
 }
 
@@ -492,7 +492,7 @@ static int	execute_pipeline(t_ast_node *pipeline)
 	//sc
 	pipe_count = count_child_pipes(pipeline) + 1;
 	argvs = alloc_argvs(pipeline, pipe_count);
-	g.redirs = ft_calloc(pipe_count + 1, sizeof(t_list *));
+	g_.redirs = ft_calloc(pipe_count + 1, sizeof(t_list *));
 	parens = ft_calloc(pipe_count + 1, sizeof(t_parenthesis));
 
 	//sc

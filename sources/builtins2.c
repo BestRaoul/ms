@@ -81,7 +81,7 @@ void	exit_builtin(char **argv)
 
 	ft_dprintf(2, "exit\n");
 	if (!argv || !argv[1])
-		n = g.status;
+		n = g_.status;
 	else if (!ft_str_is_int(argv[1]))
 		n = 2;
 	else

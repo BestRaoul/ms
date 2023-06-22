@@ -126,10 +126,10 @@ t_ast_node	*parse(t_list *lexemes)
 	if (lexme && lexme->next)
 		return (ft_dprintf(2, EMSG"(8) syntax error near unexpected token `%s'\n",
 			_type_str(lexme->next)), NULL);
-	if (g.print_ast)
+	if (g_.print_ast)
 	{
 		print_ast(ast, 0);
-		g.print_ast = 0;
+		g_.print_ast = 0;
 	}
 	return (ast);
 }

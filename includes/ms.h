@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms.h                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/20 12:42:32 by jwikiera          #+#    #+#             */
+/*   Updated: 2022/10/20 12:42:36 by jwikiera         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef MS_H
 # define MS_H
@@ -27,7 +37,7 @@ typedef struct s_global {
 	t_list	**redirs;
 }	t_global;
 
-extern t_global	g;
+extern t_global	g_;
 
 typedef t_dict_int_str_member	t_dism;
 

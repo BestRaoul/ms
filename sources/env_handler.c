@@ -28,9 +28,9 @@ int	find_in_env(char *key)
 	int	i;
 
 	i = 0;
-	while (g.env[i])
+	while (g_.env[i])
 	{
-		if (key_match(key, g.env[i]))
+		if (key_match(key, g_.env[i]))
 			return (i);
 		i++;
 	}
@@ -44,19 +44,19 @@ int	add_var_to_env(char *key, char *value)
 	char	**old;
 	int		i;
 
-	old = g.env;
-	g.env = ft_calloc(strarr_count(old) + 1 + 1, sizeof(char *));
-	garbage_collector(REMOVE, g.env);
+	old = g_.env;
+	g_.env = ft_calloc(strarr_count(old) + 1 + 1, sizeof(char *));
+	garbage_collector(REMOVE, g_.env);
 	garbage_collector(ADD, old);
 	i = 0;
 	while (old[i])
 	{
-		g.env[i] = old[i];
+		g_.env[i] = old[i];
 		i++;
 	}
-	g.env[i] = ft_strjoin2(key, "=", value, NULL);
-	garbage_collector(REMOVE, g.env[i]);
-	g.env[++i] = NULL;
+	g_.env[i] = ft_strjoin2(key, "=", value, NULL);
+	garbage_collector(REMOVE, g_.env[i]);
+	g_.env[++i] = NULL;
 	return (0);
 }
 
@@ -70,9 +70,9 @@ int	remove_var_from_env(char *key)
 
 	if (find_in_env(key) == -1)
 		return (0);
-	old = g.env;
-	g.env = ft_calloc(strarr_count(old), sizeof(char *));
-	garbage_collector(REMOVE, g.env);
+	old = g_.env;
+	g_.env = ft_calloc(strarr_count(old), sizeof(char *));
+	garbage_collector(REMOVE, g_.env);
 	garbage_collector(ADD, old);
 	i = 0;
 	j = 0;
@@ -81,10 +81,10 @@ int	remove_var_from_env(char *key)
 		if (key_match(key, old[i]))
 			garbage_collector(ADD, old[i]);
 		else
-			g.env[j++] = old[i];
+			g_.env[j++] = old[i];
 		i++;
 	}
-	g.env[j] = NULL;
+	g_.env[j] = NULL;
 	return (1);
 }
 
@@ -92,7 +92,7 @@ void	print_env(void)
 {
 	char	**envv;
 
-	envv = g.env;
+	envv = g_.env;
 	while (*envv)
 	{
 		ft_printf("%s\n", *envv);

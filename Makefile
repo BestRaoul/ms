@@ -57,7 +57,8 @@ LIBRARIES				:= -lreadline -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINT
 INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES)
 
 SOURCES_DIRECTORY		:= ./sources/
-SOURCES_LIST			:=	ast_helpers2.c\
+SOURCES_LIST			:=	main.c\
+							ast_helpers2.c\
 							ast_helpers.c\
 							builtins1.c\
 							builtins2.c\
@@ -74,8 +75,7 @@ SOURCES_LIST			:=	ast_helpers2.c\
 							wildcard.c\
 							wildcard_helpers.c\
 							ast.c\
-							execution.c\
-							main.c\
+							execution.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

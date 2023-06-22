@@ -32,6 +32,7 @@
         "stop_token": "c",
         "streambuf": "c",
         "libft.h": "c",
-        "limits.h": "c"
+        "limits.h": "c",
+        "string.h": "c"
     }
 }

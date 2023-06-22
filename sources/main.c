@@ -10,21 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "ms.h"
 
 /* (cat file1 | grep '\"lol\"') && (cat file2 | grep bruh) */
 
-extern char **environ;
+extern char	**environ;
 
-t_global g = {NULL, 0, 0, 0, 0, NULL};
+t_global	g_ = {NULL, 0, 0, 0, 0, NULL};
 
-char	*get_input()
+static char	*get_input(void)
 {
 	char	question[100];
 	char	*input;
+	char	*color;
 
-	ft_yoloprintf(question, "%s➜  %s", g.status==0 ? BCYAN : BRED, RESET);
+	color = BBLUE;
+	if (g_.status)
+		color = BRED;
+	ft_yoloprintf(question, "%s➜  %s", color, RESET);
 	input = readline(question);
 	if (input == NULL)
 		exit_builtin(NULL);
@@ -44,28 +47,37 @@ void	print_tlst(t_list *iter)
 	}
 }
 
+void	init_g(void)
+{
+	g_.dup_stdin = dup(STDIN_FILENO);
+	g_.dup_stdout = dup(STDOUT_FILENO);
+	g_.env = realloc_strarr_no_gc(environ);
+}
+
 int	main(void)
 {
-	char		*input = NULL;
-	t_ast_node	*ast = NULL;
-	t_list		*lexemes = NULL;
-	t_list		*unwraps = NULL;
+	char		*input;
+	t_list		*lexemes;
+	t_list		*unwraps;
+	t_ast_node	*ast;
 
-	g.dup_stdin = dup(STDIN_FILENO);
-	g.dup_stdout = dup(STDOUT_FILENO);
-	g.env = realloc_strarr_no_gc(environ);
+	init_g();
 	while (1)
 	{
 		garbage_collector(FREE_ALL, 0);
-		input = get_input(); //safe
-		if (*input == 0) continue;
-		lexemes = lex(input); //cannot fail
-		unwraps = unwrap(lexemes); // safe
-		if (unwraps == NULL) continue;
-		ast = parse(unwraps); //safe
-		if (ast == NULL) continue ;
-		execute(ast); //safe
-		if (g.status != 0) ft_dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
+		input = get_input();
+		if (*input == 0)
+			continue ;
+		lexemes = lex(input);
+		unwraps = unwrap(lexemes);
+		if (unwraps == NULL)
+			continue ;
+		ast = parse(unwraps);
+		if (ast == NULL)
+			continue ;
+		execute(ast);
+		if (g_.status != 0)
+			ft_dprintf(2, "(%s%d%s) ", BRED, g_.status, RESET);
 	}
 	close_and_free_all();
 	return (0);

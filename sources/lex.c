@@ -85,7 +85,7 @@ t_list	*lex(char *s)
 		&& ft_strequal(((t_dict_int_str_member *)(first->content))->value,
 			"ast"))
 	{
-		g.print_ast = 1;
+		g_.print_ast = 1;
 		ft_lst_rm(&res, 0);
 	}
 	return (res);

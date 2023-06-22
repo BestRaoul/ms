@@ -63,8 +63,8 @@ int	cd(char **argv)
 
 	if (ft_strarrlen(argv) < 2)
 	{
-		if (ft_query_envp("HOME", g.env))
-			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
+		if (ft_query_envp("HOME", g_.env))
+			return (cd(fake_cd_argv(ft_query_envp("HOME", g_.env))));
 		ft_dprintf(2, ERROR_MSG"cd: HOME not set\n");
 		return (1);
 	}

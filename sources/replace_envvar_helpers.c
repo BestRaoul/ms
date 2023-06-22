@@ -32,7 +32,7 @@ char	*handle_status(void)
 	char	status[64];
 
 	status[0] = 0;
-	ft_yoloprintf(status, "%d", g.status);
+	ft_yoloprintf(status, "%d", g_.status);
 	return (ft_strdup(status));
 }
 
@@ -46,13 +46,13 @@ char	*handle_var(char *envvar)
 	x = find_in_env(envvar);
 	if (x != -1)
 	{
-		eq_i = ft_find('=', g.env[x]);
+		eq_i = ft_find('=', g_.env[x]);
 		if (eq_i == -1)
 		{
 			ft_dprintf(2, "env: no `=' in envvar WUT?\n");
 			exit(69);
 		}
-		return (ft_strdup(&(g.env[x][eq_i + 1])));
+		return (ft_strdup(&(g_.env[x][eq_i + 1])));
 	}
 	return (ft_strdup(""));
 }

@@ -45,7 +45,7 @@ void	reown(char **strr)
 }
 
 void	close_all_pipes(t_list *ignore, int crash);
-void	close_and_free_all()
+void	close_and_free_all(void)
 {
 	if (g.redirs != NULL)
 		close_all_pipes(NULL, 0);
@@ -55,7 +55,7 @@ void	close_and_free_all()
 	garbage_collector(FREE_ALL, 0);
 }
 
-void	crash()
+void	crash(void)
 {
 	int err = errno;
 	close_and_free_all();

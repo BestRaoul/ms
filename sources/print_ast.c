@@ -14,10 +14,13 @@
 
 static void	spaces(int s)
 {
-	int	i = 0;
+	int	i;
+
+	i = 0;
 	while (i < s)
 	{
-		if (write(1, " ", 1)) {}
+		if (write(1, " ", 1) == -1)
+			crash();
 		i++;
 	}
 }
@@ -80,12 +83,20 @@ static void	print_node(t_ast_node *ast, int depth)
 
 void	print_ast(t_ast_node *ast, int depth)
 {
-	if (!ast) {
-		if (write(1, "print_ast: NULL\n", 16)) {}
-		return ;}
+	int	i;
+
+	if (!ast)
+	{
+		if (write(1, "print_ast: NULL\n", 16) == -1)
+			crash();
+		return ;
+	}
 	print_node(ast, depth);
 	depth ++;
-	for (int i = 0; i < ft_lstsize(ast->children); ++i) {
+	i = 0;
+	while (i < ft_lstsize(ast->children))
+	{
 		print_ast(ft_lst_get(ast->children, i)->content, depth);
+		i++;
 	}
 }

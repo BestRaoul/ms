@@ -88,7 +88,7 @@ int	remove_var_from_env(char *key)
 	return (1);
 }
 
-void	print_env()
+void	print_env(void)
 {
 	char	**envv;
 

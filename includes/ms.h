@@ -78,8 +78,8 @@ t_ast_node	*parse(t_list *lexemes);
 void	execute(t_ast_node *pipeline_list);
 
 /* error management */
-void	crash();
-void	close_and_free_all();
+void	crash(void);
+void	close_and_free_all(void);
 
 /* builtins */
 int		is_builtin(char *cmd);
@@ -88,15 +88,15 @@ int		cd(char **argv);
 int		echo(char **argv);
 int		export(char **argv);
 int		unset(char **argv);
-int		pwd_builtin();
-int		env_builtin();
+int		pwd_builtin(void);
+int		env_builtin(void);
 void	exit_builtin(char **argv);
 
 //wildcard_helpers.c
 int		match(char *str, char *pattern);
 
 /* env */
-void	print_env();
+void	print_env(void);
 int		add_var_to_env(char *key, char *value);
 int		remove_var_from_env(char *key);
 int		find_in_env(char *key);

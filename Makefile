@@ -59,19 +59,20 @@ INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINU
 SOURCES_DIRECTORY		:= ./sources/
 SOURCES_LIST			:=	ast_helpers2.c\
 							ast_helpers.c\
+							builtins1.c\
+							builtins2.c\
 							lex.c\
 							lex_helpers.c\
 							unwrap.c\
 							unwrap_helpers.c\
+							env_handler.c\
 							replace_envvar.c\
 							replace_envvar_helpers.c\
+							print_ast.c\
 							ast.c\
-							builtins1.c\
-							env_handler.c\
 							execution.c\
 							helpers.c\
 							main.c\
-							print_ast.c\
 							replace_wildcard.c\
 							wildcard.c
 

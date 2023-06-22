@@ -33,19 +33,19 @@ static t_ast_node	*add_child(t_ast_node *parent, t_ast_node new)
 	return (new_node);
 }
 
-static int	_type(t_list *lexeme)
+int	_type(t_list *lexeme)
 {
 	t_dict_int_str_member *x = lexeme->content;
 	return (x->key);
 }
 
-static char	*_content(t_list *lexeme)
+char	*_content(t_list *lexeme)
 {
 	t_dict_int_str_member *x = lexeme->content;
 	return (x->value);
 }
 
-static char	**_content_ptr(t_list *lexeme)
+char	**_content_ptr(t_list *lexeme)
 {
 	t_dict_int_str_member *x = lexeme->content;
 	return (&(x->value));

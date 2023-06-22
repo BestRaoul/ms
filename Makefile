@@ -69,7 +69,9 @@ SOURCES_LIST			:= main.c\
 							env_handler.c\
 							builtins1.c\
 							ast_rewrite.c\
-							ast_mark_programs.c
+							ast_mark_programs.c\
+							replace_wildcard.c\
+							unwrap.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

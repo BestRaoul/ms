@@ -35,6 +35,15 @@ char	*get_input()
 	return (input);
 }
 
+void	print_tlst(t_list *iter)
+{
+	while (iter)
+	{
+		printf("%s   ", (char *)iter->content);
+		iter = iter->next;
+	}
+}
+
 int	main(void)
 {
 	char		*input = NULL;
@@ -52,7 +61,9 @@ int	main(void)
 		if (*input == 0) continue;
 		lexemes = lex(input); //safe
 		if (lexemes == NULL) continue;
-		ast = parse(lexemes); //safe
+		t_list *unwraps = unwrap(lexemes);
+		if (unwraps == NULL) continue;
+		ast = parse(unwraps); //safe
 		if (ast == NULL) continue ;
 		execute(ast); //safe
 		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);

@@ -26,153 +26,23 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i
 	return (i);
 }
 
-int min(int x, int y)
-{
-	if (x < y)
-		return x;
-	return y;
-}
-
-char *list_2_str(t_list *lst)
-{
-	int	total_len = 0;
-	t_list *i = lst;
-	while (i)
-	{
-		total_len += ft_strlen_int(lst->content);
-		i = i->next;
-	}
-	char *str = MALLOC(total_len + 1);
-	int	j = 0;
-	i = lst;
-	while (i)
-	{
-		ft_strlcpy(&(str[j]), i->content, ft_strlen_int(i->content) + 1);
-		j += ft_strlen_int(i->content);
-		i = i->next;
-	}
-	return (str);
-}
-
-//reuses the litst's CONTENT pointers, and sets them NULL
-//so no need to free them
-char	**list_2_strr(t_list *lst)
-{
-	char **res = ft_calloc(ft_lstsize(lst) + 1, sizeof(char *));
-	int i = 0;
-	while (lst)
-	{
-		res[i++] = lst->content;
-		lst->content = NULL;
-		lst = lst->next;
-	}
-	res[i] = NULL;
-	return (res);
-}
-
-char	**ft_splitf(char *s, int (*next)(char *))
-{
-	t_list	*strs = NULL;
-	int		next_end;
-
-	while (*s)
-	{
-		next_end = next(s);
-		if (next_end > 0)
-			ft_lstadd_back(&strs, ft_lstnew(chop(s, next_end - 1)));
-		s += next_end;
-		if (!*s)
-			break;
-		s++;
-	}
-	return (list_2_strr(strs));
-}
-
 int find_literal_end(char *s)
 {
 
 	return finds_ne_nq(")"IS_SPACE, s);
 }
 
-//can fail, no closing quote -1
-int	add_until(t_list **strs_ptr, char *s)
-{
-	int		next;
-	int		is_q;
-
-	is_q = (*s == '\'' || *s == '\"');
-	if (*s == '\'') next = finds_noescape("\'", s + 1) + 1;
-	else if (*s == '\"') next = finds_noescape("\"", s + 1) + 1;
-	else next = finds_noescape("\'\")"IS_SPACE, s);
-	if (is_q && next == ft_strlen_int(s))
-		return (printf(ERROR_MSG"missing closing `%c'\n", *s), -1);
-	//CDO: readline if next_q is LEN
-	ft_lstadd_back(strs_ptr, ft_lstnew(ft_strdup(chop(s + is_q, next - 1 - is_q))));
-	return (next + 1 * is_q);
-}
-
-//can fail -1
-int	add_string(t_list **lst, char *s)
-{
-	t_list	*strs = NULL;
-	char	*start;
-	int		move;
-	
-	start = s;
-	while (*s)
-	{
-		move = add_until(&strs, s);
-		if (move == -1) return -1;
-		s += move;
-	}
-	insert_token_into_lst(LITERAL, list_2_str(strs), lst, 0);
-	return s - start;
-}
-
-// can fail -1
 int	handle_string(t_list **lst, char *s, int pos)
 {
-	char	**split;
-	char	*s2;
 	int		end;
-	int		move;	
 	
 	s += pos;
 	end = find_literal_end(s);
-	s2 = handle_env_until(s, end);
-	split = ft_splitf(s2, find_literal_end);
-	while (*split != NULL)
-	{
-		move = add_string(lst, *split++);
-		if (move == -1)
-			return (-1);
-		s += move;
-	}
+	insert_token_into_lst(LITERAL, chop(s, end - 1), lst, 0);
 	return (end);
 }
 
-//can fail -1
-int	handle_heredoc(t_list **lst, char *s, int pos)
-{
-	char	*start;
-	char	*s2;
-	int		end;
-
-	insert_token_into_lst(HEREDOCOP, NULL, lst, 2);
-	start = s;
-	s += pos + 2;
-	while (ft_isspace(*s))
-		s++;
-	end = find_literal_end(s);
-	s2 = chop(s, end - 1);
-	if (add_string(lst, s2) == -1)
-		return -1;
-	s += end;
-	return (s - start);
-}
-
-// can fail -1, no closing quote
-// else returns length to advance
+// cannot fail, returns length to advance
 int	handle_lexeme(t_list **lst, char *s, int pos)
 {
 	char	c1;
@@ -195,7 +65,7 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	else if (c1 == '|')
 		return (insert_token_into_lst(OR, NULL, lst, 2));
 	else if (c1 == '<')
-		return (handle_heredoc(lst, s, pos));
+		return (insert_token_into_lst(HEREDOCOP, NULL, lst, 2));
 	else if (c1 == '>')
 		return (insert_token_into_lst(APPEND, NULL, lst, 2));
 	else if (ft_isspace(c1))

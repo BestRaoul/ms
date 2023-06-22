@@ -63,6 +63,7 @@ char	*handle_env_until(char *str, int end);
 char	*handle_wildcard(char *s);
 char	**wildmatches(char *token, char *cwd);
 int		match(char *str, char *pattern);
+void	add_wildmatches(t_list **lst, char *pattern);
 
 /* lexing */
 t_list	*lex(char *s);
@@ -70,8 +71,17 @@ t_list	*lex(char *s);
 void	print_lex(t_list *lst);
 void	print_lex2(t_list *lst);
 
+//lexer_helper.c
+int find_literal_end(char *s);
+char *list_2_str(t_list *lst);
+char	**list_2_strr(t_list *lst);
+
+//unwraping
+t_list  *unwrap(t_list *lexemes);
+
 /* parsing rewrite */
 t_ast_node	*parse(t_list *lexemes);
+
 //print_ast.c
 void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
@@ -90,6 +100,7 @@ int		add_var_to_env(char *key, char *value);
 int		remove_var_from_env(char *key);
 int		find_in_env(char *key);
 
+void	print_tlst(t_list *iter);
 //unused
 //int		replace_env_ast(t_ast_node *ast, t_ast_node *prev, int iscommand);
 
@@ -142,6 +153,9 @@ enum TokenTypes {
 };
 
 t_ast_node	*init_ast_node_type(int type);
+
+//helper
+int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i);
 
 /* parsing funcs */
 int		prs_ast(t_list *lexemes, t_ast_node *ast);

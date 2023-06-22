@@ -199,7 +199,7 @@ int	heredoc_handler(char *delimiter)
 
 	if (pipe(_pipe) == -1) return -1;
 	input = readline("|> "); //nc - done
-	while (input != NULL && strcmp(input, delimiter) != 0)
+	while (input != NULL && ft_strncmp(input, delimiter, len(input)) != 0)
 	{
 		if (write(_pipe[1], input, ft_strlen(input)) == -1
 			|| write(_pipe[1], "\n", 1) == -1)

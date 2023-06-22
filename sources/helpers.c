@@ -19,9 +19,10 @@ char	*join(char **strr, char *joint)
 	i = 0;
 	while (strr[i] != NULL)
 	{
-		strcpy(&res[len(res)], strr[i++]);
+		ft_strlcpy(&res[len(res)], strr[i], len(strr[i]));
+		i++;
 		if (strr[i] != NULL)
-			strcpy(&res[len(res)], joint);
+			ft_strlcpy(&res[len(res)], joint, len(joint));
 	}
 	res[len(res)] = 0;
 	return (res);

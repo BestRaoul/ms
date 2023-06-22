@@ -115,16 +115,13 @@ char	**realloc_strarr_no_gc(char **strarr)
 	char	**res;
 	int		i;
 
-	res = malloc((strarr_count(strarr) + 1) * sizeof(char *));
-	if (res == NULL)
-		(perror("malloc: no gc"), exit(69));
+	res = ft_calloc((strarr_count(strarr) + 1), sizeof(char *));
+	garbage_collector(REMOVE, res);
 	i = 0;
 	while (strarr[i])
 	{
-		res[i] = malloc(ft_strlen(strarr[i]) + 1);
-		if (res[i] == NULL)
-			(perror("malloc: no gc"), exit(69));
-		ft_strlcpy(res[i], strarr[i], ft_strlen(strarr[i]) + 1);
+		res[i] = ft_strdup(strarr[i]);
+		garbage_collector(REMOVE, res[i]);
 		i++;
 	}
 	res[i] = NULL;

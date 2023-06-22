@@ -148,7 +148,7 @@ static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
 			pc++;
 		}
 		else if (t == AND || t == OR || t == RPAREN) break;
-		else //parse ERROR TODO str_type() returns char for int 
+		else 
 		{
 			if (ac + rc + pc == 0) break;
 			return (printf(ERROR_MSG"(2) error near unexpected `%s' token\n", _type_str(*lexme_ptr)), -1);

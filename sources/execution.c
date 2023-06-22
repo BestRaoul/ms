@@ -31,22 +31,20 @@ void	reown(char **strr)
 }
 
 void	close_all_pipes(t_list **redirs, t_list *ignore, int crash);
-void	close_and_free_all(char **argv, t_list **redirs)
+void	close_and_free_all(t_list **redirs)
 {
 	if (redirs != NULL)
 		close_all_pipes(redirs, NULL, 0);
 	close(g.dup_stdin);
 	close(g.dup_stdout);
 	reown(g.env);
-	if (argv != NULL)
-		reown(argv);
 	garbage_collector(FREE_ALL, 0);
 }
 
-void	crash(char **argv, t_list **redirs)
+void	crash(t_list **redirs)
 {
 	int err = errno;
-	close_and_free_all(argv, redirs);
+	close_and_free_all(redirs);
 	errno = err;
 	perror(ERROR_MSG);
 	exit(err);
@@ -130,7 +128,7 @@ void	close_all_pipes(t_list **redirs, t_list *ignore, int do_crash)
 				if (r->type == HEREDOC || r->type == PIPE_IN || r->type == PIPE_OUT)
 					if (close(ft_atoi(r->val)) == -1)
 					{
-						if (do_crash) crash(NULL, redirs);
+						if (do_crash) crash(redirs);
 					}
 				r = get_redir(redirs[i], redir_i++);
 			}
@@ -208,7 +206,6 @@ int	arg_count(char **argv)
 
 //ENS
 //can fail SC -1 -> crash
-//TODO readline NULL EOF
 int	heredoc_handler(char *delimiter)
 {
 	int	previous_in = dup(STDIN_FILENO);
@@ -228,7 +225,7 @@ int	heredoc_handler(char *delimiter)
 		free(input);
 		input = readline("|> ");//nc - done
 	}
-//	if (input == NULL) xi(); TODO
+	if (input == NULL) dprintf(2, ERROR_MSG"warning: here-document delimited by end-of-file (wanted `%s')\n", delimiter);
 	free(input);
 	if (close(_pipe[1]) == -1) return -1;
 	if (dup2(previous_in, STDIN_FILENO) == -1) return -1;
@@ -385,7 +382,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	
 	int err = consume_redirs(lst_redir);
 	if (err == -1)
-		crash(NULL, to_free.redirs);
+		crash(to_free.redirs);
 	else if (err > 0)
 		exit(err);
 	
@@ -397,7 +394,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	{
 		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children, 0};
 		execute(&pll);
-		close_and_free_all(NULL, NULL);
+		close_and_free_all(NULL);
 		exit(g.status);
 	}
 	else
@@ -405,7 +402,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 		if (is_builtin(argv[0]))
 		{
 			int status = exec_builtin(argv[0], argv);
-			close_and_free_all(NULL, NULL);
+			close_and_free_all(NULL);
 			exit(status);
 		}
 		else
@@ -419,8 +416,9 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 			if (pathname != NULL)
 				execve(pathname, my_argv, g.env);
 			dprintf(2, "%s: command not found\n", my_argv[0]);
-			close_and_free_all(argv, NULL);
-			exit(140);
+			reown(my_argv);
+			close_and_free_all(NULL);
+			exit(127);
 		}
 	}
 }
@@ -438,7 +436,7 @@ pid_t	*init_subshells(char ***argvs, t_list **redirs, t_parenthesis *parens, int
 	while (i < p_count)
 	{
 		pids[i] = fork();
-		if (pids[i] == -1) crash(NULL, redirs);
+		if (pids[i] == -1) crash(redirs);
 		if (pids[i] == 0)
 			execute_command(argvs[i], redirs[i], parent, to_free, parens[i]);
 		i++;
@@ -468,13 +466,13 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 		else if (child->type == HEREDOC)
 		{
 			int	fd_pipe_end = heredoc_handler(child->content);
-			if (fd_pipe_end == -1) crash(NULL, redirs);
+			if (fd_pipe_end == -1) crash(redirs);
 			t_list	*redir = alloc_redir(HEREDOC, ft_itoa(fd_pipe_end));
 			ft_lstadd_back(&redirs[pipe_i], redir);
 		}
 		else if (child->type == PIPE)
 		{ 
-			if (pipe(_pipe) == -1) crash(NULL, redirs);
+			if (pipe(_pipe) == -1) crash(redirs);
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_OUT, ft_itoa(_pipe[1])));
 			pipe_i++; arg_i = 0; parens[pipe_i] = (t_parenthesis){NONE, NULL};
 			ft_lstadd_back(&redirs[pipe_i], alloc_redir(PIPE_IN, ft_itoa(_pipe[0])));
@@ -495,10 +493,10 @@ int	do_solo_exec_builtin(char **argv, t_list **redirs)
 {
 	int err = consume_redirs(redirs[0]);
 	if (err > 0) return (err);
-	if (err == -1) crash(NULL, redirs);
+	if (err == -1) crash(redirs);
 	int status = exec_builtin(argv[0], argv);
-	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash(NULL, redirs);
-	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash(NULL, redirs);
+	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash(redirs);
+	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash(redirs);
 	return (status);
 }
 
@@ -533,7 +531,7 @@ int	execute_pipeline(t_ast_node *pipeline)
 	int status = -42;
 	for(int x=0; x<pipe_count; x++)
 		if (waitpid(pids[x], &status, 0) == -1)
-			crash(NULL, NULL);
+			crash(NULL);
 	return status;
 }
 

@@ -91,8 +91,8 @@ void	execute(t_ast_node *pipeline_list);
 int		execute_pipeline(t_ast_node *pipeline);
 
 /* error management */
-void	crash(char **argv, t_list **redirs);
-void	close_and_free_all(char **argv, t_list **redirs);
+void	crash(t_list **redirs);
+void	close_and_free_all(t_list **redirs);
 
 /* env */
 void	print_env();

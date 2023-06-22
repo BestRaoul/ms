@@ -138,7 +138,6 @@ t_list  *unwrap_quotes(t_list *iter, t_list **unwraped)
 }
 
 //can fail if ambigous redirect
-//TODO should fail if matches fails
 t_list  *unwrap_matches(t_list *iter, t_list **matched)
 {
     t_dict_int_str_member	*m;

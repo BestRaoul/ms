@@ -100,6 +100,7 @@ int	echo(char **argv)
 
 int	export(char **argv)
 {
+	int		crapped = 0;
 	char	*key;
 	char	*val;
 
@@ -108,7 +109,8 @@ int	export(char **argv)
 	{
 		if (!ft_isalpha(argv[0][0]))
 		{
-			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv); //TODO proper write(2) TODO proper return erro value if only 1 invbalid
+			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
+			crapped = 1;
 			argv ++;
 			continue ;
 		}
@@ -127,7 +129,7 @@ int	export(char **argv)
 		add_var_to_env(key, val);
 		argv ++;
 	}
-	return (0);
+	return (crapped);
 }
 
 int	unset(char **argv)
@@ -166,14 +168,13 @@ void	exit_builtin(char **argv)
 {
 	int	n;
 
-	garbage_collector(REMOVE, argv[1]);
-	close_and_free_all(NULL, NULL);
+	write(2, "exit\n", 5);
 	if (!argv[1])
 		n = g.status;
 	else if (!ft_str_is_int(argv[1]))
 		n = 2;
 	else 
 		n = ft_atoi(argv[1]);
-	free(argv[1]);
+	close_and_free_all(NULL);
 	exit(n);
 }

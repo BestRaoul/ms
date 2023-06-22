@@ -52,7 +52,7 @@ static void	print_type(int type)
 		ft_printf("<");
 	else if (type == REDIRRIGHT)
 		ft_printf(">");
-	else if (type == HEREDOCOP)
+	else if (type == HEREDOC)
 		ft_printf("<<");
 	else if (type == APPEND)
 		ft_printf(">>");

@@ -24,15 +24,17 @@ typedef struct s_global {
 	int		dup_stdout;
 	int		print_ast;
 	t_list	**redirs;
-} t_global;
+}	t_global;
 
 extern t_global	g;
+
+typedef t_dict_int_str_member	t_dism;
 
 typedef struct s_ast_node {
 	int		type;
 	char	*content;
 	t_list	*children;
-} t_ast_node;
+}	t_ast_node;
 
 enum TokenTypes {
 	LPAREN,
@@ -40,18 +42,17 @@ enum TokenTypes {
 	PIPE,
 	REDIRLEFT,
 	REDIRRIGHT,
-	HEREDOCOP,
 	APPEND,
 	AND,
 	OR,
+	HEREDOC,
 	LITERAL,
 	END,
 
 	NONE,
 	PIPELINELIST,
 	PIPELINE,
-	HEREDOC,
-	//for consumption
+
 	PIPE_IN,
 	PIPE_OUT,
 	PARENTHESIS,
@@ -111,6 +112,7 @@ int		count(char c, char *str);
 char	*chop(char *str, int end);
 char	*_scan2(char **str_ptr, int (*f)(char));
 char	*join(char **strr, char *joint);
+void	next(t_list **i);
 
 //gc helpers in helpers.c
 int		strarr_count(char **strarr);
@@ -118,5 +120,31 @@ char	**realloc_strarr_no_gc(char **strarr);
 
 //print_ast.c
 void	print_ast(t_ast_node *ast, int depth);
+
+//helpers --------------------------------------------
+
+//lex_helpers.c
+int		_type(t_list *lexeme);
+char	*_content(t_list *lexeme);
+char	**_content_ptr(t_list *lexeme);
+char	*_type_str(t_list *lexme);
+t_dism	*_member(t_list *lexeme);
+//2.c
+
+//unwrap_helpers.c
+char	*list_2_str(t_list *lst);
+char	**list_2_strr(t_list *lst);
+char	**ft_splitf(char *s, int (*next)(char *));
+int		add_until(t_list **strs_ptr, char *s);
+int		add_string(t_list **lst, char *s);
+
+//ast_helpers.c
+int		parse_arg(t_list *lexeme, t_ast_node *ast);
+int		parse_redir(t_list *lexeme, t_ast_node *ast);
+int		parse_heredoc(t_list *lexeme, t_ast_node *ast);
+int		parse_suffix(t_list *lexeme, t_ast_node *ast);
+//2
+int		is_redir(int t);
+t_ast_node	*add_child(t_ast_node *parent, t_ast_node new);
 
 #endif

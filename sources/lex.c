@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_helper.c                                     :+:      :+:    :+:   */
+/*   lex.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,29 +12,29 @@
 
 #include "ms.h"
 
-#define ERROR_MSG SHELL_MSG"lex: "
+#define ERROR_MSG "ms: lex: "
 
 // cannot fail returns i
-int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i)
+int	insert_token_into_lst(enum TokenTypes t, char *value, t_list **lst, int i)
 {
 	t_dict_int_str_member	*member;
 	t_list					*new;
 
-	member = t_dict_int_str_member_init(type, value);
+	member = t_dict_int_str_member_init(t, value);
 	new = ft_lstnew(member);
 	ft_lstadd_back(lst, new);
 	return (i);
 }
 
-int find_literal_end(char *s)
+int	find_literal_end(char *s)
 {
-	return finds_ne_nq(")"IS_SPACE, s);
+	return (finds_ne_nq(")"IS_SPACE, s));
 }
 
 int	handle_string(t_list **lst, char *s, int pos)
 {
 	int		end;
-	
+
 	s += pos;
 	end = find_literal_end(s);
 	insert_token_into_lst(LITERAL, chop(s, end - 1), lst, 0);
@@ -50,9 +50,8 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	c1 = s[pos];
 	c2 = s[pos + 1];
 	if (c1 == '(')
-		return (insert_token_into_lst(LPAREN, NULL, lst, 1));
-	else if (c1 == ')')
-		return (insert_token_into_lst(RPAREN, NULL, lst, 1));
+		return (insert_token_into_lst(LPAREN * (c1 == '(')
+				+ RPAREN * (c1 == ')'), NULL, lst, 1));
 	else if (c1 == '|' && c2 != '|')
 		return (insert_token_into_lst(PIPE, NULL, lst, 1));
 	else if (c1 == '<' && c2 != '<')
@@ -60,13 +59,11 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	else if (c1 == '>' && c2 != '>')
 		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, 1));
 	else if (c1 == '&')
-		return (insert_token_into_lst(AND, NULL, lst, 2));
-	else if (c1 == '|')
-		return (insert_token_into_lst(OR, NULL, lst, 2));
+		return (insert_token_into_lst(AND * (c1 == '&')
+				+ OR * (c1 == '|'), NULL, lst, 2));
 	else if (c1 == '<')
-		return (insert_token_into_lst(HEREDOCOP, NULL, lst, 2));
-	else if (c1 == '>')
-		return (insert_token_into_lst(APPEND, NULL, lst, 2));
+		return (insert_token_into_lst(HEREDOC * (c1 == '<')
+				+ APPEND * (c1 == '>'), NULL, lst, 2));
 	else if (ft_isspace(c1))
 		return (1);
 	else
@@ -84,7 +81,9 @@ t_list	*lex(char *s)
 	while (s && s[i])
 		i += handle_lexeme(&res, s, i);
 	first = ft_lst_get(res, 0);
-	if (first && ((t_dict_int_str_member * )(first->content))->value && ft_strequal( ((t_dict_int_str_member * )(first->content))->value, "ast"))
+	if (first && ((t_dict_int_str_member *)(first->content))->value
+		&& ft_strequal(((t_dict_int_str_member *)(first->content))->value,
+			"ast"))
 	{
 		g.print_ast = 1;
 		ft_lst_rm(&res, 0);

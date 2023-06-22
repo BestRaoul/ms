@@ -128,3 +128,8 @@ char	**realloc_strarr_no_gc(char **strarr)
 	res[i] = NULL;
 	return (res);
 }
+
+void	next(t_list **i)
+{
+	*i = (*i)->next;
+}

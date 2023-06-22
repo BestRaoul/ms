@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "ms.h"
-#define ERROR_MSG "TODO:ast parser: "
+#define ERROR_MSG "TODO: parser: "
 
 static int	peek_type(t_list *lexeme)
 {
@@ -40,8 +40,8 @@ int	parse_redir(t_list *lexeme, t_ast_node *ast)
 	peek = peek_type(lexeme);
 	if (peek != LITERAL)
 		return (ft_dprintf(2, \
-			ERROR_MSG"(0) filename expected \
-				after token `%s`\n", _type_str(lexeme)), -1);
+			ERROR_MSG"(0) filename expected after token `%s`\n",
+				_type_str(lexeme)), -1);
 	add_child(ast, (t_ast_node){_type(lexeme), _content(lexeme->next), 0});
 	*_content_ptr(lexeme->next) = NULL;
 	return (2);

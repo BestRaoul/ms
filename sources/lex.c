@@ -49,7 +49,7 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 
 	c1 = s[pos];
 	c2 = s[pos + 1];
-	if (c1 == '(')
+	if (c1 == '(' || c1 == ')')
 		return (insert_token_into_lst(LPAREN * (c1 == '(')
 				+ RPAREN * (c1 == ')'), NULL, lst, 1));
 	else if (c1 == '|' && c2 != '|')
@@ -58,10 +58,10 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 		return (insert_token_into_lst(REDIRLEFT, NULL, lst, 1));
 	else if (c1 == '>' && c2 != '>')
 		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, 1));
-	else if (c1 == '&')
+	else if (c1 == '&' || c1 == '|')
 		return (insert_token_into_lst(AND * (c1 == '&')
 				+ OR * (c1 == '|'), NULL, lst, 2));
-	else if (c1 == '<')
+	else if (c1 == '<' || c1 == '>')
 		return (insert_token_into_lst(HEREDOC * (c1 == '<')
 				+ APPEND * (c1 == '>'), NULL, lst, 2));
 	else if (ft_isspace(c1))

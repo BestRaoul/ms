@@ -87,7 +87,7 @@ void	print_ast(t_ast_node *ast, int depth);
 void	print_type(int type);
 
 /* execution */
-int		execute(t_ast_node *pipeline_list);
+void	execute(t_ast_node *pipeline_list);
 int		execute_pipeline(t_ast_node *pipeline);
 
 /* error management */

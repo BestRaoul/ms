@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-# define ERROR_MSG SHELL_MSG"builtin: "
+# define ERROR_MSG SHELL_MSG""
 
 int	is_builtin(char *cmd)
 {
@@ -63,19 +63,19 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		write(2, ERROR_MSG"cd: HOME not set\n", 28);
+		write(2, ERROR_MSG"cd: HOME not set\n", 4 + 17);
 		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
-		write(2, ERROR_MSG"cd: too many arguments\n", 34);
+		write(2, ERROR_MSG"cd: too many arguments\n", 4 + 23);
 		return(1);
 	}
-	int status = chdir(argv[1]);
-	if (status != 0)
+	if (chdir(argv[1]) == -1)
 	{
-		perror(ERROR_MSG);
-		return (status);
+		int err = errno;
+		dprintf(2, ERROR_MSG"cd: %s: %s\n", argv[1], strerror(errno));
+		return (err);
 	}
 	return (0);
 }
@@ -108,7 +108,7 @@ int	export(char **argv)
 	{
 		if (!ft_isalpha(argv[0][0]))
 		{
-			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
+			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv); //TODO proper write(2) TODO proper return erro value if only 1 invbalid
 			argv ++;
 			continue ;
 		}
@@ -148,7 +148,7 @@ int	pwd_builtin()
 	pwdstr = getcwd(NULL, 0);
 	if (!pwdstr)
 	{
-		ft_printf(ERROR_MSG"fatal error\n");
+		ft_printf(ERROR_MSG"pwd: fatal error\n");
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);

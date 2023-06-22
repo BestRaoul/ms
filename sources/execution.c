@@ -17,6 +17,10 @@
 #define DEBUG_REDIR 0
 #define DEBUG_ARGV 0
 
+void	set_g_status(int err)
+{
+	g.status = WIFEXITED(err) ? WEXITSTATUS(err) : err;
+}
 
 void	reown(char **strr)
 {
@@ -392,9 +396,9 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 	if (parenthesis.type == PARENTHESIS)
 	{
 		t_ast_node pll = (t_ast_node){PIPELINELIST, NULL, parenthesis.children, 0};
-		int status = execute(&pll);
+		execute(&pll);
 		close_and_free_all(NULL, NULL);
-		exit(status);
+		exit(g.status);
 	}
 	else
 	{
@@ -416,7 +420,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_free to
 				execve(pathname, my_argv, g.env);
 			dprintf(2, "%s: command not found\n", my_argv[0]);
 			close_and_free_all(argv, NULL);
-			exit(127);
+			exit(140);
 		}
 	}
 }
@@ -487,18 +491,15 @@ void	populate_execution_data(char ***argvs, t_list **redirs, t_parenthesis *pare
 }
 
 //ENS
-//can fail SC -1 -> crash
-//returns errno on redir permission error
-int	do_solo_exec_builtin(char **argv, t_list *redir)
+int	do_solo_exec_builtin(char **argv, t_list **redirs)
 {
-	int err = consume_redirs(redir);
+	int err = consume_redirs(redirs[0]);
 	if (err > 0) return (err);
-	if (err == -1) return (-1);
+	if (err == -1) crash(NULL, redirs);
 	int status = exec_builtin(argv[0], argv);
-	g.status = WIFEXITED(status) ? WEXITSTATUS(status) : status;
-	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) return -1;
-	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) return -1;
-	return (g.status);
+	if (dup2(g.dup_stdin, STDIN_FILENO) == -1) crash(NULL, redirs);
+	if (dup2(g.dup_stdin, STDOUT_FILENO) == -1) crash(NULL, redirs);
+	return (status);
 }
 
 //ENS
@@ -519,15 +520,9 @@ int	execute_pipeline(t_ast_node *pipeline)
 	//sc
 	populate_execution_data(argvs, redirs, parens, pipeline);
 
-	//sc + errors
+	//sc
 	if (pipe_count == 1 && is_builtin(argvs[0][0]))
-	{
-		int err = do_solo_exec_builtin(argvs[0], redirs[0]);
-		if (err == -1)
-			crash(NULL, redirs);
-		if (err > 0)
-			return (err);
-	}
+		return (do_solo_exec_builtin(argvs[0], redirs));
 
 	//sc
 	pids = init_subshells(argvs, redirs, parens, pipe_count);
@@ -539,12 +534,11 @@ int	execute_pipeline(t_ast_node *pipeline)
 	for(int x=0; x<pipe_count; x++)
 		if (waitpid(pids[x], &status, 0) == -1)
 			crash(NULL, NULL);
-	g.status = WIFEXITED(status) ? WEXITSTATUS(status) : status;
-	return g.status;
+	return status;
 }
 
 //ENS
-int	execute(t_ast_node *pipeline_list)
+void	execute(t_ast_node *pipeline_list)
 {
 	t_ast_node	*child;
 	t_ast_node	*next;
@@ -557,7 +551,10 @@ int	execute(t_ast_node *pipeline_list)
 	while (child != NULL)
 	{
 		if (status == 1)
+		{
 			status = execute_pipeline(child);
+			set_g_status(status);
+		}
 		else
 			status = -42;
 		next = get_child(pipeline_list, child_i++); //nc - done
@@ -569,5 +566,4 @@ int	execute(t_ast_node *pipeline_list)
 			status = (status != 0);
 		child = get_child(pipeline_list, child_i++); //nc - done
 	}
-	return status;
 }

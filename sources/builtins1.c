@@ -63,20 +63,18 @@ int	cd(char **argv)
 	{
 		if (ft_query_envp("HOME", g.env))
 			return (cd(fake_cd_argv(ft_query_envp("HOME", g.env))));
-		if (write(2, ERROR_MSG"cd: HOME not set\n", 4 + 17) == -1)
-			crash();
+		ft_dprintf(2, ERROR_MSG"cd: HOME not set\n");
 		return(1);
 	}
 	if (ft_strarrlen(argv) > 2)
 	{
-		if (write(2, ERROR_MSG"cd: too many arguments\n", 4 + 23) == -1)
-			crash();
+		ft_dprintf(2, ERROR_MSG"cd: too many arguments\n");
 		return(1);
 	}
 	if (chdir(argv[1]) == -1)
 	{
 		int err = errno;
-		dprintf(2, ERROR_MSG"cd: %s: %s\n", argv[1], strerror(errno));
+		ft_dprintf(2, ERROR_MSG"cd: %s: %s\n", argv[1], strerror(errno));
 		return (err);
 	}
 	return (0);
@@ -93,10 +91,10 @@ int	echo(char **argv)
 	res = NULL;
 	if (argv[i] != NULL)
 		res = join(&argv[i], " ");
-	if (res != NULL)
-		ft_printf("%s", res);
-	if (i == 1)
-		ft_printf("\n");
+	if (res != NULL && write(1, res, len(res)) == -1)
+		crash();
+	if (i == 1 && write(1, "\n", 1) == -1)
+		crash();
 	return (0);
 }
 
@@ -111,7 +109,7 @@ int	export(char **argv)
 	{
 		if (!ft_isalpha(argv[0][0]))
 		{
-			ft_printf(ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
+			ft_dprintf(2, ERROR_MSG"export: `%s': not a valid identifier\n", *argv);
 			crapped = 1;
 			argv ++;
 			continue ;
@@ -152,7 +150,7 @@ int	pwd_builtin()
 	pwdstr = getcwd(NULL, 0);
 	if (!pwdstr)
 	{
-		ft_printf(ERROR_MSG"pwd: fatal error\n");
+		ft_dprintf(2, ERROR_MSG"pwd: fatal error\n");
 		return (2);
 	}
 	ft_printf("%s\n", pwdstr);
@@ -170,8 +168,7 @@ void	exit_builtin(char **argv)
 {
 	int	n;
 
-	if (write(2, "exit\n", 5) == -1)
-		crash();
+	ft_dprintf(2, "exit\n");
 	if (!argv || !argv[1])
 		n = g.status;
 	else if (!ft_str_is_int(argv[1]))

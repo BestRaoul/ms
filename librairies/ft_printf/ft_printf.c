@@ -12,7 +12,7 @@
 
 #include "libftprintf.h"
 
-static int	write_str(char *s, t_pfpd data)
+static int	write_str(int _fd, char *s, t_pfpd data)
 {
 	int	i;
 
@@ -20,7 +20,7 @@ static int	write_str(char *s, t_pfpd data)
 	i = 0;
 	while (s[i] || (data.specifier == 'c' && (i < data.width || i == 0)))
 	{
-		if (write(1, &s[i], 1) == -1)
+		if (write(_fd, &s[i], 1) == -1)
 			return (-1);
 		i++;
 	}
@@ -49,22 +49,27 @@ char	*get_format(t_pfpd data, va_list va)
 	return (NULL);
 }
 
-static int	write_format(const char *str, va_list va, int *i, int *res)
+typedef struct s_fxnorm {
+	int			_fd;
+	const char	*str;
+} t_fxnorm;
+
+static int	write_format(t_fxnorm d, va_list va, int *i, int *res)
 {
 	t_pfpd	data;
 	void	*out;
 	int		j;
 
 	j = *i + 1;
-	while (str[j] && !ft_is_specifier(str[j]))
+	while (d.str[j] && !ft_is_specifier(d.str[j]))
 		j++;
-	if (ft_is_specifier(str[j]))
+	if (ft_is_specifier(d.str[j]))
 	{
-		data = ft_get_flags(&str[*i], va);
+		data = ft_get_flags(&(d.str[*i]), va);
 		out = get_format(data, va);
 		if (out == NULL)
 			return (-1);
-		*res += write_str(out, data);
+		*res += write_str(d._fd, out, data);
 		FREE(out);
 		*i = j;
 		return (*res);
@@ -85,10 +90,36 @@ int	ft_printf(const char *format, ...)
 	{
 		if (format[i] == '%')
 		{
-			if (write_format(format, va, &i, &res) == -1)
+			if (write_format((t_fxnorm){1, format}, va, &i, &res) == -1)
 				return (-1);
 		}
 		else if (write(1, &format[i], 1) == -1)
+			return (-1);
+		else
+			res++;
+		i++;
+	}
+	va_end(va);
+	return (res);
+}
+
+int	ft_dprintf(int _fd, const char *format, ...)
+{
+	va_list	va;
+	int		i;
+	int		res;
+
+	va_start(va, format);
+	i = 0;
+	res = 0;
+	while (format[i])
+	{
+		if (format[i] == '%')
+		{
+			if (write_format((t_fxnorm){_fd, format}, va, &i, &res) == -1)
+				return (-1);
+		}
+		else if (write(_fd, &format[i], 1) == -1)
 			return (-1);
 		else
 			res++;

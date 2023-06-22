@@ -65,7 +65,7 @@ int	main(void)
 		ast = parse(unwraps); //safe
 		if (ast == NULL) continue ;
 		execute(ast); //safe
-		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
+		if (g.status != 0) ft_dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
 	}
 	close_and_free_all();
 	return (0);

@@ -137,14 +137,14 @@ void	close_all_pipes(t_list *ignore, int do_crash)
 void	print_open_fds(int	max, int fd)
 {
 	int	i = 0;
-	dprintf(fd, "[%d] fds: [", getpid());
+	ft_dprintf(fd, "[%d] fds: [", getpid());
 	while (i < max)
 	{
 		int is = fcntl(i, F_GETFL);
-		dprintf(fd, "%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
+		ft_dprintf(fd, "%s%s%s, ", is!=-1?GREEN:RED, is!=-1?"y":"x", RESET);
 		i++;
 	}
-	dprintf(fd, "\b\b]\n");
+	ft_dprintf(fd, "\b\b]\n");
 }
 
 //not es
@@ -221,7 +221,7 @@ int	heredoc_handler(char *delimiter)
 		free(input);
 		input = readline("|> ");//nc - done
 	}
-	if (input == NULL) dprintf(2, ERROR_MSG"warning: here-document delimited by end-of-file (wanted `%s')\n", delimiter);
+	if (input == NULL) ft_dprintf(2, ERROR_MSG"warning: here-document delimited by end-of-file (wanted `%s')\n", delimiter);
 	free(input);
 	if (close(_pipe[1]) == -1) return -1;
 	if (dup2(previous_in, STDIN_FILENO) == -1) return -1;
@@ -311,7 +311,7 @@ int	consume_redirs(t_list *redirs)
 			if (r->type == REDIRLEFT && temp_fd == -1)
 			{
 				int err = errno;
-				return (dprintf(2, ERROR_MSG"%s: %s\n", r->val, strerror(err)), err);
+				return (ft_dprintf(2, ERROR_MSG"%s: %s\n", r->val, strerror(err)), err);
 			}
 			if (temp_fd == -1) return -1;
 			if (close(temp_fd) == -1) return -1;
@@ -352,7 +352,7 @@ int	consume_redirs(t_list *redirs)
 			if (IS_REDIR(r->type) && to == -1)
 			{
 				int err = errno;
-				return (dprintf(2, ERROR_MSG"%s: %s\n", r->val, strerror(err)), err);
+				return (ft_dprintf(2, ERROR_MSG"%s: %s\n", r->val, strerror(err)), err);
 			}
 			if (to == -1) return -1;
 			if (dup2(to, from) == -1) return -1;
@@ -411,7 +411,7 @@ void	execute_command(char	**argv, t_list *lst_redir, pid_t parent_pid, t_parenth
 			char *pathname = ft_getpath(my_argv[0], g.env);
 			if (pathname != NULL)
 				execve(pathname, my_argv, g.env);
-			dprintf(2, "%s: command not found\n", my_argv[0]);
+			ft_dprintf(2, "%s: command not found\n", my_argv[0]);
 			reown(my_argv);
 			close_and_free_all();
 			exit(127);
@@ -477,7 +477,7 @@ void	populate_execution_data(char ***argvs, t_parenthesis *parens, t_ast_node *p
 			parens[pipe_i] = (t_parenthesis){PARENTHESIS, child->children}; 
 			child->children = NULL;
 		}
-		else { dprintf(2, "pipeline: BIG ERROR\n"); exit(127); }
+		else { ft_dprintf(2, "pipeline: BIG ERROR\n"); exit(127); }
 		
 		child = get_child(pipeline, child_i++); //nc - done
 	}

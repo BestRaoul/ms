@@ -41,7 +41,7 @@ char	*handle_var(char *envvar)
 	int	x;
 	int	eq_i;
 
-	if (ft_strlen_int(envvar) == 0)
+	if (len(envvar) == 0)
 		return (ft_strdup("$"));
 	x = find_in_env(envvar);
 	if (x != -1)
@@ -49,7 +49,7 @@ char	*handle_var(char *envvar)
 		eq_i = ft_find('=', g.env[x]);
 		if (eq_i == -1)
 		{
-			dprintf(2, "env: no `=' in envvar WUT?\n");
+			ft_dprintf(2, "env: no `=' in envvar WUT?\n");
 			exit(69);
 		}
 		return (ft_strdup(&(g.env[x][eq_i + 1])));

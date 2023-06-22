@@ -82,8 +82,8 @@ int	match(char *str, char *pattern)
 	int	**t;
 	int	ij[2];
 
-	m = ft_strlen_int(pattern);
-	n = ft_strlen_int(str);
+	m = len(pattern);
+	n = len(str);
 	if (m == 0)
 		return (n == 0);
 	t = init_lookup(m, n);

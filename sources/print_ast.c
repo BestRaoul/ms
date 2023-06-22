@@ -81,7 +81,7 @@ static void	print_node(t_ast_node *ast, int depth)
 void	print_ast(t_ast_node *ast, int depth)
 {
 	if (!ast) {
-		if (write(2, "print_ast: NULL\n", 16)) {}
+		if (write(1, "print_ast: NULL\n", 16)) {}
 		return ;}
 	print_node(ast, depth);
 	depth ++;

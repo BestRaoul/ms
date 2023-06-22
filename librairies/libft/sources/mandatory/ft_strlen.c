@@ -25,7 +25,7 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-int	ft_strlen_int(const char *s)
+int	len(const char *s)
 {
 	int	i;
 

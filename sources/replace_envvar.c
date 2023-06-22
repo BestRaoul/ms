@@ -68,7 +68,7 @@ char	*handle_env(char *literal)
 	{
 		x = find_ne_nqs('$', literal, "\'");
 		out[j] = chop(literal, x - 1);
-		literal += ft_strlen_int(out[j]);
+		literal += len(out[j]);
 		j++;
 		cond_res = cond(&out, &literal, &j);
 		if (cond_res == 1)

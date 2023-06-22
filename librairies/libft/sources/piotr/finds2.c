@@ -24,7 +24,7 @@ int	findf_ne_nq(int (*f)(char), char *s)
 		if (s[i] == '\'' || s[i] == '\"')
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break;
 		}
 		if (f(s[i]))
@@ -47,7 +47,7 @@ int	finds_ne_nq(char *cs, char *s)
 		if (s[i] == '\'' || s[i] == '\"')
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break;
 		}
 		if (in(s[i], cs))
@@ -70,7 +70,7 @@ int	find_ne_nqs(char c, char *s, char *quotes)
 		if (in(s[i], quotes))
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
-			if (i == ft_strlen_int(s))
+			if (i == len(s))
 				break;
 		}
 		if (s[i] == c)

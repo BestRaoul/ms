@@ -28,7 +28,6 @@ int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i
 
 int find_literal_end(char *s)
 {
-
 	return finds_ne_nq(")"IS_SPACE, s);
 }
 
@@ -70,7 +69,7 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 		return (insert_token_into_lst(APPEND, NULL, lst, 2));
 	else if (ft_isspace(c1))
 		return (1);
-	else if (c1 == '\'' || c1 == '\"' || 1)
+	else
 		return (handle_string(lst, s, pos));
 }
 
@@ -78,18 +77,12 @@ t_list	*lex(char *s)
 {
 	t_list	*res;
 	int		i;
-	int		advance_len;
 	t_list	*first;
 
 	res = NULL;
 	i = 0;
 	while (s && s[i])
-	{
-		advance_len = handle_lexeme(&res, s, i);
-		if (advance_len < 0)
-			return (NULL);
-		i += advance_len;
-	}
+		i += handle_lexeme(&res, s, i);
 	first = ft_lst_get(res, 0);
 	if (first && ((t_dict_int_str_member * )(first->content))->value && ft_strequal( ((t_dict_int_str_member * )(first->content))->value, "ast"))
 	{

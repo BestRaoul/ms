@@ -49,6 +49,7 @@ int	main(void)
 	char		*input = NULL;
 	t_ast_node	*ast = NULL;
 	t_list		*lexemes = NULL;
+	t_list		*unwraps = NULL;
 
 	g.dup_stdin = dup(STDIN_FILENO);
 	g.dup_stdout = dup(STDOUT_FILENO);
@@ -59,18 +60,17 @@ int	main(void)
 		input = get_input(); //safe
 		if (input == NULL) break;
 		if (*input == 0) continue;
-		lexemes = lex(input); //safe
-		if (lexemes == NULL) continue;
-		t_list *unwraps = unwrap(lexemes);
+		lexemes = lex(input); //cannot fail
+		unwraps = unwrap(lexemes); // safe
 		if (unwraps == NULL) continue;
 		ast = parse(unwraps); //safe
 		if (ast == NULL) continue ;
 		execute(ast); //safe
 		if (g.status != 0) dprintf(2, "(%s%d%s) ", BRED, g.status, RESET);
 	}
-	//free g
-		//close g.dup_stdin
-		//reown (g.env)
+	close(g.dup_stdin);
+	close(g.dup_stdout);
+//TODOmsh	reown(g.env);
 	garbage_collector(FREE_ALL, 0);
 	return (0);
 }

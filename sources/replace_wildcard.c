@@ -40,7 +40,7 @@ void	add_wildmatches(t_list **lst, char *pattern)
 
 	count = add_wildmatches_in_dir(".", lst, pattern);
     if (count == -1)
-        xit2(69); //TODO better error management
+        crash(NULL, NULL); //TODO better error management
     if (count == 0)
         ft_lstadd_back(lst, ft_lstnew(ft_strdup(pattern)));
 }

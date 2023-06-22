@@ -168,7 +168,7 @@ t_list  *unwrap_matches(t_list *iter, t_list **matched)
     return *matched;
 }
 
-//can fail if no closing quotes or wildcard fails
+//can fail if no closing quotes or wildcard fails (ambigours redirect)
 t_list  *unwrap(t_list *lexemes)
 {
     t_list *unwraped = NULL;

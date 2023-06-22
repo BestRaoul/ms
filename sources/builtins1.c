@@ -164,10 +164,16 @@ int	env_builtin()
 
 void	exit_builtin(char **argv) 
 {
-	argv ++;
-	if (!*argv)
-		exit(g.status);
-	if (!ft_str_is_int(*argv))
-		exit(2);
-	exit(ft_atoi(*argv));
+	int	n;
+
+	garbage_collector(REMOVE, argv[1]);
+	close_and_free_all(NULL, NULL);
+	if (!argv[1])
+		n = g.status;
+	else if (!ft_str_is_int(argv[1]))
+		n = 2;
+	else 
+		n = ft_atoi(argv[1]);
+	free(argv[1]);
+	exit(n);
 }

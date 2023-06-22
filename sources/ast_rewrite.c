@@ -187,7 +187,7 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 			parse_suffix(*lexme_ptr, pipeline_list);
 		}
 		else if (t == RPAREN && !init) return 0;
-		else return (printf(ERROR_MSG"(7) parse error near unxepected `%s' token\n", _type_str(*lexme_ptr)), -1);
+		else return (printf(ERROR_MSG"(7) syntax error near unxepected `%s' token\n", _type_str(*lexme_ptr)), -1);
 
 		*lexme_ptr = (*lexme_ptr)->next;
 	}
@@ -204,12 +204,11 @@ t_ast_node	*parse(t_list *lexemes)
 
 	t_list **lexme_ptr = &lexemes;
 	int res = parse_pipelinelist(lexme_ptr, ast, 1);
-	if (res == -1) { /*print_ast(ast, 0);*/ return (NULL); }
+	if (res == -1) return (NULL);
 
 	t_list *lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (printf(ERROR_MSG"(8) trailing tokens %s->%s!",
-			_content(lexme), _content(lexme->next)), NULL);
+		return (printf(ERROR_MSG"(8) syntax error near unexpected token `%s'\n", _type_str(lexme->next)), NULL);
 	ast_mark_cmd(ast, 1);
 	if (g.print_ast)
 	{

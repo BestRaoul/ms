@@ -163,6 +163,7 @@ SRCS_PIOTR_LIST		:= comparison.c\
 						free_arr.c\
 						frees.c\
 						finds.c\
+						finds2.c\
 						in.c\
 						ft_atod.c\
 						ft_intr.c\

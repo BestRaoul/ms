@@ -59,7 +59,7 @@ char	**list_2_strr(t_list *lst)
 	return (res);
 }
 
-char	**ft_splitf(char *s, int (*next)(char *))
+char	**ft_splitf(char *s, int (*_next)(char *))
 {
 	t_list	*strs;
 	int		next_end;
@@ -67,7 +67,7 @@ char	**ft_splitf(char *s, int (*next)(char *))
 	strs = NULL;
 	while (*s)
 	{
-		next_end = next(s);
+		next_end = _next(s);
 		if (next_end > 0)
 			ft_lstadd_back(&strs, ft_lstnew(chop(s, next_end - 1)));
 		s += next_end;

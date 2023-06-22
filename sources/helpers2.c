@@ -55,7 +55,7 @@ char	**realloc_strarr_no_gc(char **strarr)
 	return (res);
 }
 
-void	next(t_list **i)
+void	next(t_list **i_ptr)
 {
-	*i = (*i)->next;
+	*i_ptr = (*i_ptr)->next;
 }

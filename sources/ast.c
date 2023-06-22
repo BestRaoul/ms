@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "ms.h"
 
 #define DEBUG_AST 0
@@ -19,60 +18,107 @@
 //for self reference
 static int	parse_pipelinelist(t_list **lexeme_ptr, t_ast_node *ast, int init);
 
-// lit, redir, <<, |, '(' => pipeline_list, [')', '&&', '||'] => exit
-static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
-{
+typedef struct s_pipeline_data {
 	t_ast_node	*pipeline;
 	int			ac;
 	int			rc;
 	int			pc;
 	int			t;
 	int			m;
+}	t_pipeline_data;
 
-	pipeline = add_child(ast, (t_ast_node){PIPELINE, 0, 0});
-	(ac = 0, rc = 0, pc = 0);
+//sorry for this unreadable mess, but NORM
+static int	parse_pipeline_switch(t_pipeline_data *d_, t_list **lexme_ptr)
+{
+	if ((d_->t == LITERAL) && (d_->pc == 0) && ++d_->ac)
+		d_->m = parse_arg(*lexme_ptr, d_->pipeline);
+	else if (d_->t == HEREDOC && ++d_->rc)
+		d_->m = parse_heredoc(*lexme_ptr, d_->pipeline);
+	else if (is_redir(d_->t) && ++d_->rc)
+		d_->m = parse_redir(*lexme_ptr, d_->pipeline);
+	else if (d_->t == PIPE && (d_->ac + d_->rc + d_->pc > 0))
+		*d_ = (t_pipeline_data){d_->pipeline, 0, 0, 0, 0,
+			parse_suffix(*lexme_ptr, d_->pipeline)};
+	else if (d_->t == LPAREN && (d_->ac == 0 && d_->pc == 0))
+	{
+		*lexme_ptr = (*lexme_ptr)->next;
+		d_->m = parse_pipelinelist(lexme_ptr, d_->pipeline, 0);
+		d_->pc++;
+	}
+	else if (d_->t == AND || d_->t == OR || d_->t == RPAREN)
+		return (1);
+	else
+	{
+		if (d_->ac + d_->rc + d_->pc == 0)
+			return (1);
+		return (ft_dprintf(2, EMSG"(2) error near unexpected `%s' token\n",
+				_type_str(*lexme_ptr)), -1);
+	}
+	return (0);
+}
+
+// lit, redir, <<, |, '(' => pipeline_list, [')', '&&', '||'] => exit
+static int	parse_pipeline(t_list **lexme_ptr, t_ast_node *ast)
+{
+	t_pipeline_data	d_;
+	int				x;
+
+	d_ = (t_pipeline_data){add_child(ast, (t_ast_node){PIPELINE, 0, 0}),
+		0, 0, 0, 0, 0};
 	while (*lexme_ptr != NULL)
 	{
-		t = _type(*lexme_ptr);
-		if ((t == LITERAL) && (pc == 0))
-			(m = parse_arg(*lexme_ptr, pipeline), ac++);
-		else if (t == REDIRLEFT || t == REDIRRIGHT || t == APPEND)
-			(m = parse_redir(*lexme_ptr, pipeline), rc++);
-		else if (t == HEREDOC)
-			(m = parse_heredoc(*lexme_ptr, pipeline), rc++);
-		else if (t == PIPE && (ac + rc + pc > 0))
-			(m = parse_suffix(*lexme_ptr, pipeline), ac = 0, rc = 0, pc = 0);
-		else if (t == LPAREN && (ac == 0 && pc == 0))
-		{
-			*lexme_ptr = (*lexme_ptr)->next;
-			m = parse_pipelinelist(lexme_ptr, pipeline, 0);
-			pc++;
-		}
-		else if (t == AND || t == OR || t == RPAREN)
+		d_.t = _type(*lexme_ptr);
+		x = parse_pipeline_switch(&d_, lexme_ptr);
+		if (x == 1)
 			break ;
-		else
-		{
-			if (ac + rc + pc == 0)
-				break ;
-			return (ft_dprintf(2, EMSG"(2) error near unexpected `%s' token\n",
-					_type_str(*lexme_ptr)), -1);
-		}
-		if (m == -1)
+		if (x == -1)
 			return (-1);
-		*lexme_ptr = (*lexme_ptr)->next;
-		if (m == 2)
-			*lexme_ptr = (*lexme_ptr)->next;
+		if (d_.m == -1)
+			return (-1);
+		next(lexme_ptr);
+		if (d_.m == 2)
+			next(lexme_ptr);
 	}
-	if (ac + rc + pc == 0)
+	if (d_.ac + d_.rc + d_.pc == 0)
 		return (ft_dprintf(2, EMSG"(3) missing tokens\n"), -1);
 	return (0);
+}
+
+//0 or -1 => return
+//1 => next
+static int	parse_pipelinelist_internal(t_list **lexme_ptr,
+	t_ast_node	*pipeline_list, int t, int init)
+{
+	if (parse_pipeline(lexme_ptr, pipeline_list) == -1)
+		return (-1);
+	if (*lexme_ptr == NULL)
+	{
+		if (init)
+			return (0);
+		return (ft_dprintf(2, EMSG"(5) missing closing `)' token\n"),
+			-1);
+	}
+	t = _type(*lexme_ptr);
+	if (t == AND || t == OR)
+	{
+		if ((*lexme_ptr)->next == NULL)
+			return (ft_dprintf(2, EMSG"(6) missing token after `%s' token\n",
+					_type_str(*lexme_ptr)), -1);
+		parse_suffix(*lexme_ptr, pipeline_list);
+	}
+	else if (t == RPAREN && !init)
+		return (0);
+	else
+		return (ft_dprintf(2, EMSG
+				"(7) syntax error near unxepected `%s' token\n",
+				_type_str(*lexme_ptr)), -1);
+	return (1);
 }
 
 // pipeline, `&&' or `||'
 static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 {
 	t_ast_node	*pipeline_list;
-	int			t;
 
 	if (init)
 		pipeline_list = ast;
@@ -82,29 +128,8 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 		return (ft_dprintf(2, EMSG"(4) missing tokens\n"), -1);
 	while (*lexme_ptr != NULL)
 	{
-		if (parse_pipeline(lexme_ptr, pipeline_list) == -1)
-			return (-1);
-		if (*lexme_ptr == NULL)
-		{
-			if (init)
-				return (0);
-			return (ft_dprintf(2, EMSG"(5) missing closing `)' token\n"),
-				-1);
-		}
-		t = _type(*lexme_ptr);
-		if (t == AND || t == OR)
-		{
-			if ((*lexme_ptr)->next == NULL)
-				return (ft_dprintf(2, EMSG"(6) missing token after `%s' token\n",
-					_type_str(*lexme_ptr)), -1);
-			parse_suffix(*lexme_ptr, pipeline_list);
-		}
-		else if (t == RPAREN && !init)
-			return (0);
-		else
-			return (ft_dprintf(2, EMSG"(7) syntax error near unxepected `%s' token\n",
-				_type_str(*lexme_ptr)), -1);
-		*lexme_ptr = (*lexme_ptr)->next;
+		parse_pipelinelist_internal(lexme_ptr, pipeline_list, 0, init);
+		next(lexme_ptr);
 	}
 	return (0);
 }
@@ -124,8 +149,9 @@ t_ast_node	*parse(t_list *lexemes)
 		return (NULL);
 	lexme = *lexme_ptr;
 	if (lexme && lexme->next)
-		return (ft_dprintf(2, EMSG"(8) syntax error near unexpected token `%s'\n",
-			_type_str(lexme->next)), NULL);
+		return (ft_dprintf(2, EMSG
+				"(8) syntax error near unexpected token `%s'\n",
+				_type_str(lexme->next)), NULL);
 	if (g_.print_ast)
 	{
 		print_ast(ast, 0);

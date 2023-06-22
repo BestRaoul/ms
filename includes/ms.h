@@ -123,7 +123,7 @@ int		count(char c, char *str);
 char	*chop(char *str, int end);
 char	*_scan2(char **str_ptr, int (*f)(char));
 char	*join(char **strr, char *joint);
-void	next(t_list **i);
+void	next(t_list **i_ptr);
 
 //gc helpers in helpers.c
 int		strarr_count(char **strarr);

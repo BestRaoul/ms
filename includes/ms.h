@@ -37,15 +37,15 @@ typedef struct s_global {
 	t_list	**redirs;
 }	t_global;
 
-typedef t_ast_node	t_an;
-
-extern t_global		g_;
-
 typedef struct s_ast_node {
 	int		type;
 	char	*content;
 	t_list	*children;
 }	t_ast_node;
+
+typedef t_ast_node	t_an;
+
+extern t_global		g_;
 
 enum e_TokenTypes {
 	LPAREN,

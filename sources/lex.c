@@ -55,9 +55,9 @@ int	handle_lexeme(t_list **lst, char *s, int pos)
 	else if (c1 == '|' && c2 != '|')
 		return (insert_token_into_lst(PIPE, NULL, lst, 1));
 	else if (c1 == '<' && c2 != '<')
-		return (insert_token_into_lst(REDIRLEFT, NULL, lst, 1));
+		return (insert_token_into_lst(REDIR_L, NULL, lst, 1));
 	else if (c1 == '>' && c2 != '>')
-		return (insert_token_into_lst(REDIRRIGHT, NULL, lst, 1));
+		return (insert_token_into_lst(REDIR_R, NULL, lst, 1));
 	else if (c1 == '&' || c1 == '|')
 		return (insert_token_into_lst(AND * (c1 == '&')
 				+ OR * (c1 == '|'), NULL, lst, 2));

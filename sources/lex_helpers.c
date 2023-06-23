@@ -47,9 +47,9 @@ char	*_type_str(t_list *lexme)
 		return (ft_strdup(")"));
 	else if (t == PIPE)
 		return (ft_strdup("|"));
-	else if (t == REDIRLEFT)
+	else if (t == REDIR_L)
 		return (ft_strdup("<"));
-	else if (t == REDIRRIGHT)
+	else if (t == REDIR_R)
 		return (ft_strdup(">"));
 	else if (t == HEREDOC)
 		return (ft_strdup("<<"));

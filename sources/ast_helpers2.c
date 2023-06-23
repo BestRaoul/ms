@@ -30,5 +30,5 @@ t_ast_node	*add_child(t_ast_node *parent, t_ast_node new)
 //REDIR left right append heredoc
 int	is_redir(int t)
 {
-	return (t == REDIRLEFT || t == REDIRRIGHT || t == APPEND || t == HEREDOC);
+	return (t == REDIR_L || t == REDIR_R || t == APPEND || t == HEREDOC);
 }

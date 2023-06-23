@@ -51,8 +51,8 @@ enum e_TokenTypes {
 	LPAREN,
 	RPAREN,
 	PIPE,
-	REDIRLEFT,
-	REDIRRIGHT,
+	REDIR_L,
+	REDIR_R,
 	APPEND,
 	AND,
 	OR,
@@ -86,10 +86,6 @@ t_an	*parse(t_list *lexemes);
 
 /* execution */
 void	execute(t_ast_node *pipeline_list);
-
-/* error management */
-void	crash(void);
-void	close_and_free_all(void);
 
 /* builtins */
 int		is_builtin(char *cmd);
@@ -156,5 +152,41 @@ int		parse_suffix(t_list *lexeme, t_ast_node *ast);
 //2
 int		is_redir(int t);
 t_an	*add_child(t_ast_node *parent, t_ast_node new);
+
+typedef struct s_redir {
+	int		type;
+	char	*val;
+}	t_redir;
+
+typedef struct s_parenthesis
+{
+	int		type;
+	t_list	*children;
+}	t_parenthesis;
+
+//execute_helpers.c
+# define DEBUG_INIT 0
+# define DEBUG_REDIR 0
+# define DEBUG_ARGV 0
+//error managment -full
+void	set_g_status(int err);
+void	reown(char **strr);
+void	close_all_pipes(t_list *ignore, int do_crash);
+void	close_and_free_all(void);
+void	crash(void);
+//2
+void	debug_prints_execute_command(char **argv, t_list *l_r, pid_t p_pid);
+//3
+t_an	*get_child(t_ast_node	*node, int i);
+t_redir	*get_redir(t_list	*redir, int i);
+t_list	*alloc_redir(int type, char *val);
+char	***alloc_argvs(t_ast_node *ast, int pipe_count);
+//4
+int		consume_redirs(t_list *redirs);
+//5
+int		count_child_pipes(t_ast_node *ast);
+int		heredoc_handler(char *delimiter);
+void	populate_execution_data(char ***argvs,
+			t_parenthesis *parens, t_ast_node *pipeline);
 
 #endif

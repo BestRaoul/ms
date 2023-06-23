@@ -51,9 +51,9 @@ static void	print_type(int type)
 		ft_printf(")");
 	else if (type == PIPE)
 		ft_printf("|");
-	else if (type == REDIRLEFT)
+	else if (type == REDIR_L)
 		ft_printf("<");
-	else if (type == REDIRRIGHT)
+	else if (type == REDIR_R)
 		ft_printf(">");
 	else if (type == HEREDOC)
 		ft_printf("<<");

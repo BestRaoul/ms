@@ -30,7 +30,7 @@ int	add_wildmatches_in_dir(char *dirname, t_list **lst, char *pattern)
 	dir = readdir(d);
 	while (dir != NULL)
 	{
-		if (dir->d_name[0] == '.' && match(dir->d_name, pattern))
+		if (dir->d_name[0] != '.' && match(dir->d_name, pattern))
 		{
 			ft_lstadd_back(lst, ft_lstnew(ft_strdup(dir->d_name)));
 			count++;

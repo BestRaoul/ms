@@ -37,7 +37,7 @@ else
 endif
 
 CC						:= gcc
-CFLAGS					:= -g -Wall -Wextra -Werror -isystem -Wno-unused-function $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
+CFLAGS					:= -g -Wall -Wextra -Werror -isystem $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
 RM						:= rm -f
 
 LIB_DIRECTORY			:= ./librairies/

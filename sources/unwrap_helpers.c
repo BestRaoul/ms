@@ -28,7 +28,7 @@ char	*list_2_str(t_list *lst)
 		total_len += len(lst->content);
 		i = i->next;
 	}
-	str = MALLOC(total_len + 1);
+	str = gc_malloc(total_len + 1);
 	j = 0;
 	i = lst;
 	while (i)

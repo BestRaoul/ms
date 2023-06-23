@@ -31,6 +31,6 @@ int	ft_get_str_sign(const char *str)
 			sign *= -1;
 		i ++;
 	}
-	FREE(trimmed);
+	gc_free(trimmed);
 	return (sign);
 }

@@ -38,14 +38,14 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 
 	if (start >= ft_strlen(s))
 	{
-		res = MALLOC(1);
+		res = gc_malloc(1);
 		if (!res)
 			return (0);
 		res[0] = 0;
 		return (res);
 	}
 	final_len = my_min(len, ft_strlen(s) - start) + 1;
-	res = MALLOC(final_len);
+	res = gc_malloc(final_len);
 	if (!res)
 		return (0);
 	s += start;

@@ -58,7 +58,7 @@ static char	**handle_empty(void)
 {
 	char	**res;
 
-	res = MALLOC(sizeof(*res));
+	res = gc_malloc(sizeof(*res));
 	if (!res)
 		return (0);
 	res[0] = 0;
@@ -74,10 +74,10 @@ static int	free_split(char ***res, int index)
 	i = 0;
 	while (i < index)
 	{
-		FREE((*res)[i]);
+		gc_free((*res)[i]);
 		i ++;
 	}
-	FREE(res);
+	gc_free(res);
 	return (1);
 }
 
@@ -88,7 +88,7 @@ char	**ft_splitset(char const *str, const char *sep)
 
 	if (!count_words_set(str, sep))
 		return (handle_empty());
-	res = MALLOC(sizeof(*res) * (count_words_set(str, sep) + 1));
+	res = gc_malloc(sizeof(*res) * (count_words_set(str, sep) + 1));
 	if (!res)
 		return (0);
 	i = 0;
@@ -96,7 +96,7 @@ char	**ft_splitset(char const *str, const char *sep)
 	{
 		if (!ft_chr_in_str(*str, sep))
 		{
-			res[i] = MALLOC(next_wordlen(str, sep) + 1);
+			res[i] = gc_malloc(next_wordlen(str, sep) + 1);
 			if (free_split(&res, i))
 				return (0);
 			ft_strlcpy(res[i], str, next_wordlen(str, sep) + 1);

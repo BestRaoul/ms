@@ -20,8 +20,8 @@ void	*free_arr(void **arr)
 	{
 		i = 0;
 		while (arr[i] != NULL)
-			FREE(arr[i++]);
-		FREE(arr);
+			gc_free(arr[i++]);
+		gc_free(arr);
 	}
 	return (NULL);
 }

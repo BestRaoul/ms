@@ -23,13 +23,13 @@ static void	*ft_realloc(void *old, int old_size, int new_size)
 {
 	void	*new;
 
-	new = MALLOC(new_size);
+	new = gc_malloc(new_size);
 	if (new == NULL)
 		return (NULL);
 	if (old == NULL)
 		return (new);
 	ft_strlcpy(new, old, old_size);
-	FREE(old);
+	gc_free(old);
 	return (new);
 }
 
@@ -52,7 +52,7 @@ static int	expand_format(char **format_ptr, va_list va, char **str, int *i)
 		if (*str == NULL)
 			return (expand_format_ret(v.out));
 		ft_strlcpy(&(*str)[*i], v.out, v.len + 1);
-		FREE(v.out);
+		gc_free(v.out);
 		*i += v.len;
 		*format_ptr += v.j;
 		return (0);
@@ -79,7 +79,7 @@ char	*ft_allocprintf(const char *format, ...)
 				va, &v.str, &v.i) == -1)
 		{
 			if (v.str != NULL)
-				FREE(v.str);
+				gc_free(v.str);
 			return (NULL);
 		}
 		else if (*v.format_ptr != '%')
@@ -116,7 +116,7 @@ static int	add_format(char **format_ptr, va_list va, char **str)
 			len = data.width;
 		ft_strlcpy(*str, out, len + 1);
 		*str += len;
-		FREE(out);
+		gc_free(out);
 		*format_ptr += j;
 		return (0);
 	}

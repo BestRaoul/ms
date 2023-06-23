@@ -17,14 +17,14 @@ int	ft_lstadd_size_t(size_t i, t_list **lst)
 	t_list	*child;
 	size_t	*content;
 
-	content = MALLOC(sizeof(*content));
+	content = gc_malloc(sizeof(*content));
 	if (!content)
 		return (0);
 	*content = i;
 	child = ft_lstnew(content);
 	if (!child)
 	{
-		FREE(content);
+		gc_free(content);
 		return (0);
 	}
 	ft_lstadd_back(lst, child);

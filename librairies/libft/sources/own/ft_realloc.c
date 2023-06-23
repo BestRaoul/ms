@@ -21,7 +21,7 @@ void	*ft_realloc_gnl(void *src, size_t new_len)
 	res = ft_calloc(1, new_len);
 	if (res == NULL)
 	{
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	i = 0;
@@ -31,7 +31,7 @@ void	*ft_realloc_gnl(void *src, size_t new_len)
 		*(res + i) = *(ptr + i);
 		i ++;
 	}
-	FREE(src);
+	gc_free(src);
 	return (res);
 }
 
@@ -42,13 +42,13 @@ int	*ft_realloc_intarr(int *src, size_t arr_size, size_t new_size)
 
 	if (new_size <= arr_size)
 	{
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	res = ft_calloc(new_size, sizeof(int));
 	if (res == NULL)
 	{
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	i = 0;
@@ -57,7 +57,7 @@ int	*ft_realloc_intarr(int *src, size_t arr_size, size_t new_size)
 		res[i] = src[i];
 		i ++;
 	}
-	FREE(src);
+	gc_free(src);
 	return (res);
 }
 
@@ -72,10 +72,10 @@ int	**fr_realloc_int2darr_part_two(int **src, int **res, const size_t sizes[3])
 		j = 0;
 		while (j < sizes[0])
 		{
-			FREE(src[j]);
+			gc_free(src[j]);
 			j ++;
 		}
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	i = 0;
@@ -103,14 +103,14 @@ int	**ft_realloc_int2darr(int **src, size_t elem_size,
 		j = 0;
 		while (j < elem_size)
 		{
-			FREE(src[j]);
+			gc_free(src[j]);
 			j ++;
 		}
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	res = fr_realloc_int2darr_part_two(src, res, sizes);
-	FREE(src);
+	gc_free(src);
 	return (res);
 }
 
@@ -121,13 +121,13 @@ char	*ft_realloc_chararr(char *src, size_t arr_size, size_t new_size)
 
 	if (new_size <= arr_size)
 	{
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	res = ft_calloc(new_size, sizeof(char));
 	if (res == NULL)
 	{
-		FREE(src);
+		gc_free(src);
 		return (NULL);
 	}
 	i = 0;
@@ -136,6 +136,6 @@ char	*ft_realloc_chararr(char *src, size_t arr_size, size_t new_size)
 		res[i] = src[i];
 		i ++;
 	}
-	FREE(src);
+	gc_free(src);
 	return (res);
 }

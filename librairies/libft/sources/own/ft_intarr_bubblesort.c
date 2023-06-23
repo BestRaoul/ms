@@ -18,7 +18,7 @@ int	*ft_intarr_bubblesort(const int *arr, size_t len)
 	int		swp;
 	size_t	i;
 
-	res = MALLOC(len * sizeof(*res));
+	res = gc_malloc(len * sizeof(*res));
 	if (!res)
 		return (NULL);
 	ft_memcpy(res, arr, len * sizeof(*res));

@@ -47,11 +47,11 @@ static int	handle_neg(int *n, int *i, char **res)
 	if (*n >= 0)
 	{
 		*i = 0;
-		*res = MALLOC(res_len(*n) + 1);
+		*res = gc_malloc(res_len(*n) + 1);
 		return (0);
 	}
 	*i = 1;
-	*res = MALLOC(res_len(*n) + 2);
+	*res = gc_malloc(res_len(*n) + 2);
 	if (*res)
 		(*res)[0] = '-';
 	return (1);

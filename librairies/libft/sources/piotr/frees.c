@@ -24,7 +24,7 @@ void	*frees(int count, ...)
 	{
 		temp = va_arg(va, void *);
 		if (temp != NULL)
-			FREE(temp);
+			gc_free(temp);
 		i++;
 	}
 	va_end(va);
@@ -48,7 +48,7 @@ void	*frees2(int count, ...)
 		if (mode == 0)
 		{
 			if (temp != NULL)
-				FREE(temp);
+				gc_free(temp);
 		}
 		else if (mode == 1)
 		{

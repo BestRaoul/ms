@@ -18,7 +18,7 @@ char	*ft_powertrim_chr(const char *str, char c)
 	char	*joined_set;
 	char	*res;
 
-	joined_set = MALLOC(sizeof(" \f\n\r\t\v") + 2);
+	joined_set = gc_malloc(sizeof(" \f\n\r\t\v") + 2);
 	if (!joined_set)
 		return (NULL);
 	joined_set[0] = c;
@@ -26,6 +26,6 @@ char	*ft_powertrim_chr(const char *str, char c)
 			ft_strlen(" \f\n\r\t\v") + 1))
 		return (0);
 	res = ft_strtrim(str, joined_set);
-	FREE(joined_set);
+	gc_free(joined_set);
 	return (res);
 }

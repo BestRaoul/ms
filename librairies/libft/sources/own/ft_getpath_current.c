@@ -15,9 +15,9 @@
 static char	*fr(char *trimmed, char *sep_prefix)
 {
 	if (trimmed)
-		FREE(trimmed);
+		gc_free(trimmed);
 	if (sep_prefix)
-		FREE(sep_prefix);
+		gc_free(sep_prefix);
 	return (NULL);
 }
 
@@ -32,7 +32,7 @@ char	*ft_getpath_current(const char *binname, char **envp)
 	trimmed = ft_powertrim(binname, "");
 	if (!trimmed)
 		return (NULL);
-	sep_prefix = MALLOC(sizeof(*sep_prefix) * 3);
+	sep_prefix = gc_malloc(sizeof(*sep_prefix) * 3);
 	if (!sep_prefix)
 		return (fr(trimmed, 0));
 	sep_prefix[0] = '.';

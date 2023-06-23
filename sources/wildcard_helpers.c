@@ -65,10 +65,10 @@ int	free_lookup(int m, int n, int **t)
 	i = 0;
 	while (i < n + 1)
 	{
-		FREE(t[i]);
+		gc_free(t[i]);
 		i ++;
 	}
-	FREE(t);
+	gc_free(t);
 	return (res);
 }
 

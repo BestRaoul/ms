@@ -52,7 +52,7 @@ char	*get_format(t_pfpd data, va_list va)
 typedef struct s_fxnorm {
 	int			_fd;
 	const char	*str;
-} t_fxnorm;
+}	t_fxnorm;
 
 static int	write_format(t_fxnorm d, va_list va, int *i, int *res)
 {
@@ -70,7 +70,7 @@ static int	write_format(t_fxnorm d, va_list va, int *i, int *res)
 		if (out == NULL)
 			return (-1);
 		*res += write_str(d._fd, out, data);
-		FREE(out);
+		gc_free(out);
 		*i = j;
 		return (*res);
 	}

@@ -20,7 +20,7 @@ void	*ft_calloc(size_t nmemb, size_t size)
 
 	if (!size)
 	{
-		res = MALLOC(0);
+		res = gc_malloc(0);
 		if (!res)
 			return (0);
 		return (res);
@@ -29,7 +29,7 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	max_items = hmm / size;
 	if (max_items < nmemb)
 		return (0);
-	res = MALLOC(nmemb * size);
+	res = gc_malloc(nmemb * size);
 	if (!res)
 		return (0);
 	ft_bzero(res, nmemb * size);

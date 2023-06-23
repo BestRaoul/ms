@@ -19,6 +19,6 @@ int	ft_command_ex(const char *command, char **envp)
 	res = ft_getpath(command, envp);
 	if (res == NULL)
 		return (0);
-	FREE(res);
+	gc_free(res);
 	return (1);
 }

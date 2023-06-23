@@ -18,14 +18,14 @@ static char	**create_arr(t_list *lst)
 	size_t	i;
 	char	**res;
 
-	res = MALLOC(sizeof(*res) * (ft_lstsize(lst) + 1));
+	res = gc_malloc(sizeof(*res) * (ft_lstsize(lst) + 1));
 	if (!res)
 		return (NULL);
 	iter = lst;
 	i = 0;
 	while (iter)
 	{
-		res[i] = MALLOC(sizeof(**res) * (ft_strlen(iter->content) + 1));
+		res[i] = gc_malloc(sizeof(**res) * (ft_strlen(iter->content) + 1));
 		if (!res[i])
 		{
 			ft_free_split(res, i);

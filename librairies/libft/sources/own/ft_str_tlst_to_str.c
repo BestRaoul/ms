@@ -33,7 +33,7 @@ static char	*create_arr(t_list *lst)
 	size_t	i;
 	char	*res;
 
-	res = MALLOC(sizeof(*res) * (combined_len(lst) + 1));
+	res = gc_malloc(sizeof(*res) * (combined_len(lst) + 1));
 	if (!res)
 		return (NULL);
 	iter = lst;

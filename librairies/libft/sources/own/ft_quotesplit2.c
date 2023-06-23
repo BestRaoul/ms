@@ -33,7 +33,7 @@ static int	next_token_ret(t_list **word, char **child_content,
 			return (-1);
 		}
 		*child_content = ft_powertrim(tmp, "");
-		FREE(tmp);
+		gc_free(tmp);
 		ft_lstclear(word, ft_delnode);
 		return (len);
 	}

@@ -14,6 +14,6 @@
 
 int	expand_format_ret(void	*out)
 {
-	FREE(out);
+	gc_free(out);
 	return (-1);
 }

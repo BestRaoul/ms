@@ -68,8 +68,8 @@ void	free_t_redir(void *ptr)
 {
 	if (ptr == NULL) return;
 	if (((t_redir *)ptr)->val != NULL)
-		FREE(((t_redir *)ptr)->val);
-	FREE(ptr);
+		gc_free(((t_redir *)ptr)->val);
+	gc_free(ptr);
 }
 
 //ENS
@@ -248,7 +248,7 @@ t_list	*alloc_redir(int type, char *val)
 {
 	if (val == NULL)
 		return NULL;
-	t_redir *redir = MALLOC(sizeof(t_redir)); //nc
+	t_redir *redir = gc_malloc(sizeof(t_redir)); //nc
 	redir->type = type;
 	redir->val = val;
 	t_list *_redir = ft_lstnew(redir); //nc =>free

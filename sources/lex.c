@@ -15,7 +15,7 @@
 #define ERROR_MSG "ms: lex: "
 
 // cannot fail returns i
-int	insert_token_into_lst(enum TokenTypes t, char *value, t_list **lst, int i)
+int	insert_token_into_lst(enum e_TokenTypes t, char *value, t_list **lst, int i)
 {
 	t_dict_int_str_member	*member;
 	t_list					*new;

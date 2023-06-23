@@ -79,7 +79,7 @@ static char	*helper(char const *s1, const char *set)
 			non_sep_chars ++;
 	if (!non_sep_chars)
 	{
-		res = MALLOC(1);
+		res = gc_malloc(1);
 		if (!res)
 			return (0);
 		res[0] = 0;
@@ -100,7 +100,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 	if (res != 0)
 		return (res);
 	len = ending_index(s1, set) - start + 2;
-	res = MALLOC(len);
+	res = gc_malloc(len);
 	if (!res)
 		return (0);
 	s1 += start;

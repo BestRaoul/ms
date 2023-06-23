@@ -18,7 +18,7 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	char	*res;
 
 	index = 0;
-	res = MALLOC(ft_strlen(s) + 1);
+	res = gc_malloc(ft_strlen(s) + 1);
 	if (!res)
 		return (0);
 	while (index < ft_strlen(s))

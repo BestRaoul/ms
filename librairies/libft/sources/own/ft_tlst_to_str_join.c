@@ -18,7 +18,7 @@ static char	*create_arr(t_list *lst, char sep)
 	int		i;
 	char	*res;
 
-	res = MALLOC(sizeof(*res) * (ft_lstsize(lst) + 1
+	res = gc_malloc(sizeof(*res) * (ft_lstsize(lst) + 1
 				+ ft_max_int(ft_lstsize(lst) - 1, 0)));
 	if (!res)
 		return (NULL);

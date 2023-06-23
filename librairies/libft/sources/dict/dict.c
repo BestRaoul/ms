@@ -16,7 +16,7 @@ t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value)
 {
 	t_dict_int_str_member	*res;
 
-	res = MALLOC(sizeof(*res));
+	res = gc_malloc(sizeof(*res));
 	if (!res)
 		return (NULL);
 	res->key = key;
@@ -33,7 +33,7 @@ void	t_dict_int_str_member_free(t_dict_int_str_member *dict_int_str_member)
 {
 	if (dict_int_str_member->value != NULL)
 	{
-		FREE(dict_int_str_member->value);
+		gc_free(dict_int_str_member->value);
 	}
-	FREE(dict_int_str_member);
+	gc_free(dict_int_str_member);
 }

@@ -10,14 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MALLOC
-# define MALLOC(x) gc_malloc(__FILE__, __LINE__, x)
-#endif
-
-#ifndef FREE
-# define FREE(x) gc_free(__FILE__, __LINE__, x);
-#endif
-
 #ifndef LIBFT_H
 # define LIBFT_H
 
@@ -339,54 +331,55 @@ typedef struct s_dict_int_str_member
 	char	*value;
 }	t_dict_int_str_member;
 
+typedef t_dict_int_str_member	t_dism;
+
 //int	dict_int_str_insert(t_dict_int_str *dict, int key, char *value);
 
 /* creates a t_dict_int_str_member. passed char is copied */
-t_dict_int_str_member	*t_dict_int_str_member_init(int key, char *value);
-void					t_dict_int_str_member_free(t_dict_int_str_member * dict_int_str_member);
+t_dism		*t_dict_int_str_member_init(int key, char *value);
+void		t_dict_int_str_member_free(t_dism *dict_int_str_member);
 
 /* piotr */
-int		ft_printf(const char *format, ...);
-int		ft_dprintf(int _fd, const char *format, ...);
-char	*ft_allocprintf(const char *format, ...);
-char	*ft_yoloprintf(char *str, const char *format, ...);
-double	ft_atod(const char *str);
-int		find_intr(int x, int *r, int size);
-int		get_intr(int (*compare)(int, int), int *r, int size);
-int		count_intr(int (*f)(int), int *r, int size);
-int		countx_intr(int x, int (*compare)(int, int), int *r, int size);
-void	*free_arr(void **arr);
-void	*frees(int count, ...);
-void	*frees2(int count, ...);
-int		ft_size(char **arr);
-int		eq(int x, int y);
-int		less(int x, int y);
-int		less_eq(int x, int y);
-int		more(int x, int y);
-int		more_eq(int x, int y);
+int			ft_printf(const char *format, ...);
+int			ft_dprintf(int _fd, const char *format, ...);
+char		*ft_allocprintf(const char *format, ...);
+char		*ft_yoloprintf(char *str, const char *format, ...);
+double		ft_atod(const char *str);
+int			find_intr(int x, int *r, int size);
+int			get_intr(int (*compare)(int, int), int *r, int size);
+int			count_intr(int (*f)(int), int *r, int size);
+int			countx_intr(int x, int (*compare)(int, int), int *r, int size);
+void		*free_arr(void **arr);
+void		*frees(int count, ...);
+void		*frees2(int count, ...);
+int			ft_size(char **arr);
+int			eq(int x, int y);
+int			less(int x, int y);
+int			less_eq(int x, int y);
+int			more(int x, int y);
+int			more_eq(int x, int y);
 /* finds.c */
-int		in(char c, char *str);
+int			in(char c, char *str);
 
-int 	ft_find(char c, const char *str);
-int		find(char c, char *str);
-int		find_noescape(char c, char *str);
-int		finds_noescape(char *cs, char *str);
-int		findf_noescape(int (*match)(char), char *str);
-int		findf_ne_nq(int (*match)(char), char *s);
-int		finds_ne_nq(char *cs, char *s);
-int		find_ne_nqs(char c, char *s, char *quotes);
-int		findf(int (*f)(char), char *str);
-int		findf_nt(int (*f)(char), char *str);
+int			ft_find(char c, const char *str);
+int			find(char c, char *str);
+int			find_noescape(char c, char *str);
+int			finds_noescape(char *cs, char *str);
+int			findf_noescape(int (*match)(char), char *str);
+int			findf_ne_nq(int (*match)(char), char *s);
+int			finds_ne_nq(char *cs, char *s);
+int			find_ne_nqs(char c, char *s, char *quotes);
+int			findf(int (*f)(char), char *str);
+int			findf_nt(int (*f)(char), char *str);
 
-
-enum GC_ACTION {
-    ADD,
+enum e_gc_action {
+	ADD,
 	REMOVE,
-    FREE_ALL,
+	FREE_ALL,
 };
 
-void	*gc_malloc(const char* fname, int lineno, size_t size);
-void	gc_free(const char* fname, int lineno, void *ptr);
-void    *garbage_collector(int action, void *ptr);
+void		*gc_malloc(size_t size);
+void		gc_free(void *ptr);
+void		*garbage_collector(int action, void *ptr);
 
 #endif

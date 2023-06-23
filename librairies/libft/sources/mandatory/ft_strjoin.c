@@ -18,7 +18,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	unsigned int	len;
 
 	len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	res = MALLOC(len);
+	res = gc_malloc(len);
 	if (!res)
 		return (0);
 	ft_strlcpy(res, s1, len);

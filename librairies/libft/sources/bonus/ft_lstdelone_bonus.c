@@ -18,5 +18,5 @@ void	ft_lstdelone(t_list *node, void (*del)(void*))
 		return ;
 	if (node->content)
 		del(node->content);
-	FREE(node);
+	gc_free(node);
 }

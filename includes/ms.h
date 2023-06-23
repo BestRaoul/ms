@@ -37,9 +37,9 @@ typedef struct s_global {
 	t_list	**redirs;
 }	t_global;
 
-extern t_global	g_;
+typedef t_ast_node	t_an;
 
-typedef t_dict_int_str_member	t_dism;
+extern t_global		g_;
 
 typedef struct s_ast_node {
 	int		type;
@@ -47,7 +47,7 @@ typedef struct s_ast_node {
 	t_list	*children;
 }	t_ast_node;
 
-enum TokenTypes {
+enum e_TokenTypes {
 	LPAREN,
 	RPAREN,
 	PIPE,
@@ -59,11 +59,9 @@ enum TokenTypes {
 	HEREDOC,
 	LITERAL,
 	END,
-
 	NONE,
 	PIPELINELIST,
 	PIPELINE,
-
 	PIPE_IN,
 	PIPE_OUT,
 	PARENTHESIS,
@@ -72,18 +70,19 @@ enum TokenTypes {
 // lexing.c
 t_list	*lex(char *s);
 //lex + unwrap.c
-int find_literal_end(char *s);
-int	insert_token_into_lst(enum TokenTypes type, char *value, t_list **lst, int i);
+int		find_literal_end(char *s);
+int		insert_token_into_lst(enum e_TokenTypes type, char *value,
+			t_list **lst, int i);
 
 //unwraping.c
-t_list  *unwrap(t_list *lexemes);
+t_list	*unwrap(t_list *lexemes);
 //replace_envvar.c
 char	*handle_env(char *s);
 //replace_wildcard.c
 void	add_wildmatches(t_list **lst, char *pattern);
 
 //parsing.c
-t_ast_node	*parse(t_list *lexemes);
+t_an	*parse(t_list *lexemes);
 
 /* execution */
 void	execute(t_ast_node *pipeline_list);
@@ -156,6 +155,6 @@ int		parse_heredoc(t_list *lexeme, t_ast_node *ast);
 int		parse_suffix(t_list *lexeme, t_ast_node *ast);
 //2
 int		is_redir(int t);
-t_ast_node	*add_child(t_ast_node *parent, t_ast_node new);
+t_an	*add_child(t_ast_node *parent, t_ast_node new);
 
 #endif

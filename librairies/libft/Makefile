@@ -168,7 +168,8 @@ SRCS_PIOTR_LIST		:= comparison.c\
 						ft_atod.c\
 						ft_intr.c\
 						ft_size.c\
-						garbage_collection.c
+						garbage_collection.c\
+						garbage_collection2.c
 OBJS_PIOTR_LIST		:= $(patsubst %.c, %.o, $(SRCS_PIOTR_LIST))
 
 INCLUDE_DIR			:= ./includes/

@@ -95,8 +95,7 @@ static int	parse_pipelinelist_internal(t_list **lexme_ptr,
 	{
 		if (init)
 			return (0);
-		return (ft_dprintf(2, EMSG"(5) missing closing `)' token\n"),
-			-1);
+		return (ft_dprintf(2, EMSG"(5) missing closing `)' token\n"), -1);
 	}
 	t = _type(*lexme_ptr);
 	if (t == AND || t == OR)
@@ -119,6 +118,7 @@ static int	parse_pipelinelist_internal(t_list **lexme_ptr,
 static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 {
 	t_ast_node	*pipeline_list;
+	int			x;
 
 	if (init)
 		pipeline_list = ast;
@@ -128,7 +128,9 @@ static int	parse_pipelinelist(t_list **lexme_ptr, t_ast_node *ast, int init)
 		return (ft_dprintf(2, EMSG"(4) missing tokens\n"), -1);
 	while (*lexme_ptr != NULL)
 	{
-		parse_pipelinelist_internal(lexme_ptr, pipeline_list, 0, init);
+		x = parse_pipelinelist_internal(lexme_ptr, pipeline_list, 0, init);
+		if (x == 0 || x == -1)
+			return (x);
 		next(lexme_ptr);
 	}
 	return (0);
@@ -140,7 +142,7 @@ t_ast_node	*parse(t_list *lexemes)
 	t_list		**lexme_ptr;
 	t_list		*lexme;
 
-	ast = MALLOC(sizeof(t_ast_node));
+	ast = gc_malloc(sizeof(t_ast_node));
 	ast->children = NULL;
 	ast->content = NULL;
 	ast->type = PIPELINELIST;

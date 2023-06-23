@@ -18,7 +18,7 @@ t_ast_node	*add_child(t_ast_node *parent, t_ast_node new)
 	t_ast_node	*new_node;
 
 	lst_elem = ft_lstnew(NULL);
-	new_node = MALLOC(sizeof(t_ast_node));
+	new_node = gc_malloc(sizeof(t_ast_node));
 	new_node->type = new.type;
 	new_node->content = new.content;
 	new_node->children = new.children;

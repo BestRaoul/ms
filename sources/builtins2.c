@@ -27,7 +27,7 @@ int	export(char **argv)
 		if (!ft_isalpha(argv[0][0]))
 		{
 			ft_dprintf(2, ERROR_MSG"export: `%s': not a valid identifier\n",
-				*argv++);
+					   (*argv)++);
 			crapped = 1;
 			continue ;
 		}

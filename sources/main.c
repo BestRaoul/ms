@@ -47,11 +47,52 @@ void	print_tlst(t_list *iter)
 	}
 }
 
-void	init_g(void)
+
+static void	handler_c(int sig, siginfo_t *info, void *context)
 {
+	printf("kill: %d.\n", sig);
+	(void) info; (void) context;
+	//g.status 130
+	//close fds
+	main_loop();
+}
+
+static void	handler_slash(int sig, siginfo_t *info, void *context)
+{
+	printf("kill: %d.\n", sig);
+	(void) info; (void) context;
+}
+
+#include <unistd.h>
+#include <signal.h>
+void	init(void)
+{
+	struct sigaction	sa_c;
+	struct sigaction	sa_slash;
+
 	g_.dup_stdin = dup(STDIN_FILENO);
 	g_.dup_stdout = dup(STDOUT_FILENO);
 	g_.env = realloc_strarr_no_gc(environ);
+	
+	sa_c.sa_flags = SA_SIGINFO;
+	sa_c.sa_sigaction = handler_c;
+	sigaction(SIGINT, &sa_c, NULL);
+
+	sa_slash.sa_flags = SA_SIGINFO;
+	sa_slash.sa_sigaction = handler_slash;
+	sigaction(SIGQUIT, &sa_slash, NULL);
+	
+	/*
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = handler_c;
+	sigaction(??, &sa, NULL);
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = handler_d;
+	sigaction(??, &sa, NULL);
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = handler_slash;
+	sigaction(??, &sa, NULL);
+	*/
 }
 
 int	main(void)
@@ -61,7 +102,7 @@ int	main(void)
 	t_list		*unwraps;
 	t_ast_node	*ast;
 
-	init_g();
+	init();
 	while (1)
 	{
 		garbage_collector(FREE_ALL, 0);

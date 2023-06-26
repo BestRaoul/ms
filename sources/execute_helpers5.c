@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 typedef struct s_ped {
 	int	arg_i;

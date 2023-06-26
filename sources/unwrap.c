@@ -93,9 +93,11 @@ t_list	*unwrap(t_list *lexemes)
 	unwraped = NULL;
 	matched = NULL;
 	unwrap_envvars(lexemes);
+	mark_ignored_stars(lexemes);
 	if (unwrap_quotes(lexemes, &unwraped) == NULL)
 		return (NULL);
 	if (unwrap_matches(unwraped, &matched) == NULL)
 		return (NULL);
+	unmark_ignored_stars(matched);
 	return (matched);
 }

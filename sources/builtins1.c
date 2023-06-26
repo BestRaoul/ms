@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 int	is_builtin(char *cmd)
 {
@@ -38,6 +38,8 @@ char	**fake_cd_argv(char *pth)
 
 int	exec_builtin(char *cmd, char **argv)
 {
+	if (g_.is_sig)
+		return (1);
 	if (ft_strequal(cmd, "echo"))
 		return (echo(argv));
 	if (ft_strequal(cmd, "cd"))

@@ -27,14 +27,21 @@
 # include <dirent.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <signal.h>
+# include <sys/termios.h>
+# include <termios.h>
+
+# define ECHOCTL  	0x00000040
 
 typedef struct s_global {
-	char	**env;
-	int		status;
-	int		dup_stdin;
-	int		dup_stdout;
-	int		print_ast;
-	t_list	**redirs;
+	char			**env;
+	int				status;
+	int				dup_stdin;
+	int				dup_stdout;
+	int				print_ast;
+	t_list			**redirs;
+	int				is_sig;
+	struct termios	orig_termios;
 }	t_global;
 
 typedef struct s_ast_node {
@@ -76,6 +83,9 @@ int		insert_token_into_lst(enum e_TokenTypes type, char *value,
 
 //unwraping.c
 t_list	*unwrap(t_list *lexemes);
+void	unmark_ignored_stars(t_list *iter);
+void	mark_ignored_stars(t_list *iter);
+
 //replace_envvar.c
 char	*handle_env(char *s);
 //replace_wildcard.c
@@ -126,6 +136,10 @@ char	**realloc_strarr_no_gc(char **strarr);
 
 //print_ast.c
 void	print_ast(t_ast_node *ast, int depth);
+
+/* sighandlers */
+void	handler_c(int sig, siginfo_t *info, void *context);
+void	handler_slash(int sig, siginfo_t *info, void *context);
 
 //helpers --------------------------------------------
 
@@ -188,5 +202,7 @@ int		count_child_pipes(t_ast_node *ast);
 int		heredoc_handler(char *delimiter);
 void	populate_execution_data(char ***argvs,
 			t_parenthesis *parens, t_ast_node *pipeline);
+
+void	main_loop(void);
 
 #endif

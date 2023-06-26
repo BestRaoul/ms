@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 //CDO: optimise to replace KEY by VAL
 int	export(char **argv)
@@ -83,7 +83,10 @@ void	exit_builtin(char **argv)
 	if (!argv || !argv[1])
 		n = g_.status;
 	else if (!ft_str_is_int(argv[1]))
-		n = 2;
+	{
+		ft_dprintf(2, "ms: exit: %s: numeric argument required\n", argv[1]);
+		n = 255;
+	}
 	else
 		n = ft_atoi(argv[1]);
 	close_and_free_all();

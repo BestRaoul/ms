@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 static char	*_type_2_str(int t)
 {

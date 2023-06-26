@@ -12,10 +12,14 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 void	set_g_status(int err)
 {
+	if (g_.is_sig == 2)
+		err = 131;
+	if (g_.is_sig == 1)
+		err = 130;
 	if (WIFEXITED(err))
 		g_.status = WEXITSTATUS(err);
 	else
@@ -70,6 +74,7 @@ void	close_and_free_all(void)
 	close(g_.dup_stdout);
 	reown(g_.env);
 	garbage_collector(FREE_ALL, 0);
+	tcsetattr(STDIN_FILENO, TCSANOW, &g_.orig_termios);
 }
 
 void	crash(void)

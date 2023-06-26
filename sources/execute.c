@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 //ENS
 //exit point -> never returns
@@ -28,7 +28,7 @@ void	execute_command(char **argv, t_list *_r, pid_t p_pid, t_parenthesis ps)
 		exit(errno);
 	close_all_pipes(_r, 1);
 	pll = (t_ast_node){PIPELINELIST, NULL, ps.children};
-	if (ps.type == PARENTHESIS)
+	if (!g_.is_sig && ps.type == PARENTHESIS)
 		(execute(&pll), close_and_free_all(), exit(g_.status));
 	else if (is_builtin(argv[0]))
 	{
@@ -38,9 +38,10 @@ void	execute_command(char **argv, t_list *_r, pid_t p_pid, t_parenthesis ps)
 	my_argv = realloc_strarr_no_gc(argv);
 	(garbage_collector(FREE_ALL, 0), close(g_.dup_stdin), close(g_.dup_stdout));
 	pathname = ft_getpath(my_argv[0], g_.env);
-	if (pathname != NULL)
+	if (!g_.is_sig && pathname != NULL)
 		execve(pathname, my_argv, g_.env);
-	ft_dprintf(2, "%s: command not found\n", my_argv[0]);
+	if (!g_.is_sig)
+		ft_dprintf(2, "%s: command not found\n", my_argv[0]);
 	(reown(my_argv), close_and_free_all(), exit(127));
 }
 
@@ -76,6 +77,7 @@ int	do_solo_exec_builtin(char **argv)
 	if (consume_redirs(g_.redirs[0]) == -1)
 		return (errno);
 	status = exec_builtin(argv[0], argv);
+	close_all_pipes(NULL, 1);
 	if (dup2(g_.dup_stdin, STDIN_FILENO) == -1
 		|| dup2(g_.dup_stdin, STDOUT_FILENO) == -1)
 		crash();

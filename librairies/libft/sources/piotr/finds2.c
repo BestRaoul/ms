@@ -63,11 +63,16 @@ int	finds_ne_nq(char *cs, char *s)
 int	find_ne_nqs(char c, char *s, char *quotes)
 {
 	int		i;
+	int		dq_toggle;
 
 	i = 0;
+	dq_toggle = 0;
 	while (s[i])
 	{
-		if (in(s[i], quotes))
+		if (s[i] == '\"')
+			if (i == 0 || s[i - 1] != '\\')
+				dq_toggle = !dq_toggle;
+		if (!dq_toggle && in(s[i], quotes))
 		{
 			i += find_noescape(s[i], &(s[i + 1])) + 1;
 			if (i == len(s))

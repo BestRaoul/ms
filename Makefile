@@ -4,9 +4,13 @@ UNAME_S					:= $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
   LINUX_INCLUDES		:= -I/usr/include
+  MACOS_INCLUDES		:=
+  MACOS_LIBS			:=
   OS_FLAG				:= -D LINUX
 else
   LINUX_INCLUDES		:=
+  MACOS_INCLUDES		:= -I /Users/jwikiera/Applications/homebrew/opt/readline/include
+  MACOS_LIBS			:= -L /Users/jwikiera/Applications/homebrew/opt/readline/lib
   OS_FLAG				:= -D OSX
 endif
 
@@ -37,7 +41,7 @@ else
 endif
 
 CC						:= gcc
-CFLAGS					:= -g -Wall -Wextra -Werror -isystem -D_XOPEN_SOURCE=700 $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
+CFLAGS					:= -g -Wall -Wextra -Werror -D_XOPEN_SOURCE=700 $(OPTFLAG) $(DEVFLAGS) $(OS_FLAG)
 RM						:= rm -f
 
 LIB_DIRECTORY			:= ./librairies/
@@ -53,8 +57,8 @@ LIBPRINTF_HEADERS		:= $(LIBPRINTF_DIRECTORY)includes/
 INCLUDE_DIR				:= ./includes/
 
 # lm: default math lib
-LIBRARIES				:= -lreadline -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINTF_DIRECTORY) $(FRAMEWORK) $(LINUX_LIBS)
-INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES)
+LIBRARIES				:= -lreadline -lftprintf -lft -L. -L$(LIBFT_DIRECTORY) -L$(LIBPRINTF_DIRECTORY) $(FRAMEWORK) $(LINUX_LIBS) $(MACOS_LIBS)
+INCLUDES				:= -I$(LIBFT_HEADERS) -I$(LIBPRINTF_HEADERS) -I$(INCLUDE_DIR) $(LINUX_INCLUDES) $(MACOS_INCLUDES)
 
 SOURCES_DIRECTORY		:= ./sources/
 SOURCES_LIST			:=	main.c\
@@ -64,6 +68,7 @@ SOURCES_LIST			:=	main.c\
 							lex_helpers.c\
 							unwrap.c\
 							unwrap_helpers.c\
+							unwrap_helpers2.c\
 							env_handler.c\
 							envvar_helpers.c\
 							envvar.c\
@@ -80,7 +85,8 @@ SOURCES_LIST			:=	main.c\
 							execute_helpers2.c\
 							execute_helpers3.c\
 							execute_helpers4.c\
-							execute_helpers5.c
+							execute_helpers5.c\
+							sig_handlers.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))
@@ -140,7 +146,7 @@ fclean: clean
 re: fclean all
 
 norm:
-	norminette includes/*.h sources/*.c librairies/libft/sources/ librairies/ft_printf/
+	norminette includes sources librairies
 
 funcs: $(NAME)
 	@echo "Functions used in $(NAME):"

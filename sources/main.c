@@ -16,7 +16,7 @@
 
 extern char	**environ;
 
-t_global	g_ = {NULL, 0, 0, 0, 0, NULL};
+t_global	g_ = {NULL, 0, 0, 0, 0, NULL, 0, (struct termios){0}};
 
 static char	*get_input(void)
 {
@@ -27,8 +27,14 @@ static char	*get_input(void)
 	color = BBLUE;
 	if (g_.status)
 		color = BRED;
-	ft_yoloprintf(question, "%s➜  %s", color, RESET);
+	if (g_.status != 0)
+		ft_yoloprintf(question, "(%s%d%s)%s➜  %s",
+			BRED, g_.status, RESET, color, RESET);
+	else
+		ft_yoloprintf(question, "%s➜  %s", color, RESET);
+	g_.is_sig = -1;
 	input = readline(question);
+	g_.is_sig = 0;
 	if (input == NULL)
 		exit_builtin(NULL);
 	garbage_collector(ADD, input);
@@ -47,52 +53,31 @@ void	print_tlst(t_list *iter)
 	}
 }
 
-
-static void	handler_c(int sig, siginfo_t *info, void *context)
-{
-	printf("kill: %d.\n", sig);
-	(void) info; (void) context;
-	//g.status 130
-	//close fds
-	main_loop();
-}
-
-static void	handler_slash(int sig, siginfo_t *info, void *context)
-{
-	printf("kill: %d.\n", sig);
-	(void) info; (void) context;
-}
-
-#include <unistd.h>
-#include <signal.h>
 void	init(void)
 {
 	struct sigaction	sa_c;
 	struct sigaction	sa_slash;
+	struct termios		new_termios;
 
 	g_.dup_stdin = dup(STDIN_FILENO);
 	g_.dup_stdout = dup(STDOUT_FILENO);
 	g_.env = realloc_strarr_no_gc(environ);
-	
 	sa_c.sa_flags = SA_SIGINFO;
 	sa_c.sa_sigaction = handler_c;
-	sigaction(SIGINT, &sa_c, NULL);
-
+	sa_c.sa_mask = 0;
+	if (sigaction(SIGINT, &sa_c, NULL) == -1)
+		crash();
 	sa_slash.sa_flags = SA_SIGINFO;
 	sa_slash.sa_sigaction = handler_slash;
-	sigaction(SIGQUIT, &sa_slash, NULL);
-	
-	/*
-	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = handler_c;
-	sigaction(??, &sa, NULL);
-	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = handler_d;
-	sigaction(??, &sa, NULL);
-	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = handler_slash;
-	sigaction(??, &sa, NULL);
-	*/
+	sa_slash.sa_mask = 0;
+	if (sigaction(SIGQUIT, &sa_slash, NULL) == -1)
+		crash();
+	if (tcgetattr(STDIN_FILENO, &g_.orig_termios) == -1)
+		crash();
+	new_termios = g_.orig_termios;
+	new_termios.c_lflag &= ~ECHOCTL;
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &new_termios) == -1)
+		crash();
 }
 
 int	main(void)
@@ -117,9 +102,5 @@ int	main(void)
 		if (ast == NULL)
 			continue ;
 		execute(ast);
-		if (g_.status != 0)
-			ft_dprintf(2, "(%s%d%s) ", BRED, g_.status, RESET);
 	}
-	close_and_free_all();
-	return (0);
 }

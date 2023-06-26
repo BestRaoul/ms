@@ -13,7 +13,7 @@
 #include "ms.h"
 
 #define DEBUG_AST 0
-#define EMSG "TODO:ast parser: "
+#define EMSG "ms: ast parser: "
 
 //for self reference
 static int	parse_pipelinelist(t_list **lexeme_ptr, t_ast_node *ast, int init);

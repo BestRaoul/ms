@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 //ENS
 t_ast_node	*get_child(t_ast_node	*node, int i)

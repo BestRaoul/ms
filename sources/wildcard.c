@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: wildcard: "
+#define ERROR_MSG "ms: wildcard: "
 
 //returns count of matches added
 int	add_wildmatches_in_dir(char *dirname, t_list **lst, char *pattern)

@@ -12,7 +12,7 @@
 
 #include "ms.h"
 
-#define ERROR_MSG "TODO: "
+#define ERROR_MSG "ms: "
 
 static void	elegant_error_consumption(char *s)
 {
@@ -77,6 +77,9 @@ static int	consume_redirs_secondpass(t_list *redirs, int in_i, int out_i)
 	return (0);
 }
 
+#define RR 0x601
+#define AP 0x209
+
 static int	consume_redirs_thirdpass(t_list *redirs, int in_i, int out_i)
 {
 	t_redir	*r;
@@ -94,8 +97,8 @@ static int	consume_redirs_thirdpass(t_list *redirs, int in_i, int out_i)
 					|| r->type == APPEND || r->type == PIPE_OUT);
 			to = ft_atoi(r->val);
 			if (r->type == REDIR_L || r->type == REDIR_R || r->type == APPEND)
-				to = open(r->val, 01101 * (r->type == REDIR_R)
-						+ 02101 * (r->type == APPEND), (unsigned int)00664);
+				to = open(r->val, RR * (r->type == REDIR_R)
+						+ AP * (r->type == APPEND), (unsigned int)00664);
 			if (to == -1)
 				return (elegant_error_consumption(r->val), -1);
 			if (dup2(to, from) == -1 || close(to) == -1)

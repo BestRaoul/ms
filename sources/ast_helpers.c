@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "ms.h"
-#define ERROR_MSG "TODO: parser: "
+#define ERROR_MSG "ms: parser: "
 
 static int	peek_type(t_list *lexeme)
 {

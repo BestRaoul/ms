@@ -14,32 +14,6 @@
 
 #define EMSG "ms: "
 
-char	*list_2_str(t_list *lst)
-{
-	int		total_len;
-	t_list	*i;
-	char	*str;
-	int		j;
-
-	total_len = 0;
-	i = lst;
-	while (i)
-	{
-		total_len += len(lst->content);
-		i = i->next;
-	}
-	str = gc_malloc(total_len + 1);
-	j = 0;
-	i = lst;
-	while (i)
-	{
-		ft_strlcpy(&(str[j]), i->content, len(i->content) + 1);
-		j += len(i->content);
-		i = i->next;
-	}
-	return (str);
-}
-
 //reuses the litst's CONTENT pointers, and sets them NULL
 //so no need to free them
 char	**list_2_strr(t_list *lst)
@@ -115,6 +89,6 @@ int	add_string(t_list **lst, char *s)
 			return (-1);
 		s += move;
 	}
-	insert_token_into_lst(LITERAL, list_2_str(strs), lst, 0);
+	insert_token_into_lst(LITERAL, ft_str_tlst_to_str(strs), lst, 0);
 	return (s - start);
 }

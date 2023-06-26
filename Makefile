@@ -86,7 +86,8 @@ SOURCES_LIST			:=	main.c\
 							execute_helpers3.c\
 							execute_helpers4.c\
 							execute_helpers5.c\
-							sig_handlers.c
+							sig_handlers.c\
+							path.c
 
 HEADER_LIST				:= ms.h
 HEADER_FILES			:= $(addprefix $(INCLUDE_DIR), $(HEADER_LIST))

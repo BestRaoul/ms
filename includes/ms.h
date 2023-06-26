@@ -88,6 +88,7 @@ void	mark_ignored_stars(t_list *iter);
 
 //replace_envvar.c
 char	*handle_env(char *s);
+int		export_valid(char *s);
 //replace_wildcard.c
 void	add_wildmatches(t_list **lst, char *pattern);
 
@@ -116,6 +117,7 @@ void	print_env(void);
 int		add_var_to_env(char *key, char *value);
 int		remove_var_from_env(char *key);
 int		find_in_env(char *key);
+char	*where_bin(char *binname);
 
 //replace_envvar_helpers.c
 int		is_aznum(char c);

@@ -45,7 +45,8 @@ SRCS_MANDATORY_LIST	:= ft_isalpha.c\
 						ft_putchar_fd.c\
 						ft_putstr_fd.c\
 						ft_putendl_fd.c\
-						ft_putnbr_fd.c
+						ft_putnbr_fd.c\
+						ft_strarr_append_str.c
 OBJS_MANDATORY_LIST	:= $(patsubst %.c, %.o, $(SOURCES_MANDATORY_LIST))
 OBJS_MANDATORY		:= $(addprefix $(OBJECTS_DIRECTORY), $(OBJS_MANDATORY_LIST))
 

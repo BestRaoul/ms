@@ -37,7 +37,7 @@ void	execute_command(char **argv, t_list *_r, pid_t p_pid, t_parenthesis ps)
 	}
 	my_argv = realloc_strarr_no_gc(argv);
 	(garbage_collector(FREE_ALL, 0), close(g_.dup_stdin), close(g_.dup_stdout));
-	pathname = ft_getpath(my_argv[0], g_.env);
+	pathname = where_bin(my_argv[0]);
 	if (!g_.is_sig && pathname != NULL)
 		execve(pathname, my_argv, g_.env);
 	if (!g_.is_sig)

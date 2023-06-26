@@ -61,6 +61,7 @@ char	*handle_env(char *literal)
 	int		j;
 	int		x;
 	int		cond_res;
+	char	*temp;
 
 	out = ft_calloc((2 + 2 * count('$', literal)), sizeof(char *));
 	j = 0;
@@ -76,7 +77,8 @@ char	*handle_env(char *literal)
 		if (cond_res == 2)
 			continue ;
 		literal++;
-		out[j] = handle_var(_scan2(&(literal), is_aznum));
+		temp = _scan2(&literal, is_aznum);
+		out[j] = handle_var(temp);
 		j++;
 	}
 	return (ret(out, j));

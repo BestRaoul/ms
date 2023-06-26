@@ -19,7 +19,8 @@ int	key_match(char *key, char *entry)
 	eq_i = ft_find('=', entry);
 	if (eq_i == -1)
 		return (-1);
-	return (ft_strncmp(key, entry, eq_i) == 0);
+	return (ft_strncmp(key, entry, len(key)) == 0
+		&& ft_strncmp(key, entry, eq_i) == 0);
 }
 
 //-1 if not found
@@ -44,6 +45,8 @@ int	add_var_to_env(char *key, char *value)
 	char	**old;
 	int		i;
 
+	if (find_in_env(key) != -1)
+		remove_var_from_env(key);
 	old = g_.env;
 	g_.env = ft_calloc(strarr_count(old) + 1 + 1, sizeof(char *));
 	garbage_collector(REMOVE, g_.env);

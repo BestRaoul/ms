@@ -12,6 +12,25 @@
 
 #include "ms.h"
 
+int	export_valid(char *s)
+{
+	if (len(s) == 0)
+		return (0);
+	if (ft_str_startswith(s, "="))
+		return (0);
+	if (ft_isdigit(*s))
+		return (0);
+	while (*s)
+	{
+		if (*s == '=')
+			return (1);
+		if (!ft_isalnum(*s))
+			return (0);
+		s++;
+	}
+	return (1);
+}
+
 int	is_aznum(char c)
 {
 	return (in(c, "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST")

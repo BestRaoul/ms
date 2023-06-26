@@ -22,13 +22,15 @@ int	export(char **argv)
 	int		split;
 
 	crapped = 0;
-	while (*++argv)
+	argv++;
+	while (*argv)
 	{
-		if (!ft_isalpha(argv[0][0]))
+		if (!export_valid(*argv))
 		{
 			ft_dprintf(2, ERROR_MSG"export: `%s': not a valid identifier\n",
 				*argv);
 			crapped = 1;
+			argv++;
 			continue ;
 		}
 		if (!in('=', *argv) && argv++)
@@ -36,9 +38,8 @@ int	export(char **argv)
 		split = find('=', *argv);
 		(*argv)[split] = '\0';
 		key = &((*argv)[0]);
-		if (find_in_env(key) != -1)
-			remove_var_from_env(key);
 		add_var_to_env(key, &((*argv)[split + 1]));
+		argv++;
 	}
 	return (crapped);
 }

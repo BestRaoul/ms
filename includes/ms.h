@@ -6,7 +6,7 @@
 /*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 12:42:32 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/20 12:42:36 by jwikiera         ###   ########.fr       */
+/*   Updated: 2023/06/29 15:48:24 by jwikiera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,16 @@
 # include <sys/wait.h>
 # include <sys/types.h>
 # include <signal.h>
-# include <sys/termios.h>
+# ifndef __ANDROID__
+#  include <sys/termios.h>
+# else
+#  include <termios.h>
+# endif
 # include <termios.h>
 
-# define ECHOCTL  	0x00000040
+# ifndef __ANDROID__
+#  define ECHOCTL  	0x00000040
+# endif
 
 typedef struct s_global {
 	char			**env;

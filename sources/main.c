@@ -6,7 +6,7 @@
 /*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 12:42:32 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/20 12:42:36 by jwikiera         ###   ########.fr       */
+/*   Updated: 2023/06/29 15:50:08 by jwikiera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ static char	*get_input(void)
 			BRED, g_.status, RESET, color, RESET);
 	else
 		ft_yoloprintf(question, "%s➜  %s", color, RESET);
-	g_.is_sig = -1;
+	g_.is_sig = (sigset_t)-1;
 	input = readline(question);
-	g_.is_sig = 0;
+	g_.is_sig = (sigset_t)0;
 	if (input == NULL)
 		exit_builtin(NULL);
 	garbage_collector(ADD, input);

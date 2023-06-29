@@ -6,7 +6,7 @@
 /*   By: jwikiera <jwikiera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/11 12:50:27 by jwikiera          #+#    #+#             */
-/*   Updated: 2022/10/11 16:19:21 by jwikiera         ###   ########.fr       */
+/*   Updated: 2023/06/29 15:38:52 by jwikiera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,6 @@ static int	is_bin_in_dir(char *dirname, char *binname)
 	}
 	closedir(d);
 	return (0);
-}
-
-static int	find_from_behind(char c, char *s, int start)
-{
-	while (start >= 0)
-	{
-		if (s[start] == c)
-			return (start);
-		start--;
-	}
-	return (-1);
 }
 
 static char	*strarrlast(char **strarr)

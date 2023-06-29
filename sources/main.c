@@ -6,7 +6,7 @@
 /*   By: jwikiera <jwikiera@student.42lausan>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 12:42:32 by jwikiera          #+#    #+#             */
-/*   Updated: 2023/06/29 15:50:08 by jwikiera         ###   ########.fr       */
+/*   Updated: 2023/06/29 15:55:54 by jwikiera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ static char	*get_input(void)
 			BRED, g_.status, RESET, color, RESET);
 	else
 		ft_yoloprintf(question, "%s➜  %s", color, RESET);
-	g_.is_sig = (sigset_t)-1;
+	g_.is_sig = -1;
 	input = readline(question);
-	g_.is_sig = (sigset_t)0;
+	g_.is_sig = 0;
 	if (input == NULL)
 		exit_builtin(NULL);
 	garbage_collector(ADD, input);
@@ -64,12 +64,12 @@ void	init(void)
 	g_.env = realloc_strarr_no_gc(environ);
 	sa_c.sa_flags = SA_SIGINFO;
 	sa_c.sa_sigaction = handler_c;
-	sa_c.sa_mask = 0;
+	sigemptyset(&sa_c.sa_mask);
 	if (sigaction(SIGINT, &sa_c, NULL) == -1)
 		crash();
 	sa_slash.sa_flags = SA_SIGINFO;
 	sa_slash.sa_sigaction = handler_slash;
-	sa_slash.sa_mask = 0;
+	sigemptyset(&sa_slash.sa_mask);
 	if (sigaction(SIGQUIT, &sa_slash, NULL) == -1)
 		crash();
 	if (tcgetattr(STDIN_FILENO, &g_.orig_termios) == -1)

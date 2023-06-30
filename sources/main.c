@@ -24,6 +24,7 @@ static char	*get_input(void)
 	char	*input;
 	char	*color;
 
+	rl_replace_line("", 0);
 	color = BBLUE;
 	if (g_.status)
 		color = BRED;
@@ -64,12 +65,12 @@ void	init(void)
 	g_.env = realloc_strarr_no_gc(environ);
 	sa_c.sa_flags = SA_SIGINFO;
 	sa_c.sa_sigaction = handler_c;
-	sigemptyset(&sa_c.sa_mask);
+	sa_c.sa_mask = 0;
 	if (sigaction(SIGINT, &sa_c, NULL) == -1)
 		crash();
 	sa_slash.sa_flags = SA_SIGINFO;
 	sa_slash.sa_sigaction = handler_slash;
-	sigemptyset(&sa_slash.sa_mask);
+	sa_slash.sa_mask = 0;
 	if (sigaction(SIGQUIT, &sa_slash, NULL) == -1)
 		crash();
 	if (tcgetattr(STDIN_FILENO, &g_.orig_termios) == -1)

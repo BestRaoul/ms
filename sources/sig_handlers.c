@@ -19,8 +19,8 @@ void	handler_c(int sig, siginfo_t *info, void *context)
 	(void) sig;
 	if (g_.is_sig == -1)
 	{
-		write(1, "\n", 1);
-		rl_replace_line("", 1);
+		write(2, "\n", 1);
+		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
 	}

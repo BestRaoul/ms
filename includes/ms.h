@@ -212,5 +212,6 @@ void	populate_execution_data(char ***argvs,
 			t_parenthesis *parens, t_ast_node *pipeline);
 
 void	main_loop(void);
+void	disown_pathname_and_free_all(char *pathname);
 
 #endif

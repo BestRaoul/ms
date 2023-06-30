@@ -108,3 +108,10 @@ int	heredoc_handler(char *delimiter)
 		crash();
 	return (_pipe[0]);
 }
+
+void	disown_pathname_and_free_all(char *pathname)
+{
+	if (pathname != NULL)
+		garbage_collector(REMOVE, pathname);
+	(garbage_collector(FREE_ALL, 0), close(g_.dup_stdin), close(g_.dup_stdout));
+}

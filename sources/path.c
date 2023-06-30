@@ -55,12 +55,12 @@ char	*where_bin(char *binname)
 		strarr++;
 	}
 	spltres = ft_split(binname, '/');
-	if (!strarrlast(spltres))
+	if (strarrlast(spltres) == NULL)
 		return (NULL);
 	_b = strarrlast(spltres);
 	spltres[ft_strarrlen(spltres) - 1] = NULL;
-	_p = join(spltres, "/");
+	_p = ft_strarr_to_str(spltres, '/');
 	if (is_bin_in_dir(_p, _b))
-		return (ft_joinpaths(_p, _b));
+		return (ft_joinpaths(_p, _b, NULL));
 	return (NULL);
 }

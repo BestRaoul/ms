@@ -24,7 +24,6 @@ static char	*get_input(void)
 	char	*input;
 	char	*color;
 
-	rl_replace_line("", 0);
 	color = BBLUE;
 	if (g_.status)
 		color = BRED;
@@ -34,6 +33,8 @@ static char	*get_input(void)
 	else
 		ft_yoloprintf(question, "%s➜  %s", color, RESET);
 	g_.is_sig = -1;
+	rl_on_new_line();
+	rl_replace_line("", 0);
 	input = readline(question);
 	g_.is_sig = 0;
 	if (input == NULL)
@@ -54,11 +55,22 @@ void	print_tlst(t_list *iter)
 	}
 }
 
+void	reset_settings_termios(void)
+{
+	struct termios		new_termios;
+
+	if (tcgetattr(STDIN_FILENO, &g_.orig_termios) == -1)
+		crash();
+	new_termios = g_.orig_termios;
+	new_termios.c_lflag &= ~ECHOCTL;
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &new_termios) == -1)
+		crash();
+}
+
 void	init(void)
 {
 	struct sigaction	sa_c;
 	struct sigaction	sa_slash;
-	struct termios		new_termios;
 
 	g_.dup_stdin = dup(STDIN_FILENO);
 	g_.dup_stdout = dup(STDOUT_FILENO);
@@ -73,12 +85,7 @@ void	init(void)
 	sa_slash.sa_mask = 0;
 	if (sigaction(SIGQUIT, &sa_slash, NULL) == -1)
 		crash();
-	if (tcgetattr(STDIN_FILENO, &g_.orig_termios) == -1)
-		crash();
-	new_termios = g_.orig_termios;
-	new_termios.c_lflag &= ~ECHOCTL;
-	if (tcsetattr(STDIN_FILENO, TCSANOW, &new_termios) == -1)
-		crash();
+	reset_settings_termios();
 }
 
 int	main(void)
@@ -91,6 +98,7 @@ int	main(void)
 	init();
 	while (1)
 	{
+		reset_settings_termios();
 		garbage_collector(FREE_ALL, 0);
 		input = get_input();
 		if (*input == 0)

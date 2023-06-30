@@ -33,34 +33,42 @@ static int	is_bin_in_dir(char *dirname, char *binname)
 	return (0);
 }
 
-static char	*strarrlast(char **strarr)
+/*static char	*strarrlast(char **strarr)
 {
 	if (strarr == NULL || ft_strarrlen(strarr) == 0)
 		return (NULL);
 	return (strarr[ft_strarrlen(strarr) - 1]);
-}
+}*/
 
 char	*where_bin(char *binname)
 {
 	char	**strarr;
-	char	**spltres;
-	char	*_b;
-	char	*_p;
 
 	strarr = ft_environ_to_path_strarr(g_.env);
-	while (*strarr)
+	while (strarr && *strarr)
 	{
 		if (is_bin_in_dir(*strarr, binname))
 			return (ft_joinpaths(*strarr, binname, NULL));
 		strarr++;
 	}
+	if (access(binname, X_OK))
+		return (NULL);
+	return (ft_strdup(binname));
+}
+
+/*
+ * char	**spltres;
+	char	*_b;
+	char	*_p;
 	spltres = ft_split(binname, '/');
 	if (strarrlast(spltres) == NULL)
 		return (NULL);
 	_b = strarrlast(spltres);
 	spltres[ft_strarrlen(spltres) - 1] = NULL;
 	_p = ft_strarr_to_str(spltres, '/');
+	if (ft_str_startswith(binname, "/"))
+		_p = ft_strjoin("/", _p);
+	dprintf(2, ".p .b, .%s. .%s.\n", _p, _b);
 	if (is_bin_in_dir(_p, _b))
 		return (ft_joinpaths(_p, _b, NULL));
-	return (NULL);
-}
+ */
